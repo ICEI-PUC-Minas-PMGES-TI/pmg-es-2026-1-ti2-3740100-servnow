@@ -1,25 +1,23 @@
-# TITULO DO PROJETO
+# ServNow
 
 
-**Nome completo do Aluno 1, email do aluno 1**
+**Lucas Vinícius de Oliveira Siqueira, 1579483@sga.pucminas.br**
 
-**Nome completo do Aluno 2, email do aluno 2**
+**Fábio Garcia Martins, 676102@sga.pucminas.br**
 
-**Nome completo do Aluno 3, email do aluno 3**
+**Gabriel Henrique Fernandes Vieira, 1564418@sga.pucminas.br**
 
-**Nome completo do Aluno 4, email do aluno 4**
+**Lucas Silva Borges, 1598846@sga.pucminas.br**
 
-**Nome completo do Aluno 5, email do aluno 5**
-
-**Nome completo do Aluno 6, email do aluno 6**
+**Marco Túlio Sales de Deus, Marco Túlio Sales de Deus**
 
 ---
 
 Professores:
 
-** Prof. Nome do Prof 1 **
+** ProfLucca Soares de Paiva Lacerda 
 
-** Prof. Nome do Prof 2 **
+** Michelle Hanne Soares de Andrade **
 
 ** Prof. Nome do Prof 3 **
 
@@ -39,35 +37,95 @@ mostrar algum resultado relevante do trabalho (até 10 linhas)._
 
 ## 1. Introdução
 
-_Apresente uma frase introdutória definindo o que será apresentado._
+_Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização._
 
 ### 1.1 Contextualização
 
-_Na **contextualização**, o aluno deve dizer do que se trata o trabalho, em que área ou contexto se insere.
-A **contextualização** deve ser desenvolvida de algo mais genérico para algo mais específico. 
-A citação de pesquisas quantitativas é bem aceita aqui (corretamente referenciadas)._
+_Com o avanço da tecnologia e a popularização de aplicativos de serviços sob demanda, 
+como Uber, tornou-se comum a mediação digital entre prestadores de serviços e clientes. 
+Plataformas digitais passaram a facilitar o acesso a diferentes tipos de serviços, tornando os 
+processos mais rápidos, organizados e seguros. 
+Entretanto, muitos serviços do cotidiano — como pequenos reparos residenciais, serviços 
+hidráulicos, desentupimento, troca de chuveiro, montagem de móveis e manutenção elétrica 
+básica — ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
+de indicações de conhecidos, grupos em redes sociais ou contatos diretos por aplicativos de 
+mensagens. 
+
+Esse modelo de contratação pode gerar diversos problemas, como dificuldade em 
+encontrar profissionais confiáveis, falta de padronização de preços, ausência de avaliações sobre 
+o prestador e insegurança ao permitir a entrada de um profissional desconhecido em casa. Além 
+disso, a comunicação e o agendamento costumam ocorrer de forma manual, o que pode gerar 
+atrasos e desencontros. 
+Diante desse cenário, surge a necessidade de um sistema digital que conecte clientes a 
+profissionais de manutenção residencial de forma prática, segura e organizada. A proposta do 
+projeto é desenvolver uma plataforma que permita solicitar serviços de forma rápida, além de 
+avaliar o prestador após a conclusão do serviço._
 
 ### 1.2 Problema
 
-_Em seguida o aluno deve caminhar a contextualização para descrever o **problema** que o trabalho trata. 
-O **problema** pode ser algo vivido em uma empresa específica. Neste caso, o aluno deve rapidamente apresentar 
-o cenário de problema da empresa. A empresa só deve ser citada explicitamente se o aluno tiver autorização 
-para tal._
+_Atualmente, a contratação de profissionais para serviços domésticos apresenta diversos desafios: 
+
+• Dificuldade em encontrar profissionais confiáveis e disponíveis 
+rapidamente. 
+
+• Falta de transparência quanto a preços e prazos. 
+
+• Ausência de histórico, avaliações e reputação dos prestadores. 
+
+• Processos manuais de contato (telefone, mensagens ou indicações), que 
+tornam a experiência do cliente pouco prática. 
+
+• Insegurança do cliente ao permitir a entrada de profissionais desconhecidos 
+em sua residência. 
+
+Esses fatores impactam negativamente a experiência do usuário e dificultam a 
+profissionalização do setor de prestação de serviços residenciais._
 
 ### 1.3 Objetivo geral
 
-_O aluno deve escrever um pequeno parágrafo ou frase com o **objetivo geral** do trabalho. 
-O objetivo deve ser bem direto, específico e definido com verbos de ação (elaborar, propor, avaliar, comparar, desenvolver, etc.). No caso específico deste projeto, o objetivo deste trabalho é desenvolver um sistema para automação de processos para um problema específico._
+_Desenvolver um sistema digital de intermediação de serviços residenciais sob demanda, 
+conectando clientes a prestadores de serviços como eletricistas, encanadores e profissionais de 
+manutenção, proporcionando mais praticidade, segurança e organização no processo de 
+solicitação e execução dos serviços._
 
 #### 1.3.1 Objetivos específicos
 
-_Apresente também alguns (pelo menos 4) **objetivos específicos** dependendo de onde você vai querer 
-concentrar sua prática investigativa, ou como você irá aprofundar seu trabalho._
+_• Desenvolver uma plataforma digital para cadastro de clientes e prestadores 
+de serviços. 
+
+• Permitir que o cliente solicite serviços informando descrição do problema, 
+local e disponibilidade de horário.
+
+• Implementar sistema de geolocalização para localizar prestadores 
+próximos ao cliente. 
+
+• Exibir preço médio ou estimado do serviço, aumentando a transparência de 
+valores. 
+
+• Criar um sistema de avaliações e feedback, permitindo que clientes e 
+prestadores avaliem a experiência do serviço. 
+
+• Permitir que o prestador aceite ou recuse solicitações de serviço.
+
+• Implementar mecanismos de segurança, como verificação da identidade do 
+prestador por código de confirmação ou reconhecimento facial quando o profissional 
+chegar ao local._
 
 ### 1.4 Justificativas
 
-_Mostre também as **justificativas** para o 
-desenvolvimento do seu trabalho e, caso deseje, destaque alguma contribuição do trabalho._
+_A criação de um sistema de prestação de serviços residenciais sob demanda se justifica 
+pela necessidade de modernizar e organizar um mercado ainda bastante informal. 
+
+Para os clientes, o sistema oferece mais praticidade, rapidez, segurança e previsibilidade 
+de custos, além da possibilidade de escolher profissionais com base em avaliações reais de outros 
+usuários. 
+
+Para os prestadores de serviço, a plataforma proporciona maior visibilidade, organização 
+da agenda e ampliação da carteira de clientes. 
+
+No contexto acadêmico, o projeto permite aplicar conhecimentos de análise de sistemas, 
+modelagem de processos, banco de dados e desenvolvimento de aplicações. 
+_
 
 ## 2. Participantes do processo
 
