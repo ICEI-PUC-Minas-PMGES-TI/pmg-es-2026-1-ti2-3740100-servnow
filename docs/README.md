@@ -98,8 +98,7 @@ próximos ao cliente.
 • Exibir preço médio ou estimado do serviço, aumentando a transparência de 
 valores. 
 
-• Criar um sistema de avaliações e feedback, permitindo que clientes e 
-prestadores avaliem a experiência do serviço. 
+• Criar um sistema de avaliações e feedback, permitindo que clientes  avaliem a experiência do serviço. 
 
 • Permitir que o prestador aceite ou recuse solicitações de serviço.
 
