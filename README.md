@@ -8,7 +8,6 @@ Além disso, o sistema busca permitir o cadastro de clientes e prestadores, poss
 
 ## Integrantes
 
-* Lucas Vinícius de Oliveira Siqueira
 * Fábio Garcia Martins
 * Gabriel Henrique Fernandes Vieira
 * Lucas Silva Borges
@@ -18,7 +17,7 @@ Além disso, o sistema busca permitir o cadastro de clientes e prestadores, poss
 
 * Lucca Soares de Paiva Lacerda
 * Michelle Hanne Soares de Andrade
-* Nome completo do professor 3
+* Luiz Carlos da Silva
 
 ## Instruções de utilização
 
