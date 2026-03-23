@@ -129,8 +129,6 @@ Usuário que solicita serviços residenciais por meio da plataforma. Ele descrev
 Prestador de Serviço
 Profissional responsável por executar os serviços solicitados, como eletricista, encanador, montador de móveis ou técnico de manutenção. Ele pode aceitar ou recusar solicitações e receber avaliações dos clientes.
 
-Plataforma / Sistema
-Sistema digital responsável por intermediar a comunicação entre cliente e prestador, realizar geolocalização, registrar solicitações de serviço e armazenar avaliações.
 ## 3. Modelagem do processo de negócio
 
 ### 3.1. Análise da situação atual
