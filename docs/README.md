@@ -75,7 +75,7 @@ tornam a experiência do cliente pouco prática.
 em sua residência. 
 
 Esses fatores impactam negativamente a experiência do usuário e dificultam a 
-profissionalização do setor de prestação de serviços residenciais._
+profissionalização do setor de prestação de serviços residenciais.
 
 ### 1.3 Objetivo geral
 
@@ -105,7 +105,7 @@ prestadores avaliem a experiência do serviço.
 
 • Implementar mecanismos de segurança, como verificação da identidade do 
 prestador por código de confirmação ou reconhecimento facial quando o profissional 
-chegar ao local._
+chegar ao local.
 
 ### 1.4 Justificativas
 
