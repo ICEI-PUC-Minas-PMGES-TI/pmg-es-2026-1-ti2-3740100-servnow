@@ -1,8 +1,5 @@
 # ServNow
 
-
-**Lucas Vinícius de Oliveira Siqueira, 1579483@sga.pucminas.br**
-
 **Fábio Garcia Martins, 676102@sga.pucminas.br**
 
 **Gabriel Henrique Fernandes Vieira, 1564418@sga.pucminas.br**
@@ -12,7 +9,6 @@
 **Marco Túlio Sales de Deus, Marco Túlio Sales de Deus**
 
 ---
-
 Professores:
 
 ** ProfLucca Soares de Paiva Lacerda 
@@ -37,7 +33,7 @@ mostrar algum resultado relevante do trabalho (até 10 linhas)._
 
 ## 1. Introdução
 
-_Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização._
+_Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização.
 
 ### 1.1 Contextualização
 
@@ -47,7 +43,7 @@ Plataformas digitais passaram a facilitar o acesso a diferentes tipos de serviç
 processos mais rápidos, organizados e seguros. 
 Entretanto, muitos serviços do cotidiano  como pequenos reparos residenciais, serviços 
 hidráulicos, desentupimento, troca de chuveiro, montagem de móveis e manutenção elétrica 
-básica — ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
+básica  ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
 de indicações de conhecidos, grupos em redes sociais ou contatos diretos por aplicativos de 
 mensagens. 
 
