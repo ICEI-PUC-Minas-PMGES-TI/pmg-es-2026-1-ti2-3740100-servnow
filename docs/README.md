@@ -41,11 +41,11 @@ _Um sistema digital de intermediação de serviços residenciais sob demanda, co
 
 ### 1.1 Contextualização
 
-_Com o avanço da tecnologia e a popularização de aplicativos de serviços sob demanda, 
+Com o avanço da tecnologia e a popularização de aplicativos de serviços sob demanda, 
 como Uber, tornou-se comum a mediação digital entre prestadores de serviços e clientes. 
 Plataformas digitais passaram a facilitar o acesso a diferentes tipos de serviços, tornando os 
 processos mais rápidos, organizados e seguros. 
-Entretanto, muitos serviços do cotidiano — como pequenos reparos residenciais, serviços 
+Entretanto, muitos serviços do cotidiano  como pequenos reparos residenciais, serviços 
 hidráulicos, desentupimento, troca de chuveiro, montagem de móveis e manutenção elétrica 
 básica — ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
 de indicações de conhecidos, grupos em redes sociais ou contatos diretos por aplicativos de 
@@ -59,11 +59,11 @@ atrasos e desencontros.
 Diante desse cenário, surge a necessidade de um sistema digital que conecte clientes a 
 profissionais de manutenção residencial de forma prática, segura e organizada. A proposta do 
 projeto é desenvolver uma plataforma que permita solicitar serviços de forma rápida, além de 
-avaliar o prestador após a conclusão do serviço._
+avaliar o prestador após a conclusão do serviço.
 
 ### 1.2 Problema
 
-_Atualmente, a contratação de profissionais para serviços domésticos apresenta diversos desafios: 
+Atualmente, a contratação de profissionais para serviços domésticos apresenta diversos desafios: 
 
 • Dificuldade em encontrar profissionais confiáveis e disponíveis 
 rapidamente. 
@@ -83,14 +83,14 @@ profissionalização do setor de prestação de serviços residenciais._
 
 ### 1.3 Objetivo geral
 
-_Desenvolver um sistema digital de intermediação de serviços residenciais sob demanda, 
+Desenvolver um sistema digital de intermediação de serviços residenciais sob demanda, 
 conectando clientes a prestadores de serviços como eletricistas, encanadores e profissionais de 
 manutenção, proporcionando mais praticidade, segurança e organização no processo de 
-solicitação e execução dos serviços._
+solicitação e execução dos serviços.
 
 #### 1.3.1 Objetivos específicos
 
-_• Desenvolver uma plataforma digital para cadastro de clientes e prestadores 
+• Desenvolver uma plataforma digital para cadastro de clientes e prestadores 
 de serviços. 
 
 • Permitir que o cliente solicite serviços informando descrição do problema, 
@@ -113,7 +113,7 @@ chegar ao local._
 
 ### 1.4 Justificativas
 
-_A criação de um sistema de prestação de serviços residenciais sob demanda se justifica 
+A criação de um sistema de prestação de serviços residenciais sob demanda se justifica 
 pela necessidade de modernizar e organizar um mercado ainda bastante informal. 
 
 Para os clientes, o sistema oferece mais praticidade, rapidez, segurança e previsibilidade 
@@ -125,21 +125,44 @@ da agenda e ampliação da carteira de clientes.
 
 No contexto acadêmico, o projeto permite aplicar conhecimentos de análise de sistemas, 
 modelagem de processos, banco de dados e desenvolvimento de aplicações. 
-_
+
 
 ## 2. Participantes do processo
+Cliente
+Usuário que solicita serviços residenciais por meio da plataforma. Ele descreve o problema, informa o local e horário desejado e avalia o profissional após a conclusão do serviço.
 
-_Apresente aqui os perfis dos usuários-chave do sistema. Diversas são as informações que podem ser relevantes para a definição dos perfis dos usuários, tais como idade, gênero, aspectos culturais, nível de educação, entre outros. A pesquisa de mercado pode ser uma ferramenta poderosa para se identificar e caracterizar os perfis de usuários. Apresente claramente o papel a ser desempenhado por cada usuário._
+Prestador de Serviço
+Profissional responsável por executar os serviços solicitados, como eletricista, encanador, montador de móveis ou técnico de manutenção. Ele pode aceitar ou recusar solicitações e receber avaliações dos clientes.
 
+Plataforma / Sistema
+Sistema digital responsável por intermediar a comunicação entre cliente e prestador, realizar geolocalização, registrar solicitações de serviço e armazenar avaliações.
 ## 3. Modelagem do processo de negócio
 
 ### 3.1. Análise da situação atual
 
-_Apresente uma descrição textual de como os sistemas atuais resolvem o problema que seu projeto se propõe a resolver. Caso sua proposta seja inovadora e não existam processos claramente definidos, **apresente como as tarefas que o seu sistema pretende implementar são executadas atualmente**, mesmo que não se utilize tecnologia computacional._
+A análise da situação atual permite identificar diversos pontos de atenção e problemas no processo de contratação de serviços residenciais.
+
+Primeiramente, existe dificuldade em localizar profissionais confiáveis e disponíveis rapidamente, pois o processo depende principalmente de indicações informais ou buscas em redes sociais.
+
+Outro problema é a falta de transparência nos valores dos serviços, já que cada profissional define o preço individualmente, sem qualquer referência ou comparação.
+
+Também não existe um sistema estruturado de avaliações e histórico de serviços, o que impede que os clientes tomem decisões baseadas na experiência de outros usuários.
+
+Além disso, a comunicação ocorre de forma manual, por telefone ou aplicativos de mensagens, o que pode gerar atrasos, falhas de comunicação e dificuldades para organizar horários e agendamentos.
+
+Esses fatores tornam o processo atual pouco eficiente, inseguro e pouco profissional.
 
 ### 3.2. Descrição geral da proposta de solução
 
-_Apresente aqui uma descrição da sua proposta abordando seus limites e suas ligações com as estratégias do negócio e os objetivos geral e específicos do projeto. Apresente aqui as oportunidades de melhorias._
+Para solucionar os problemas identificados, o projeto propõe a criação de uma plataforma digital que intermedeie a contratação de serviços residenciais de forma organizada e segura.
+
+Com a utilização do sistema, os clientes poderão solicitar serviços diretamente pela plataforma, informando o tipo de serviço, descrição do problema e localização. O sistema utilizará geolocalização para encontrar prestadores próximos e disponíveis.
+
+Os prestadores de serviço receberão as solicitações e poderão aceitar ou recusar o atendimento. Após a conclusão do serviço, o cliente poderá avaliar o profissional, criando um histórico de reputação dentro da plataforma.
+
+Além disso, o sistema poderá incluir mecanismos de segurança, como verificação da identidade do prestador por meio de código de confirmação ou Face ID quando o profissional chegar ao local.
+
+Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e organizado, reduzindo a informalidade e melhorando a experiência tanto para clientes quanto para prestadores de serviço.
 
 ### 3.3. Modelagem dos processos
 
