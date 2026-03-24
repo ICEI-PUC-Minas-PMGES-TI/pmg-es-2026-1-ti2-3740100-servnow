@@ -89,22 +89,14 @@ solicitação e execução dos serviços.
 • Desenvolver uma plataforma digital para cadastro de clientes e prestadores 
 de serviços. 
 
-• Permitir que o cliente solicite serviços informando descrição do problema, 
-local e disponibilidade de horário.
+• Permitir a conclusão do serviço após a finalização do atendimento pelo prestador(vinculado a uma avaliação final do serviço e o respectivo pagamento).
+• Implementar gestão de prestadores (crud, media de preços de serviços,  historico de serviços, demandas, solicitações de serviço)
 
-• Implementar sistema de geolocalização para localizar prestadores 
-próximos ao cliente. 
-
-• Exibir preço médio ou estimado do serviço, aumentando a transparência de 
-valores. 
-
-• Criar um sistema de avaliações e feedback, permitindo que clientes  avaliem a experiência do serviço. 
-
-• Permitir que o prestador aceite ou recuse solicitações de serviço.
+• Implementar gestão de clientes( solicitar serviço, serviços em analise, em andamento, aceitos)
 
 • Implementar mecanismos de segurança, como verificação da identidade do 
-prestador por código de confirmação ou reconhecimento facial quando o profissional 
-chegar ao local.
+prestador por código de confirmação  quando o profissional 
+chegar ao local para iniciar o serviço.
 
 ### 1.4 Justificativas
 
