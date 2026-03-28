@@ -1,15 +1,21 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { Home } from "../pages/Home";
-import { Layout } from "lucide-react";
+import { Login } from "../pages/Home/Login";
+// Removi o Layout do lucide-react pois ele é um ícone!
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+
+    element: <div className="app-layout"><Outlet /></div>, 
     children: [
       {
-        path: "/",
+        path: "/", // Página inicial
         element: <Home />,
+      },
+      {
+        path: "/login", 
+        element: <Login />,
       },
     ],
   },

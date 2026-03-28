@@ -47,8 +47,10 @@ export function Header({
               </button>
             </>
           ) : (
-            <button className="btn-login" onClick={onLogin}>
-              Login
+            <button className="btn-login" onClick={onLogin} >
+        <Link to="/Login" className="botao-entrar">
+  Login
+</Link>
             </button>
           )}
         </div>
