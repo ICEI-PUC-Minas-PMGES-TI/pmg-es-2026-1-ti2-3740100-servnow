@@ -1,4 +1,4 @@
-### 3.3.4 Processo 4 – NOME DO PROCESSO
+### 3.3.4 Processo 4 –FINALIZAÇAO DO SERVIÇO
 
 _Apresente aqui o nome e as oportunidades de melhoria para o processo 4. 
 Em seguida, apresente o modelo do processo 4, descrito no padrão BPMN._
