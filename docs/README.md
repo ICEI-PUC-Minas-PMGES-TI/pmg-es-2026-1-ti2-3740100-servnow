@@ -155,13 +155,12 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 ### 3.3. Modelagem dos processos
 
 [PROCESSO 1 - Finalização de serviço ](processo-1-nome-do-processo.md "Detalhamento do Processo 2.")
-<img width="2904" height="1380" alt="Processo 1 FINALIZAÇÃO DE SERVIÇO" src="https://github.com/user-attachments/assets/34568e53-342f-494f-b624-ffb17583aec7" />
 
 [PROCESSO 2 - Gestao de Clientes ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
 
-[PROCESSO 3 - Nome do Processo](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
+[PROCESSO 3 - Gestao de Prestadores](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
 
-[PROCESSO 4 - Nome do Processo](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
+[PROCESSO 4 - Finalização de serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
 
 ## 4. Projeto da solução
 
