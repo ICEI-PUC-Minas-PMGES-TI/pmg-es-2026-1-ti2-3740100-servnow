@@ -6,7 +6,7 @@
 
 **Lucas Silva Borges, 1598846@sga.pucminas.br**
 
-**Marco Túlio Sales de Deus, Marco Túlio Sales de Deus**
+**Marco Túlio Sales de Deus, 891847@sga.pcuminas.br**
 
 ---
 Professores:
@@ -15,7 +15,7 @@ Professores:
 
 ** Michelle Hanne Soares de Andrade **
 
-** Prof. Nome do Prof 3 **
+** Luiz Carlos da Silva **
 
 ---
 
@@ -33,7 +33,7 @@ mostrar algum resultado relevante do trabalho (até 10 linhas)._
 
 ## 1. Introdução
 
-_Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização.
+Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização.
 
 ### 1.1 Contextualização
 
@@ -41,6 +41,7 @@ Com o avanço da tecnologia e a popularização de aplicativos de serviços sob 
 como Uber, tornou-se comum a mediação digital entre prestadores de serviços e clientes. 
 Plataformas digitais passaram a facilitar o acesso a diferentes tipos de serviços, tornando os 
 processos mais rápidos, organizados e seguros. 
+
 Entretanto, muitos serviços do cotidiano  como pequenos reparos residenciais, serviços 
 hidráulicos, desentupimento, troca de chuveiro, montagem de móveis e manutenção elétrica 
 básica  ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
@@ -52,6 +53,7 @@ encontrar profissionais confiáveis, falta de padronização de preços, ausênc
 o prestador e insegurança ao permitir a entrada de um profissional desconhecido em casa. Além 
 disso, a comunicação e o agendamento costumam ocorrer de forma manual, o que pode gerar 
 atrasos e desencontros. 
+
 Diante desse cenário, surge a necessidade de um sistema digital que conecte clientes a 
 profissionais de manutenção residencial de forma prática, segura e organizada. A proposta do 
 projeto é desenvolver uma plataforma que permita solicitar serviços de forma rápida, além de 
@@ -90,6 +92,7 @@ solicitação e execução dos serviços.
 de serviços. 
 
 • Permitir a conclusão do serviço após a finalização do atendimento pelo prestador(vinculado a uma avaliação final do serviço e o respectivo pagamento).
+
 • Implementar gestão de prestadores (crud, media de preços de serviços,  historico de serviços, demandas, solicitações de serviço)
 
 • Implementar gestão de clientes( solicitar serviço, serviços em analise, em andamento, aceitos)
@@ -154,7 +157,7 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 PROCESSO 1- FINALIZAÇÃO DE SERVIÇO
 <img width="2904" height="1380" alt="Processo 1 FINALIZAÇÃO DE SERVIÇO" src="https://github.com/user-attachments/assets/34568e53-342f-494f-b624-ffb17583aec7" />
 
-[PROCESSO 2 - Nome do Processo](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
+[PROCESSO 2 - Gestao de Clientes ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
 
 [PROCESSO 3 - Nome do Processo](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
 
@@ -162,7 +165,7 @@ PROCESSO 1- FINALIZAÇÃO DE SERVIÇO
 
 ## 4. Projeto da solução
 
-_O documento a seguir apresenta o detalhamento do projeto da solução. São apresentadas duas seções que descrevem, respectivamente: modelo relacional e tecnologias._
+O documento a seguir apresenta o detalhamento do projeto da solução. São apresentadas duas seções que descrevem, respectivamente: modelo relacional e tecnologias._
 
 [Projeto da solução](solution-design.md "Detalhamento do projeto da solução: modelo relacional e tecnologias.")
 
