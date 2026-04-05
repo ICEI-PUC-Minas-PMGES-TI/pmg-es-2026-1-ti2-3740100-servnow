@@ -93,9 +93,9 @@ de serviços.
 
 • Permitir a conclusão do serviço após a finalização do atendimento pelo prestador(vinculado a uma avaliação final do serviço e o respectivo pagamento).
 
-• Implementar gestão de prestadores (crud, media de preços de serviços,  historico de serviços, demandas, solicitações de serviço)
+• Implementar gestão de prestadores (Media de preços de serviços,  historico de serviços, demandas, solicitações de serviço)
 
-• Implementar gestão de clientes( solicitar serviço, serviços em analise, em andamento, aceitos)
+• Implementar gestão de clientes( Solicitar serviço, serviços em analise, em andamento, aceitos)
 
 • Implementar mecanismos de segurança, como verificação da identidade do 
 prestador por código de confirmação  quando o profissional 
@@ -154,13 +154,13 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 
 ### 3.3. Modelagem dos processos
 
-[PROCESSO 1 - Iniciar atendimento ](processo-1-nome-do-processo.md "Detalhamento do Processo 1.")
+[PROCESSO 1-   Gestao de Clientes ](processo-1-nome-do-processo.md "Detalhamento do Processo 1.")
 
-[PROCESSO 2 - Gestao de Clientes ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
+[PROCESSO 2-   Gestao de Prestadores ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
 
-[PROCESSO 3 - Gestao de Prestadores](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
+[PROCESSO 3 -  Iniciar atendimento ](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
 
-[PROCESSO 4 - Finalização de serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
+[PROCESSO 4 - Concluir de serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
 
 ## 4. Projeto da solução
 
