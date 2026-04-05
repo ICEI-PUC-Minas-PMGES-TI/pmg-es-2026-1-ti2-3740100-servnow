@@ -1,67 +1,203 @@
-### 3.3.1 Processo 1 – Iniciar atendimento
+### 3.3.1 Processo 1 – Gestão de Clientes
 
-_Apresente aqui o nome e as oportunidades de melhoria para o processo 1. 
-Em seguida, apresente o modelo do processo 1, descrito no padrão BPMN._
+O processo de gestão de clientes abrange desde o cadastro e autenticação na plataforma até a solicitação e acompanhamento de serviços residenciais. Atualmente, sem um sistema centralizado, o cliente depende de contatos informais e não tem visibilidade sobre o status do seu atendimento.
 
-![Exemplo de um Modelo BPMN do PROCESSO 1](images/process.png "Modelo BPMN do Processo 1.")
+A oportunidade de melhoria está em oferecer ao cliente uma jornada digital completa: criar sua conta, autenticar-se com segurança, solicitar serviços informando tipo, descrição e localização, e acompanhar em tempo real o status de cada solicitação pelo painel da plataforma ServNow.
+
+![Modelo BPMN do Processo 1 – Gestão de Clientes](images/bpmn_gestao_clientes.png "Modelo BPMN do Processo 1.")
+
+---
 
 #### Detalhamento das atividades
 
-_Descreva aqui cada uma das propriedades das atividades do processo 1. 
-Devem estar relacionadas com o modelo de processo apresentado anteriormente._
+Os tipos de dados utilizados nas atividades são:
 
-_Os tipos de dados a serem utilizados são:_
+* **Área de texto** - campo texto de múltiplas linhas
+* **Caixa de texto** - campo texto de uma linha
+* **Número** - campo numérico
+* **Data** - campo do tipo data (dd-mm-aaaa)
+* **Hora** - campo do tipo hora (hh:mm:ss)
+* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)
+* **Imagem** - campo contendo uma imagem
+* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (radio button ou combobox)
+* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (checkbox ou listbox)
+* **Arquivo** - campo de upload de documento
+* **Link** - campo que armazena uma URL
+* **Tabela** - campo formado por uma matriz de valores
 
-_* **Área de texto** - campo texto de múltiplas linhas_
+---
 
-_* **Caixa de texto** - campo texto de uma linha_
+## Parte 1 – Cadastro e Login
 
-_* **Número** - campo numérico_
+---
 
-_* **Data** - campo do tipo data (dd-mm-aaaa)_
+**Preencher cadastro**
 
-_* **Hora** - campo do tipo hora (hh:mm:ss)_
+| **Campo**       | **Tipo**        | **Restrições**                          | **Valor default** |
+| ---             | ---             | ---                                     | ---               |
+| Nome completo   | Caixa de texto  | mínimo de 3 caracteres                  |                   |
+| Endereço        | Caixa de texto  | logradouro, número, bairro, cidade, CEP |                   |
+| Telefone        | Caixa de texto  | formato (00) 00000-0000                 |                   |
+| E-mail          | Caixa de texto  | formato de e-mail válido, único         |                   |
+| Senha           | Caixa de texto  | mínimo de 8 caracteres                  |                   |
 
-_* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)_
+| **Comandos**    | **Destino**                        | **Tipo**  |
+| ---             | ---                                | ---       |
+| Cadastrar       | Validar dados (sistema)            | default   |
+| Cancelar        | Tela inicial                       | cancel    |
 
-_* **Imagem** - campo contendo uma imagem_
+---
 
-_* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (tradicional radio button ou combobox)_
+**Validar dados**
 
-_* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (tradicional checkbox ou listbox)_
+Atividade executada automaticamente pelo sistema. Verifica se todos os campos obrigatórios foram preenchidos corretamente e se o e-mail informado ainda não está cadastrado.
 
-_* **Arquivo** - campo de upload de documento_
+| **Campo**             | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                   | ---            | ---             | ---               |
+| Resultado da validação | Seleção única | ok / erro       | —                 |
+| Mensagem de erro      | Área de texto  | somente leitura |                   |
 
-_* **Link** - campo que armazena uma URL_
+| **Comandos**    | **Destino**                         | **Tipo**  |
+| ---             | ---                                 | ---       |
+| *(automático)*  | Conta criada — se ok                | default   |
+| *(automático)*  | Preencher cadastro — se erro        | cancel    |
 
-_* **Tabela** - campo formado por uma matriz de valores_
+---
 
+**Inserir credenciais**
 
-**Nome da atividade 1**
+| **Campo** | **Tipo**       | **Restrições**           | **Valor default** |
+| ---       | ---            | ---                      | ---               |
+| E-mail    | Caixa de texto | formato de e-mail válido |                   |
+| Senha     | Caixa de texto | mínimo de 8 caracteres   |                   |
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-| ***Exemplo:***  |                  |                |                   |
-| login           | Caixa de Texto   | formato de e-mail |                |
-| senha           | Caixa de Texto   | mínimo de 8 caracteres |           |
+| **Comandos**     | **Destino**                  | **Tipo**  |
+| ---              | ---                          | ---       |
+| Entrar           | Autenticar (sistema)         | default   |
+| Esqueci a senha  | Processo de recuperação      | cancel    |
 
-| **Comandos**         |  **Destino**                   | **Tipo** |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel  ) |
-| ***Exemplo:***       |                                |                   |
-| entrar               | Fim do Processo 1              | default           |
-| cadastrar            | Início do proceso de cadastro  |                   |
+---
 
+**Autenticar**
 
-**Nome da atividade 2**
+Atividade executada automaticamente pelo sistema. Verifica se o e-mail existe e se a senha informada corresponde ao cadastro.
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-|                 |                  |                |                   |
+| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                    | ---            | ---             | ---               |
+| Resultado da autenticação | Seleção única | ok / erro     | —                 |
+| Mensagem de erro       | Área de texto  | somente leitura |                   |
 
-| **Comandos**         |  **Destino**                   | **Tipo**          |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-|                      |                                |                   |
+| **Comandos**   | **Destino**                          | **Tipo**  |
+| ---            | ---                                  | ---       |
+| *(automático)* | Acessar painel — se ok               | default   |
+| *(automático)* | Inserir credenciais — se senha inválida | cancel |
+
+---
+
+**Acessar painel (Dashboard)**
+
+Tela principal do cliente após autenticação bem-sucedida. Exibe resumo das solicitações ativas e acesso às funcionalidades da plataforma.
+
+| **Campo**              | **Tipo**  | **Restrições**  | **Valor default** |
+| ---                    | ---       | ---             | ---               |
+| Nome do cliente        | Caixa de texto | somente leitura |              |
+| Solicitações ativas    | Tabela    | somente leitura |                   |
+| Notificações recentes  | Tabela    | somente leitura |                   |
+
+| **Comandos**          | **Destino**                    | **Tipo**  |
+| ---                   | ---                            | ---       |
+| Nova solicitação      | Preencher solicitação          | default   |
+| Ver minhas solicitações | Listar solicitações          | default   |
+| Sair                  | Tela de login                  | cancel    |
+
+---
+
+## Parte 2 – Solicitação e Acompanhamento
+
+---
+
+**Preencher solicitação**
+
+| **Campo**           | **Tipo**         | **Restrições**                               | **Valor default** |
+| ---                 | ---              | ---                                          | ---               |
+| Tipo de serviço     | Seleção única    | obrigatório (ex: elétrico, hidráulico, etc.) |                   |
+| Descrição do problema | Área de texto  | mínimo de 20 caracteres, máximo de 500       |                   |
+| Endereço do serviço | Caixa de texto   | CEP válido, logradouro e número              |                   |
+| Data desejada       | Data             | data futura                                  |                   |
+| Horário desejado    | Hora             | dentro do horário de operação da plataforma  |                   |
+| Fotos do problema   | Imagem           | opcional, JPG ou PNG, até 3 imagens          |                   |
+
+| **Comandos**        | **Destino**                        | **Tipo**  |
+| ---                 | ---                                | ---       |
+| Enviar solicitação  | Enviar solicitação (confirmar)     | default   |
+| Cancelar            | Painel do cliente                  | cancel    |
+
+---
+
+**Enviar solicitação**
+
+Tela de revisão e confirmação antes de submeter a solicitação à plataforma.
+
+| **Campo**           | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                 | ---            | ---             | ---               |
+| Resumo da solicitação | Área de texto | somente leitura |                  |
+| Confirmação         | Seleção única  | Confirmar / Editar |               |
+
+| **Comandos**    | **Destino**                        | **Tipo**  |
+| ---             | ---                                | ---       |
+| Confirmar       | Registrar solicitação (sistema)    | default   |
+| Editar          | Preencher solicitação              | cancel    |
+
+---
+
+**Listar solicitações**
+
+Painel de acompanhamento de todas as solicitações do cliente.
+
+| **Campo**       | **Tipo**  | **Restrições**  | **Valor default** |
+| ---             | ---       | ---             | ---               |
+| Lista de solicitações | Tabela | somente leitura |               |
+| ID da solicitação | Caixa de texto | somente leitura |           |
+| Tipo de serviço | Caixa de texto | somente leitura |                |
+| Status          | Caixa de texto | somente leitura (aberta / em andamento / concluída / recusada) | |
+| Data de criação | Data      | somente leitura |                   |
+
+| **Comandos**        | **Destino**            | **Tipo**  |
+| ---                 | ---                    | ---       |
+| Filtrar             | Filtrar resultados      | default   |
+| Ver detalhes        | Ver detalhes           | default   |
+| Nova solicitação    | Preencher solicitação  | default   |
+
+---
+
+**Filtrar resultados**
+
+| **Campo**       | **Tipo**      | **Restrições**                                    | **Valor default** |
+| ---             | ---           | ---                                               | ---               |
+| Status          | Seleção múltipla | aberta / em andamento / concluída / recusada   | todos             |
+| Data inicial    | Data          | anterior ou igual à data final                    |                   |
+| Data final      | Data          | posterior ou igual à data inicial                 |                   |
+| Tipo de serviço | Seleção única | todos / elétrico / hidráulico / manutenção / etc. | todos             |
+
+| **Comandos**  | **Destino**         | **Tipo**  |
+| ---           | ---                 | ---       |
+| Aplicar       | Listar solicitações | default   |
+| Limpar filtros | Listar solicitações | cancel   |
+
+---
+
+**Ver detalhes**
+
+| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                    | ---            | ---             | ---               |
+| ID da solicitação      | Caixa de texto | somente leitura |                   |
+| Status atual           | Caixa de texto | somente leitura |                   |
+| Nome do prestador      | Caixa de texto | somente leitura |                   |
+| Avaliação do prestador | Número         | somente leitura (0 a 5 estrelas) |        |
+| Histórico de atualizações | Tabela      | somente leitura |                   |
+| Data e hora do serviço | Data e Hora    | somente leitura |                   |
+
+| **Comandos**        | **Destino**           | **Tipo**  |
+| ---                 | ---                   | ---       |
+| Voltar              | Listar solicitações   | cancel    |
+| Avaliar prestador   | Processo 4 – Concluir serviço | default |
