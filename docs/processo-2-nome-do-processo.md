@@ -4,7 +4,7 @@ O processo de gestão de prestadores atualmente ocorre de forma informal e desce
 
 A oportunidade de melhoria está em centralizar todo o ciclo do prestador na plataforma ServNow: desde o cadastro com validação de dados, passando pelo aceite ou recusa de solicitações, até a verificação de identidade por código de confirmação no momento do atendimento, e o registro de avaliações ao final do serviço.
 
-![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/gestao_prestadores_servnow%20Diagrama.png "Modelo BPMN do Processo 2.")
+![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/bpmn_gestao_prestadores.png "Modelo BPMN do Processo 2.")
 
 ---
 
