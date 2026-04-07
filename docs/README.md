@@ -158,9 +158,9 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 
 [PROCESSO 2-   Gestao de Prestadores ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
 
-[PROCESSO 3 -  Iniciar atendimento ](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
+[PROCESSO 3 -   Solicitar Serviço ](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
 
-[PROCESSO 4 - Concluir de serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
+[PROCESSO 4 -   Executar Serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
 
 ## 4. Projeto da solução
 
