@@ -1,4 +1,5 @@
 ### 3.3.3 Processo 3 –SOLICITAR SERVIÇOS
+//explicar o problema e melhorias 
 
 _Apresente aqui o nome e as oportunidades de melhoria para o processo 3. 
 Em seguida, apresente o modelo do processo 3, descrito no padrão BPMN._
@@ -11,57 +12,87 @@ Em seguida, apresente o modelo do processo 3, descrito no padrão BPMN._
 _Descreva aqui cada uma das propriedades das atividades do processo 3. 
 Devem estar relacionadas com o modelo de processo apresentado anteriormente._
 
-_Os tipos de dados a serem utilizados são:_
+**Preencher solicitação**
 
-_* **Área de texto** - campo texto de múltiplas linhas_
+| **Campo**           | **Tipo**         | **Restrições**                               | **Valor default** |
+| ---                 | ---              | ---                                          | ---               |
+| Tipo de serviço     | Seleção única    | obrigatório (ex: elétrico, hidráulico, etc.) |                   |
+| Descrição do problema | Área de texto  | mínimo de 20 caracteres, máximo de 500       |                   |
+| Endereço do serviço | Caixa de texto   | CEP válido, logradouro e número              |                   |
+| Data desejada       | Data             | data futura                                  |                   |
+| Horário desejado    | Hora             | dentro do horário de operação da plataforma  |                   |
+| Fotos do problema   | Imagem           | opcional, JPG ou PNG, até 3 imagens          |                   |
 
-_* **Caixa de texto** - campo texto de uma linha_
+| **Comandos**        | **Destino**                        | **Tipo**  |
+| ---                 | ---                                | ---       |
+| Enviar solicitação  | Enviar solicitação (confirmar)     | default   |
+| Cancelar            | Painel do cliente                  | cancel    |
 
-_* **Número** - campo numérico_
+---
 
-_* **Data** - campo do tipo data (dd-mm-aaaa)_
+**Enviar solicitação**
 
-_* **Hora** - campo do tipo hora (hh:mm:ss)_
+Tela de revisão e confirmação antes de submeter a solicitação à plataforma.
 
-_* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)_
+| **Campo**           | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                 | ---            | ---             | ---               |
+| Resumo da solicitação | Área de texto | somente leitura |                  |
+| Confirmação         | Seleção única  | Confirmar / Editar |               |
 
-_* **Imagem** - campo contendo uma imagem_
+| **Comandos**    | **Destino**                        | **Tipo**  |
+| ---             | ---                                | ---       |
+| Confirmar       | Registrar solicitação (sistema)    | default   |
+| Editar          | Preencher solicitação              | cancel    |
 
-_* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (tradicional radio button ou combobox)_
+---
 
-_* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (tradicional checkbox ou listbox)_
+**Listar solicitações**
 
-_* **Arquivo** - campo de upload de documento_
+Painel de acompanhamento de todas as solicitações do cliente.
 
-_* **Link** - campo que armazena uma URL_
+| **Campo**       | **Tipo**  | **Restrições**  | **Valor default** |
+| ---             | ---       | ---             | ---               |
+| Lista de solicitações | Tabela | somente leitura |               |
+| ID da solicitação | Caixa de texto | somente leitura |           |
+| Tipo de serviço | Caixa de texto | somente leitura |                |
+| Status          | Caixa de texto | somente leitura (aberta / em andamento / concluída / recusada) | |
+| Data de criação | Data      | somente leitura |                   |
 
-_* **Tabela** - campo formado por uma matriz de valores_
+| **Comandos**        | **Destino**            | **Tipo**  |
+| ---                 | ---                    | ---       |
+| Filtrar             | Filtrar resultados      | default   |
+| Ver detalhes        | Ver detalhes           | default   |
+| Nova solicitação    | Preencher solicitação  | default   |
 
-**Nome da atividade 1**
+---
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-| ***Exemplo:***  |                  |                |                   |
-| login           | Caixa de Texto   | formato de e-mail |                |
-| senha           | Caixa de Texto   | mínimo de 8 caracteres |           |
+**Filtrar resultados**
 
-| **Comandos**         |  **Destino**                   | **Tipo** |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel  ) |
-| ***Exemplo:***       |                                |                   |
-| entrar               | Fim do Processo 1              | default           |
-| cadastrar            | Início do proceso de cadastro  |                   |
+| **Campo**       | **Tipo**      | **Restrições**                                    | **Valor default** |
+| ---             | ---           | ---                                               | ---               |
+| Status          | Seleção múltipla | aberta / em andamento / concluída / recusada   | todos             |
+| Data inicial    | Data          | anterior ou igual à data final                    |                   |
+| Data final      | Data          | posterior ou igual à data inicial                 |                   |
+| Tipo de serviço | Seleção única | todos / elétrico / hidráulico / manutenção / etc. | todos             |
 
+| **Comandos**  | **Destino**         | **Tipo**  |
+| ---           | ---                 | ---       |
+| Aplicar       | Listar solicitações | default   |
+| Limpar filtros | Listar solicitações | cancel   |
 
-**Nome da atividade 2**
+---
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-|                 |                  |                |                   |
+**Ver detalhes**
 
-| **Comandos**         |  **Destino**                   | **Tipo**          |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-|                      |                                |                   |
+| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
+| ---                    | ---            | ---             | ---               |
+| ID da solicitação      | Caixa de texto | somente leitura |                   |
+| Status atual           | Caixa de texto | somente leitura |                   |
+| Nome do prestador      | Caixa de texto | somente leitura |                   |
+| Avaliação do prestador | Número         | somente leitura (0 a 5 estrelas) |        |
+| Histórico de atualizações | Tabela      | somente leitura |                   |
+| Data e hora do serviço | Data e Hora    | somente leitura |                   |
+
+| **Comandos**        | **Destino**           | **Tipo**  |
+| ---                 | ---                   | ---       |
+| Voltar              | Listar solicitações   | cancel    |

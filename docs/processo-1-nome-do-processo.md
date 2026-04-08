@@ -27,7 +27,7 @@ Os tipos de dados utilizados nas atividades são:
 
 ---
 
-## Parte 1 – Cadastro e Login
+## Cadastro e Login
 
 ---
 

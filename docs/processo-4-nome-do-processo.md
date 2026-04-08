@@ -1,7 +1,7 @@
-### 3.3.4 Processo 4 –FINALIZAÇAO DO SERVIÇO
-
+### 3.3.4 Processo 4 – EXECUÇÃO DE SERVIÇO
+//explicar o problema e melhorias
 _Apresente aqui o nome e as oportunidades de melhoria para o processo 4. 
-Em seguida, apresente o modelo do processo 4, descrito no padrão BPMN._
+Em seguida, apresente o modelo do processo 4, descrito no padrão BPMN._ 
 
 ![Exemplo de um Modelo BPMN do PROCESSO 4](images/process.png "Modelo BPMN do Processo 4.")
 
@@ -11,57 +11,32 @@ Em seguida, apresente o modelo do processo 4, descrito no padrão BPMN._
 _Descreva aqui cada uma das propriedades das atividades do processo 4. 
 Devem estar relacionadas com o modelo de processo apresentado anteriormente._
 
-_Os tipos de dados a serem utilizados são:_
-
-_* **Área de texto** - campo texto de múltiplas linhas_
-
-_* **Caixa de texto** - campo texto de uma linha_
-
-_* **Número** - campo numérico_
-
-_* **Data** - campo do tipo data (dd-mm-aaaa)_
-
-_* **Hora** - campo do tipo hora (hh:mm:ss)_
-
-_* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)_
-
-_* **Imagem** - campo contendo uma imagem_
-
-_* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (tradicional radio button ou combobox)_
-
-_* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (tradicional checkbox ou listbox)_
-
-_* **Arquivo** - campo de upload de documento_
-
-_* **Link** - campo que armazena uma URL_
-
-_* **Tabela** - campo formado por uma matriz de valores_
-
-**Nome da atividade 1**
-
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-| ***Exemplo:***  |                  |                |                   |
-| login           | Caixa de Texto   | formato de e-mail |                |
-| senha           | Caixa de Texto   | mínimo de 8 caracteres |           |
-
-| **Comandos**         |  **Destino**                   | **Tipo** |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel  ) |
-| ***Exemplo:***       |                                |                   |
-| entrar               | Fim do Processo 1              | default           |
-| cadastrar            | Início do proceso de cadastro  |                   |
 
 
-**Nome da atividade 2**
+## Executar Serviço
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-|                 |                  |                |                   |
+| **Campo** | **Tipo** | **Restrições** | **Valor default** |
+| --- | --- | --- | --- |
+| Hora de início | Hora | preenchido automaticamente pelo sistema | — |
+| Observações do serviço | Área de texto | máximo de 300 caracteres | |
+| Fotos do serviço | Imagem | JPG ou PNG, até 5 imagens, máx. 3 MB cada | |
 
-| **Comandos**         |  **Destino**                   | **Tipo**          |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-|                      |                                |                   |
+| **Comandos** | **Destino** | **Tipo** |
+| --- | --- | --- |
+| Concluir atendimento | Concluir atendimento | default |
+
+---
+
+## Concluir Atendimento
+
+| **Campo** | **Tipo** | **Restrições** | **Valor default** |
+| --- | --- | --- | --- |
+| Hora de conclusão | Hora | preenchido automaticamente | — |
+| Valor final cobrado | Número | valor positivo, em R$ | |
+| Método de pagamento | Seleção única | Pix / Cartão / Dinheiro | |
+| Confirmação do cliente | Seleção única | "Confirmar conclusão" / "Contestar" | |
+
+| **Comandos** | **Destino** | **Tipo** |
+| --- | --- | --- |
+| Finalizar atendimento | Registrar avaliação e conclusão (sistema) | default |
+| Cancelar conclusão | Executar serviço | cancel |
