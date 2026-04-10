@@ -27,99 +27,49 @@ Os tipos de dados utilizados nas atividades são:
 
 ---
 
-**Solicitar cadastro**
+### Preencher cadastro
 
-| **Campo**             | **Tipo**        | **Restrições**                        | **Valor default** |
-| ---                   | ---             | ---                                   | ---               |
-| Nome completo         | Caixa de texto  | mínimo de 3 caracteres                |                   |
-| E-mail                | Caixa de texto  | formato de e-mail válido              |                   |
-| Senha                 | Caixa de texto  | mínimo de 8 caracteres                |                   |
-| CPF                   | Caixa de texto  | formato 000.000.000-00, único         |                   |
-| Telefone              | Caixa de texto  | formato (00) 00000-0000               |                   |
-| Tipo de serviço       | Seleção múltipla | pelo menos 1 opção selecionada       |                   |
-| Área de atuação (CEP) | Caixa de texto  | formato de CEP válido                 |                   |
-| Documento de identidade | Arquivo       | PDF ou imagem, máx. 5 MB             |                   |
-| Foto de perfil        | Imagem          | JPG ou PNG, máx. 2 MB                 |                   |
+| Campo           | Tipo            | Restrições                                                                 | Valor default |
+|------------------|-----------------|----------------------------------------------------------------------------|---------------|
+| Nome completo    | Caixa de texto  | mínimo de 10 caracteres                                                   |               |
+| Endereço         | Caixa de texto  | logradouro, número, bairro, cidade, CEP                                  |               |
+| Telefone         | Caixa de texto  | formato (XX) 00000-0000                                                   |               |
+| E-mail           | Caixa de texto  | formato de e-mail válido, único                                           |               |
+| Senha            | Caixa de texto  | mínimo de 8 caracteres, pelo menos 1 letra maiúscula, 1 número e 1 caractere especial |               |
 
-| **Comandos**     | **Destino**                          | **Tipo**  |
-| ---              | ---                                  | ---       |
-| Enviar cadastro  | Validar dados do prestador (sistema) | default   |
-| Cancelar         | Tela inicial                         | cancel    |
+| Comandos         | Destino                        | Tipo    |
+|------------------|--------------------------------|---------|
+| Cadastrar        | Validar dados (sistema)       | default |
+| Cancelar         | Home page                     | cancel  |
 
----
 
-**Configurar perfil e disponibilidade**
+**Inserir credenciais**
 
-| **Campo**              | **Tipo**         | **Restrições**                         | **Valor default** |
-| ---                    | ---              | ---                                    | ---               |
-| Descrição profissional | Área de texto    | máximo de 500 caracteres               |                   |
-| Preço médio por serviço | Número          | valor positivo, em R$                  |                   |
-| Dias disponíveis       | Seleção múltipla | pelo menos 1 dia selecionado           |                   |
-| Horário de início      | Hora             | anterior ao horário de fim             |                   |
-| Horário de fim         | Hora             | posterior ao horário de início         |                   |
-| Raio de atendimento (km) | Número         | entre 1 e 100                          | 10                |
+| **Campo** | **Tipo**       | **Restrições**           | **Valor default** |
+| ---       | ---            | ---                      | ---               |
+| E-mail    | Caixa de texto | formato de e-mail válido |                   |
+| Senha     | Caixa de texto | mínimo de 8 caracteres   |                   |
 
-| **Comandos**     | **Destino**                              | **Tipo**  |
-| ---              | ---                                      | ---       |
-| Salvar perfil    | Aguardar solicitações (fila do sistema)  | default   |
-| Editar depois    | Painel do prestador                      | cancel    |
+| **Comandos**     | **Destino**                  | **Tipo**  |
+| ---              | ---                          | ---       |
+| Entrar           | Autenticar (sistema)         | default   |
+| Esqueci a senha  | Processo de recuperação      | cancel    |
 
----
 
-**Analisar solicitação de serviço**
+### Configurar perfil e disponibilidade
 
-| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
-| ---                    | ---            | ---             | ---               |
-| Tipo de serviço        | Caixa de texto | somente leitura |                   |
-| Descrição do problema  | Área de texto  | somente leitura |                   |
-| Endereço do cliente    | Caixa de texto | somente leitura |                   |
-| Data e hora desejada   | Data e Hora    | somente leitura |                   |
-| Valor estimado pelo cliente | Número    | somente leitura |                   |
+| Campo                      | Tipo               | Restrições                                      | Valor default |
+|----------------------------|--------------------|-------------------------------------------------|---------------|
+| Descrição profissional     | Área de texto      | máximo de 500 caracteres                        |               |
+| Preço médio por serviço    | Número             | valor positivo, em R$                           |               |
+| Dias disponíveis           | Seleção múltipla   | pelo menos 1 dia selecionado                    |               |
+| Horário de início          | Hora               | anterior ao horário de fim                      |               |
+| Horário de fim             | Hora               | posterior ao horário de início                  |               |
+| Raio de atendimento (km)   | Número             | entre 1 e 100                                   | 10            |
+| Documento de identidade    | Arquivo            | PDF ou imagem, máximo de 5 MB                   |               |
+| Foto de perfil             | Imagem             | JPG ou PNG, máximo de 2 MB                      |               |
 
-| **Comandos**      | **Destino**                          | **Tipo**  |
-| ---               | ---                                  | ---       |
-| Aceitar           | Deslocar ao local (prestador)        | default   |
-| Recusar           | Fim do processo (solicitação recusada) | cancel  |
-
----
-
-**Deslocar ao local e apresentar código de confirmação**
-
-| **Campo**              | **Tipo**       | **Restrições**              | **Valor default** |
-| ---                    | ---            | ---                         | ---               |
-| Código de confirmação  | Caixa de texto | 6 dígitos numéricos gerados pelo sistema | —      |
-| Status de deslocamento | Seleção única  | "A caminho" / "Chegou"      | A caminho         |
-
-| **Comandos**           | **Destino**                              | **Tipo**  |
-| ---                    | ---                                      | ---       |
-| Informar chegada       | Verificar código de confirmação (sistema)| default   |
-
----
-
-**Executar serviço**
-
-| **Campo**           | **Tipo**      | **Restrições**           | **Valor default** |
-| ---                 | ---           | ---                      | ---               |
-| Hora de início      | Hora          | preenchido automaticamente pelo sistema | —    |
-| Observações do serviço | Área de texto | máximo de 300 caracteres |                  |
-| Fotos do serviço    | Imagem        | JPG ou PNG, até 5 imagens, máx. 3 MB cada |          |
-
-| **Comandos**        | **Destino**               | **Tipo**  |
-| ---                 | ---                       | ---       |
-| Concluir atendimento | Concluir atendimento      | default   |
-
----
-
-**Concluir atendimento**
-
-| **Campo**              | **Tipo**      | **Restrições**                        | **Valor default** |
-| ---                    | ---           | ---                                   | ---               |
-| Hora de conclusão      | Hora          | preenchido automaticamente            | —                 |
-| Valor final cobrado    | Número        | valor positivo, em R$                 |                   |
-| Método de pagamento    | Seleção única | Pix / Cartão / Dinheiro               |                   |
-| Confirmação do cliente | Seleção única | "Confirmar conclusão" / "Contestar"   |                   |
-
-| **Comandos**           | **Destino**                                    | **Tipo**  |
-| ---                    | ---                                            | ---       |
-| Finalizar atendimento  | Registrar avaliação e conclusão (sistema)      | default   |
-| Cancelar conclusão     | Executar serviço                               | cancel    |
+| Comandos        | Destino                                 | Tipo    |
+|-----------------|-----------------------------------------|---------|
+| Salvar perfil   | Aguardar solicitações (fila do sistema) | default |
+| Editar depois   | Painel do prestador                     | cancel  |

@@ -35,8 +35,7 @@ Os tipos de dados utilizados nas atividades são:
 
 | **Campo**       | **Tipo**        | **Restrições**                          | **Valor default** |
 | ---             | ---             | ---                                     | ---               |
-| Nome completo   | Caixa de texto  | mínimo de 10 caracteres                  |                   |
-| Endereço        | Caixa de texto  | logradouro, número, bairro, cidade, CEP |                   |
+| Nome completo   | Caixa de texto  | mínimo de 10 caracteres                 |                   |
 | Telefone        | Caixa de texto  | formato (XX) 00000-0000                 |                   |
 | E-mail          | Caixa de texto  | formato de e-mail válido, único         |                   |
 | Senha           | Caixa de texto  | mínimo de 8 caracteres                  |                   |
@@ -48,21 +47,6 @@ Os tipos de dados utilizados nas atividades são:
 
 ---
 
-**Validar dados**
-
-Atividade executada automaticamente pelo sistema. Verifica se todos os campos obrigatórios foram preenchidos corretamente e se o e-mail informado ainda não está cadastrado.
-
-| **Campo**             | **Tipo**       | **Restrições**  | **Valor default** |
-| ---                   | ---            | ---             | ---               |
-| Resultado da validação | Seleção única | ok / erro       | —                 |
-| Mensagem de erro      | Área de texto  | somente leitura |                   |
-
-| **Comandos**    | **Destino**                         | **Tipo**  |
-| ---             | ---                                 | ---       |
-| *(automático)*  | Conta criada — se ok                | default   |
-| *(automático)*  | Preencher cadastro — se erro        | cancel    |
-
----
 
 **Inserir credenciais**
 
@@ -78,40 +62,19 @@ Atividade executada automaticamente pelo sistema. Verifica se todos os campos ob
 
 ---
 
-**Loguin**
 
-Atividade executada automaticamente pelo sistema. Verifica se o e-mail existe e se a senha informada corresponde ao cadastro.
+### Configurar perfil do cliente
 
-| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
-| ---                    | ---            | ---             | ---               |
-| Resultado da autenticação | Seleção única | ok / erro     | —                 |
-| Mensagem de erro       | Área de texto  | somente leitura |                   |
+| Campo                    | Tipo             | Restrições                                      | Valor default |
+|--------------------------|------------------|-------------------------------------------------|---------------|
+| Endereço                 | Caixa de texto   | logradouro, número, bairro, cidade, CEP         |               |
+| Foto de perfil           | Imagem           | JPG ou PNG, máximo de 2 MB                      |               |
+| Foto do local (opcional) | Imagem           | JPG ou PNG, máximo de 5 MB                      |               |
 
-| **Comandos**   | **Destino**                          | **Tipo**  |
-| ---            | ---                                  | ---       |
-| *(automático)* | Acessar painel — se ok               | default   |
-| *(automático)* | Inserir credenciais — se senha inválida | cancel |
-
----
-
-**Acessar painel (Dashboard)**
-
-Tela principal do cliente após autenticação bem-sucedida. Exibe resumo das solicitações ativas e acesso às funcionalidades da plataforma.
-
-| **Campo**              | **Tipo**  | **Restrições**  | **Valor default** |
-| ---                    | ---       | ---             | ---               |
-| Nome do cliente        | Caixa de texto | somente leitura |              |
-| Solicitações ativas    | Tabela    | somente leitura |                   |
-| Notificações recentes  | Tabela    | somente leitura |                   |
-
-| **Comandos**          | **Destino**                    | **Tipo**  |
-| ---                   | ---                            | ---       |
-| Nova solicitação      | Preencher solicitação          | default   |
-| Ver minhas solicitações | Listar solicitações          | default   |
-| Sair                  | Tela de login                  | cancel    |
-
----
-
+| Comandos         | Destino                       | Tipo    |
+|------------------|-------------------------------|---------|
+| Salvar perfil    | Página inicial do cliente     | default |
+| Editar depois    | Painel do cliente             | cancel  |
 
 
 
