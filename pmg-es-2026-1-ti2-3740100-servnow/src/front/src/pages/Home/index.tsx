@@ -72,7 +72,7 @@ export function Home() {
             <Link to="/cadastro">
               <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
             </Link>
-            <Link to="/cadastro-prestador">
+            <Link to="/cadastro">
               <button className="btn-outline">Sou prestador</button>
             </Link>
           </div>
@@ -203,7 +203,7 @@ export function Home() {
               <li><CheckCircle size={17} className="icon-sky" /> Gerencie sua agenda com facilidade</li>
               <li><CheckCircle size={17} className="icon-sky" /> Pagamento garantido pela plataforma</li>
             </ul>
-            <Link to="/cadastro-prestador">
+            <Link to="/cadastro">
               <button className="btn-primary">Quero me cadastrar <ArrowRight size={15} /></button>
             </Link>
           </div>
@@ -292,7 +292,7 @@ export function Home() {
               <Link to="/cadastro">
                 <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
               </Link>
-              <Link to="/cadastro-prestador">
+              <Link to="/cadastro">
                 <button className="btn-outline">Sou prestador</button>
               </Link>
             </div>

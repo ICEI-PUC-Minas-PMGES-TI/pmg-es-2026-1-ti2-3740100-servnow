@@ -5,7 +5,7 @@ import "./Login.css";
 
 import loginImg from "../../../assets/login.svg";
 
-type UserType = "cliente" | "prestador";
+type UserType = "cliente" | "prestador";  // no cadastro teremos que colocar esse identificador para salvar no bd
 
 export function Login() {
   const [userType, setUserType] = useState<UserType>("cliente");
@@ -112,7 +112,7 @@ export function Login() {
           {/* CADASTRO */}
           <p className="login-register">
             Ainda não tem conta?{" "}
-            <Link to={userType === "cliente" ? "/cadastro" : "/cadastro-prestador"}>
+            <Link to={userType === "cliente" ? "/cadastro" : "/cadastro"}>
               Cadastre-se grátis
             </Link>
           </p>

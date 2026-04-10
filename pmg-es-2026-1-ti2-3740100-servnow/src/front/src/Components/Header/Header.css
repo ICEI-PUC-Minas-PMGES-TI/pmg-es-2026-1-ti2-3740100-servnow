@@ -43,8 +43,8 @@
 }
 
 .logo-img {
-  width: 110px; /* Tamanho da imagem aumentado */
-  height: 110px; /* Tamanho da imagem aumentado */
+  width: 110px; 
+  height: 110px; 
   border-radius: 14px;
   object-fit: cover;
   border: 2px solid rgba(56, 189, 248, 0.6);
@@ -58,13 +58,13 @@
 }
 
 .logo-text {
-  font-size: 36px; /* Tamanho do texto aumentado */
+  font-size: 36px; 
   font-weight: 700;
   letter-spacing: -0.5px;
   color: #e0f2fe;
 }
 
-/* NAV */
+/* NAVBAR */
 .header-nav {
   display: flex;
   align-items: center;
@@ -233,7 +233,6 @@
     height: 72px;
   }
 
-  /* Talvez você queira diminuir a logo no mobile para caber melhor na altura de 72px */
   .logo-img {
     width: 40px;
     height: 40px;

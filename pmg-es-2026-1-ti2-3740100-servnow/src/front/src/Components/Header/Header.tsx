@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Header.css";
 import logo from "../../assets/logo2.png";
 
@@ -17,6 +18,7 @@ export function Header({
   userName,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="header">
@@ -47,10 +49,14 @@ export function Header({
               </button>
             </>
           ) : (
-            <button className="btn-login" onClick={onLogin} >
-        <Link to="/Login" className="botao-entrar">
-  Login
-</Link>
+              <button
+                  className="btn-login"
+                  onClick={() => {
+                    onLogin?.();
+                    navigate("/login");
+                  }}
+            >
+              Login
             </button>
           )}
         </div>
@@ -77,7 +83,7 @@ export function Header({
             {isLoggedIn ? (
               <button className="btn-logout" onClick={onLogout}>Logout</button>
             ) : (
-              <button className="btn-login" onClick={onLogin}>Login</button>
+              <button className="btn-login" onClick={onLogin}></button>
             )}
           </div>
         </div>
