@@ -27,7 +27,7 @@ Os tipos de dados utilizados nas atividades são:
 
 ---
 
-## Cadastro e Login
+## Cadastro
 
 ---
 
@@ -35,16 +35,16 @@ Os tipos de dados utilizados nas atividades são:
 
 | **Campo**       | **Tipo**        | **Restrições**                          | **Valor default** |
 | ---             | ---             | ---                                     | ---               |
-| Nome completo   | Caixa de texto  | mínimo de 3 caracteres                  |                   |
+| Nome completo   | Caixa de texto  | mínimo de 10 caracteres                  |                   |
 | Endereço        | Caixa de texto  | logradouro, número, bairro, cidade, CEP |                   |
-| Telefone        | Caixa de texto  | formato (00) 00000-0000                 |                   |
+| Telefone        | Caixa de texto  | formato (XX) 00000-0000                 |                   |
 | E-mail          | Caixa de texto  | formato de e-mail válido, único         |                   |
 | Senha           | Caixa de texto  | mínimo de 8 caracteres                  |                   |
 
 | **Comandos**    | **Destino**                        | **Tipo**  |
 | ---             | ---                                | ---       |
 | Cadastrar       | Validar dados (sistema)            | default   |
-| Cancelar        | Tela inicial                       | cancel    |
+| Cancelar        | Home page                      | cancel    |
 
 ---
 
@@ -78,7 +78,7 @@ Atividade executada automaticamente pelo sistema. Verifica se todos os campos ob
 
 ---
 
-**Autenticar**
+**Loguin**
 
 Atividade executada automaticamente pelo sistema. Verifica se o e-mail existe e se a senha informada corresponde ao cadastro.
 
