@@ -1,6 +1,4 @@
 ### 3.3.4 Processo 4 – EXECUÇÃO DE SERVIÇO
-//explicar o problema e melhorias
-
 Oportunidades de melhoria:
 
 Registro fotográfico obrigatório  ausência de documentação visual antes/depois do serviço, expondo ambas as partes em contestações.
