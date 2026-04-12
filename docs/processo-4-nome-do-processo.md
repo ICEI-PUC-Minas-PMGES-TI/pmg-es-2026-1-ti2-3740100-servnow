@@ -7,7 +7,10 @@ Subprocesso de pagamento inexistente método registrado, mas sem confirmação d
 
 Ausência de notificações, o cliente não recebe comunicação entre abertura do serviço e cobrança final.
 
-Modelo BPMN do Processo 4 [EXECUÇÃO DE SERVIÇO](<EXECUÇÃO DE SERVIÇO.png>) 
+Modelo BPMN do Processo 4 
+
+<img width="4854" height="2490" alt="image" src="https://github.com/user-attachments/assets/e37b66e4-15d3-4917-a9a0-2464ddfd6ef6" />
+
 
 
 #### Detalhamento das atividades
