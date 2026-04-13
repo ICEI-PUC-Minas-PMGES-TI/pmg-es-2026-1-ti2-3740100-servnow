@@ -2,11 +2,14 @@
 
 Atualmente, a execução de serviços por prestadores ocorre de forma bastante informal e pouco estruturada, o que gera diversos problemas tanto para o cliente quanto para o profissional. A ausência de um canal centralizado dificulta o acompanhamento do andamento do serviço e torna a comunicação desorganizada, muitas vezes dependente de mensagens dispersas ou contatos informais. Como consequência, o cliente não possui visibilidade sobre o que está sendo feito, o que gera insegurança, principalmente em situações em que precisa se ausentar do local durante a execução. Além disso, a falta de registros e atualizações sobre o serviço impede um controle adequado e dificulta a construção de confiança entre as partes.
 
-Com a implementação de uma plataforma digital, esse cenário tende a melhorar significativamente. O processo passa a ser mais estruturado, permitindo que o cliente acompanhe o andamento do serviço em tempo real, receba atualizações e tenha acesso a um histórico completo das atividades realizadas. A comunicação se torna mais organizada e transparente, reduzindo falhas e incertezas. Dessa forma, mesmo quando o cliente precisa sair de casa, ele continua tendo controle sobre o serviço, o que aumenta a sensação de segurança e melhora a experiência como um todo.
+Com a implementação de uma plataforma digital, esse cenário tende a melhorar significativamente. O processo passa a ser mais estruturado, permitindo que o cliente acompanhe o andamento do serviço em tempo real, receba atualizações e  fotos. A comunicação se torna mais organizada e transparente, reduzindo falhas e incertezas. Dessa forma, mesmo quando o cliente precisa sair de casa, ele continua tendo controle sobre o serviço, o que aumenta a sensação de segurança e melhora a experiência como um todo.
 
 Modelo BPMN do Processo 4 
 
-<img width="4854" height="2490" alt="image" src="https://github.com/user-attachments/assets/5e3657bf-37cd-4fd1-bc30-2fd8ac35aa93" />
+
+
+<img width="6840" height="2490" alt="image" src="https://github.com/user-attachments/assets/803ec845-591f-4f77-b375-285c2ed688bd" />
+
 
 
 
