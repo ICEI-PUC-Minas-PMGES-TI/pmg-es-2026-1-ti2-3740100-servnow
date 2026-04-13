@@ -1,8 +1,8 @@
 ### 3.3.2 Processo 2 – Gestão de Prestadores
 
-O processo de gestão de prestadores atualmente ocorre de forma informal e descentralizada, sem uma plataforma que padronize o cadastro, a validação de identidade ou o histórico de serviços dos profissionais. Isso gera insegurança para os clientes e falta de visibilidade para os prestadores.
+Atualmente, não existe uma plataforma centralizada para visualização e gerenciamento de prestadores de serviço. Os profissionais dependem, em grande parte, de indicações informais para conseguir novos clientes, o que limitaseu alcance e dificulta o crescimento profissional. Esse cenário gera insegurança, comunicação desorganizada e falta de transparência durante todo o processo de contratação e execução do serviço.
 
-A oportunidade de melhoria está em centralizar todo o ciclo do prestador na plataforma ServNow: desde o cadastro com validação de dados, passando pelo aceite ou recusa de solicitações, até a verificação de identidade por código de confirmação no momento do atendimento, e o registro de avaliações ao final do serviço.
+A oportunidade de melhoria está na centralização de todo esse ciclo por meio da plataforma ServNow. Com ela, os prestadores poderão se cadastrar de forma padronizada, com validação de dados e identidade, aumentando a confiança no serviço oferecido.
 
 ![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/bpmn_gestao_prestadores.png "Modelo BPMN do Processo 2.")
 
