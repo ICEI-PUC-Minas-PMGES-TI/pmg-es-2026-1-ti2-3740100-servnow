@@ -1,16 +1,14 @@
 ### 3.3.3 Processo 3 –SOLICITAR SERVIÇOS
-//explicar o problema e melhorias 
 
-_Apresente aqui o nome e as oportunidades de melhoria para o processo 3. 
-Em seguida, apresente o modelo do processo 3, descrito no padrão BPMN._
+Atualmente, o processo de solicitação de serviços ocorre de forma desorganizada e pouco padronizada, geralmente por meio de contatos informais, como mensagens ou indicações. Nesse cenário, o cliente precisa explicar o problema repetidas vezes, nem sempre consegue detalhar corretamente as informações e não possui um registro estruturado da solicitação. Além disso, há pouca ou nenhuma visibilidade sobre o andamento do serviço, o que gera incerteza, dificuldade de comunicação e falta de controle durante todo o processo.
 
-![Exemplo de um Modelo BPMN do PROCESSO 3](images/process.png "Modelo BPMN do Processo 3.")
+A oportunidade de melhoria está na digitalização e centralização desse fluxo por meio da plataforma. Com ela, o cliente passa a realizar a solicitação de forma estruturada, preenchendo informações essenciais como tipo de serviço, descrição do problema, endereço, data e horário desejados, além de poder anexar imagens. Após o envio, a solicitação é registrada e pode ser acompanhada em um painel, onde o cliente visualiza o status em tempo real, acessa o histórico de atualizações e consulta os detalhes do atendimento. Dessa forma, o processo se torna mais organizado, transparente e eficiente, proporcionando maior controle, segurança e praticidade ao cliente durante toda a jornada do serviço.
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/688afc0f-c56e-41fd-a289-7a4f1c90b6b9" />
+
 
 
 #### Detalhamento das atividades
-
-_Descreva aqui cada uma das propriedades das atividades do processo 3. 
-Devem estar relacionadas com o modelo de processo apresentado anteriormente._
 
 **Preencher solicitação**
 

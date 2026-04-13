@@ -1,8 +1,12 @@
 ### 3.3.2 Processo 2 – Gestão de Prestadores
 
-O processo de gestão de prestadores atualmente ocorre de forma informal e descentralizada, sem uma plataforma que padronize o cadastro, a validação de identidade ou o histórico de serviços dos profissionais. Isso gera insegurança para os clientes e falta de visibilidade para os prestadores.
+Atualmente, não existe uma plataforma centralizada para visualização e gerenciamento de prestadores de serviço. Os profissionais dependem, em grande parte, de indicações informais para conseguir novos clientes, o que limita seu alcance e dificulta o crescimento profissional. Esse cenário gera insegurança, comunicação desorganizada e falta de transparência durante todo o processo de contratação e execução do serviço.
 
-A oportunidade de melhoria está em centralizar todo o ciclo do prestador na plataforma ServNow: desde o cadastro com validação de dados, passando pelo aceite ou recusa de solicitações, até a verificação de identidade por código de confirmação no momento do atendimento, e o registro de avaliações ao final do serviço.
+A oportunidade de melhoria está na centralização de todo esse ciclo por meio da plataforma. Com ela, os prestadores poderão se cadastrar de forma padronizada, com validação de dados e identidade, aumentando a confiança no serviço oferecido.
+
+O processo de gestão de prestadores inicia com o preenchimento dos dados de cadastro na plataforma. Após essa etapa, as informações passam por uma fase de validação. Caso sejam identificados dados inválidos, o prestador é direcionado para corrigi-los e reenviar. Se optar por não corrigir ou se o cadastro for reprovado, o processo é encerrado.
+
+Se os dados forem aprovados, o prestador segue para a configuração do perfil profissional, onde define suas informações de atuação. Em seguida, informa seus dias e horários disponíveis. Após isso, o prestador passa a aguardar solicitações de serviço e, a partir desse momento, torna-se ativo na plataforma, estando apto a receber e atender clientes.
 
 ![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/bpmn_gestao_prestadores.png "Modelo BPMN do Processo 2.")
 

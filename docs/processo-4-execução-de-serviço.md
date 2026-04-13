@@ -1,15 +1,16 @@
 ### 3.3.4 Processo 4 – EXECUÇÃO DE SERVIÇO
-//explicar o problema e melhorias
 
-Oportunidades de melhoria:
+Atualmente, a execução de serviços por prestadores ocorre de forma bastante informal e pouco estruturada, o que gera diversos problemas tanto para o cliente quanto para o profissional. A ausência de um canal centralizado dificulta o acompanhamento do andamento do serviço e torna a comunicação desorganizada, muitas vezes dependente de mensagens dispersas ou contatos informais. Como consequência, o cliente não possui visibilidade sobre o que está sendo feito, o que gera insegurança, principalmente em situações em que precisa se ausentar do local durante a execução. Além disso, a falta de registros e atualizações sobre o serviço impede um controle adequado e dificulta a construção de confiança entre as partes.
 
-Registro fotográfico obrigatório  ausência de documentação visual antes/depois do serviço, expondo ambas as partes em contestações.
+Com a implementação de uma plataforma digital, esse cenário tende a melhorar significativamente. O processo passa a ser mais estruturado, permitindo que o cliente acompanhe o andamento do serviço em tempo real, receba atualizações e  fotos. A comunicação se torna mais organizada e transparente, reduzindo falhas e incertezas. Dessa forma, mesmo quando o cliente precisa sair de casa, ele continua tendo controle sobre o serviço, o que aumenta a sensação de segurança e melhora a experiência como um todo.
 
-Subprocesso de pagamento inexistente método registrado, mas sem confirmação de recebimento nem tratamento de falha.
+Modelo BPMN do Processo 4 
 
-Ausência de notificações, o cliente não recebe comunicação entre abertura do serviço e cobrança final.
 
-Modelo BPMN do Processo 4 [EXECUÇÃO DE SERVIÇO](<EXECUÇÃO DE SERVIÇO.png>) 
+
+<img width="6840" height="2490" alt="image" src="https://github.com/user-attachments/assets/6dc8e62e-c7ca-4e49-8374-71f5d5ec029a" />
+
+
 
 
 #### Detalhamento das atividades

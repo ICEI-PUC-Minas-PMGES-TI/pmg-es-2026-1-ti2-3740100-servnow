@@ -1,10 +1,14 @@
 ### 3.3.1 Processo 1 – Gestão de Clientes
 
-O processo de gestão de clientes abrange desde o cadastro e autenticação na plataforma até a solicitação e acompanhamento de serviços residenciais. Atualmente, sem um sistema centralizado, o cliente depende de contatos informais e não tem visibilidade sobre o status do seu atendimento.
+Atualmente, não há uma plataforma centralizada que facilite essa interação, fazendo com que o cliente dependa de indicações informais ou contatos diretos, muitas vezes sem informações suficientes sobre o prestador. Isso gera insegurança, dificuldade na comunicação e falta de visibilidade sobre o andamento do serviço após a contratação.
 
-A oportunidade de melhoria está em oferecer ao cliente uma jornada digital completa: criar sua conta, autenticar-se com segurança, solicitar serviços informando tipo, descrição e localização, e acompanhar em tempo real o status de cada solicitação pelo painel da plataforma ServNow.
+A oportunidade de melhoria está na implementação de uma jornada digital completa por meio da plataforma. Nela, o cliente poderá criar sua conta, autenticar-se com segurança e ter acesso a uma lista de prestadores disponíveis, com informações relevantes e avaliações.
 
-![Modelo BPMN do Processo 1 – Gestão de Clientes](images/bpmn_gestao_clientes.png "Modelo BPMN do Processo 1.")
+
+O processo de gestão de clientes envolve o cadastro e a autenticação do usuário na plataforma, etapas essenciais para garantir o acesso seguro às funcionalidades disponíveis. Por meio desse processo, o cliente consegue acessar seu painel, onde pode visualizar todos os serviços solicitados, acompanhar o status de cada atendimento e gerenciar suas interações dentro da plataforma.
+
+<img width="1199" height="691" alt="image" src="https://github.com/user-attachments/assets/b5fc8195-d54c-4073-9ced-4f5a7f2b46fb" />
+
 
 ---
 
