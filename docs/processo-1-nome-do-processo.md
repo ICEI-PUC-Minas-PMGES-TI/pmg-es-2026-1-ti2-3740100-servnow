@@ -4,7 +4,8 @@ O processo de gestão de clientes abrange desde o cadastro e autenticação na p
 
 A oportunidade de melhoria está em oferecer ao cliente uma jornada digital completa: criar sua conta, autenticar-se com segurança, solicitar serviços informando tipo, descrição e localização, e acompanhar em tempo real o status de cada solicitação pelo painel da plataforma ServNow.
 
-![Modelo BPMN do Processo 1 – Gestão de Clientes](images/bpmn_gestao_clientes.png "Modelo BPMN do Processo 1.")
+<img width="1164" height="658" alt="image" src="https://github.com/user-attachments/assets/905c26b0-7783-428f-953b-c149ff3d49ae" />
+
 
 ---
 
