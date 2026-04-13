@@ -154,13 +154,13 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 
 ### 3.3. Modelagem dos processos
 
-[PROCESSO 1-   Gestao de Clientes ](processo-1-nome-do-processo.md "Detalhamento do Processo 1.")
+[PROCESSO 1-   Gestao de Clientes ](processo1-gestão-de-clientes.md "Detalhamento do Processo 1.")
 
-[PROCESSO 2-   Gestao de Prestadores ](processo-2-nome-do-processo.md "Detalhamento do Processo 2.")
+[PROCESSO 2-   Gestao de Prestadores ](processo2-gestão-de-prestadores.md "Detalhamento do Processo 2.")
 
-[PROCESSO 3 -   Solicitar Serviço ](processo-3-nome-do-processo.md "Detalhamento do Processo 3.")
+[PROCESSO 3 -   Solicitar Serviço ](processo-3-solicitação-de-serviço.md "Detalhamento do Processo 3.")
 
-[PROCESSO 4 -   Executar Serviço](processo-4-nome-do-processo.md "Detalhamento do Processo 4.")
+[PROCESSO 4 -   Executar Serviço](processo-4-execução-de-serviço.md "Detalhamento do Processo 4.")
 
 ## 4. Projeto da solução
 
