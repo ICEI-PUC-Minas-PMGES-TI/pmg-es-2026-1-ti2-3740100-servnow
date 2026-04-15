@@ -8,8 +8,10 @@ A oportunidade de melhoria está na implementação de uma jornada digital compl
 O processo de gestão de clientes envolve o cadastro e a autenticação do usuário na plataforma, etapas essenciais para garantir o acesso seguro às funcionalidades disponíveis. Por meio desse processo, o cliente consegue acessar seu painel, onde pode visualizar todos os serviços solicitados, acompanhar o status de cada atendimento e gerenciar suas interações dentro da plataforma.
 
 
-<img width="1199" height="691" alt="image" src="https://github.com/user-attachments/assets/b5fc8195-d54c-4073-9ced-4f5a7f2b46fb" />
 
+=======
+<img width="1350" height="791" alt="image" src="https://github.com/user-attachments/assets/849df7fa-6228-47a4-8d77-05a05cb70c44" />
+>>>>>>> f2a6274338d7c39c54c5bf5c1d7eed81191181de
 
 ---
 
