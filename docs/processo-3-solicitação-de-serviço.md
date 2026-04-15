@@ -4,9 +4,8 @@ Atualmente, o processo de solicitação de serviços ocorre de forma desorganiza
 
 A oportunidade de melhoria está na digitalização e centralização desse fluxo por meio da plataforma. Com ela, o cliente passa a realizar a solicitação de forma estruturada, preenchendo informações essenciais como tipo de serviço, descrição do problema, endereço, data e horário desejados, além de poder anexar imagens. Após o envio, a solicitação é registrada e pode ser acompanhada em um painel, onde o cliente visualiza o status em tempo real, acessa o histórico de atualizações e consulta os detalhes do atendimento. Dessa forma, o processo se torna mais organizado, transparente e eficiente, proporcionando maior controle, segurança e praticidade ao cliente durante toda a jornada do serviço.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/688afc0f-c56e-41fd-a289-7a4f1c90b6b9" />
 
-
+![Processo 3](<images/Solicitar Serviços (1).svg>)
 
 #### Detalhamento das atividades
 
