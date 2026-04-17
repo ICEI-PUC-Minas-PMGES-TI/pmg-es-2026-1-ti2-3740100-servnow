@@ -33,8 +33,8 @@ export function Header({
         {/* NAV */}
         <nav className="header-nav">
           <a href="#" className="nav-link">Início</a>
-          <a href="#" className="nav-link">Serviços</a>
-          <a href="#" className="nav-link">Sobre</a>
+          <a href="#" className="nav-link">Solicitações</a>
+          <a href="#" className="nav-link">Painel</a>
         </nav>
 
         {/* AÇÕES */}

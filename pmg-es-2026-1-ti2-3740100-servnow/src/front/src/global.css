@@ -1,0 +1,179 @@
+body{
+    padding: 0;
+    margin: 0;
+}
+
+/* =========================================
+   GLOBAL CSS (Para todas as páginas)
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+
+/* BASE */
+body {
+  font-family: 'Sora', sans-serif;
+  background: #f0f6ff;
+  color: #0a2e52;
+  margin: 0;
+  padding: 0;
+}
+
+/* UTILS E SEÇÕES GERAIS */
+.section {
+  padding: 96px 0;
+}
+
+.section-alt { 
+  background: #e8f2fc; 
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 10px;
+}
+
+.section-sub {
+  color: #5a7a9a;
+  font-size: 16px;
+  margin-top: -10px;
+  margin-bottom: 48px;
+}
+
+.section h2 {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  color: #0a2e52;
+}
+
+.icon-sky { 
+  color: #38bdf8; 
+}
+
+/* BOTÕES GERAIS */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #fff;
+  border: none;
+  padding: 13px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(56, 189, 248, 0.5);
+  filter: brightness(1.08);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  padding: 13px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* COMPONENTE REAPROVEITÁVEL: TEXTO DE UM LADO, IMAGEM DO OUTRO */
+.split-section .section-inner { padding-top: 0; padding-bottom: 0; }
+
+.split-inner {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+.split-inner.reverse { flex-direction: row-reverse; }
+
+.split-text { flex: 1; }
+
+.split-text h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.split-text p {
+  font-size: 15px;
+  color: #5a7a9a;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.benefit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.benefit-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #2d5a7a;
+  font-weight: 500;
+}
+
+.split-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.split-image img {
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  filter: drop-shadow(0 16px 32px rgba(10, 46, 82, 0.12));
+  transition: transform 0.4s;
+}
+
+.split-image img:hover {
+  transform: translateY(-6px);
+}
+
+/* RESPONSIVO GLOBAL */
+@media (max-width: 1024px) {
+  .split-inner,
+  .split-inner.reverse { flex-direction: column; gap: 40px; }
+}
+
+@media (max-width: 768px) {
+  .section-inner { padding: 0 24px; }
+  .section { padding: 64px 0; }
+}
