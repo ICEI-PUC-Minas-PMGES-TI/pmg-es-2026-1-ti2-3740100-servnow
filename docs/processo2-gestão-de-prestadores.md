@@ -69,7 +69,7 @@ Os tipos de dados utilizados nas atividades são:
 | Dias disponíveis           | Seleção múltipla   | pelo menos 1 dia selecionado                    |               |
 | Horário de início          | Hora               | anterior ao horário de fim                      |               |
 | Horário de fim             | Hora               | posterior ao horário de início                  |               |
-| Raio de atendimento (km)   | Número             | entre 1 e 100                                   | 10            |
+| Raio de atendimento (km)   | Número             | entre 1 e 30                                   |             |
 | Documento de identidade    | Arquivo            | PDF ou imagem, máximo de 5 MB                   |               |
 | Foto de perfil             | Imagem             | JPG ou PNG, máximo de 2 MB                      |               |
 

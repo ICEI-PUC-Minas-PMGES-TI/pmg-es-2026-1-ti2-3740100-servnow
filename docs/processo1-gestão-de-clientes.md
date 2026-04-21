@@ -45,12 +45,12 @@ Os tipos de dados utilizados nas atividades são:
 | Nome completo   | Caixa de texto  | mínimo de 10 caracteres                 |                   |
 | Telefone        | Caixa de texto  | formato (XX) 00000-0000                 |                   |
 | E-mail          | Caixa de texto  | formato de e-mail válido, único         |                   |
-| Senha           | Caixa de texto  | mínimo de 8 caracteres                  |                   |
+| Senha           | Caixa de texto  |mínimo de 8 caracteres, pelo menos 1 letra maiúscula, 1 número e 1 caractere especial                  |                   |
 
 | **Comandos**    | **Destino**                        | **Tipo**  |
 | ---             | ---                                | ---       |
 | Cadastrar       | Validar dados (sistema)            | default   |
-| Cancelar        | Home page                      | cancel    |
+| Cancelar        | Home page                          | cancel    |
 
 ---
 
