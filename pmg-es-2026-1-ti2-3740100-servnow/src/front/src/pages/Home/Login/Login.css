@@ -277,6 +277,27 @@
 
 .btn-login:active { transform: translateY(0); }
 
+.btn-login:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
+}
+
+.login-feedback {
+  margin: -6px 0 2px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.login-feedback.error {
+  color: #b42318;
+}
+
+.login-feedback.success {
+  color: #067647;
+}
+
 /* DIVIDER */
 .login-divider {
   display: flex;
