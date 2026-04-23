@@ -2,8 +2,8 @@
 
 ### 4.1. Modelo de dados
 
-![MODELO DE DADOS](<images/Modelo de dados Servnow .svg>)
-
+![Modelo de dados](images/ModelodedadosServnow.svg)
+adiconar campo especialidade no prestador
 ---
 
 ### 4.2. Tecnologias

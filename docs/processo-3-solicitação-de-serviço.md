@@ -11,14 +11,13 @@ A oportunidade de melhoria está na digitalização e centralização desse flux
 
 **Preencher solicitação**
 
-| **Campo**           | **Tipo**         | **Restrições**                               | **Valor default** |
-| ---                 | ---              | ---                                          | ---               |
-| Tipo de serviço     | Seleção única    | obrigatório (ex: elétrico, hidráulico, etc.) |                   |
-| Descrição do problema | Área de texto  | mínimo de 20 caracteres, máximo de 500       |                   |
-| Endereço do serviço | Caixa de texto   | CEP válido, logradouro e número              |                   |
-| Data desejada       | Data             | data futura                                  |                   |
-| Horário desejado    | Hora             | dentro do horário de operação da plataforma  |                   |
-| Fotos do problema   | Imagem           | opcional, JPG ou PNG, até 3 imagens          |                   |
+| **Campo**           | **Tipo**         | **Restrições**                               | 
+| ---                 | ---              | ---                                          | 
+| Tipo de serviço     | Seleção única    | obrigatório (ex: elétrico, hidráulico, etc.) |  
+| Descrição do problema | Área de texto  | mínimo de 20 caracteres, máximo de 500       |                  
+| Endereço do serviço | Caixa de texto   | CEP válido, logradouro e número              |                   
+| Horário desejado    | Hora             | dentro do horário de operação da plataforma  |                   
+| Fotos do problema   | Imagem           | opcional, JPG ou PNG, até 3 imagens          |                  
 
 | **Comandos**        | **Destino**                        | **Tipo**  |
 | ---                 | ---                                | ---       |
@@ -31,10 +30,10 @@ A oportunidade de melhoria está na digitalização e centralização desse flux
 
 Tela de revisão e confirmação antes de submeter a solicitação à plataforma.
 
-| **Campo**           | **Tipo**       | **Restrições**  | **Valor default** |
-| ---                 | ---            | ---             | ---               |
-| Resumo da solicitação | Área de texto | somente leitura |                  |
-| Confirmação         | Seleção única  | Confirmar / Editar |               |
+| **Campo**           | **Tipo**       | **Restrições**     | 
+| ---                 | ---            | ---                | 
+| Resumo da solicitação | Área de texto | somente leitura   |                 
+| Confirmação         | Seleção única  | Confirmar / Editar |               
 
 | **Comandos**    | **Destino**                        | **Tipo**  |
 | ---             | ---                                | ---       |
@@ -47,25 +46,26 @@ Tela de revisão e confirmação antes de submeter a solicitação à plataforma
 
 Painel de acompanhamento de todas as solicitações do cliente.
 
-| **Campo**       | **Tipo**  | **Restrições**  | **Valor default** |
-| ---             | ---       | ---             | ---               |
-| Lista de solicitações | Tabela | somente leitura |               |
-| ID da solicitação | Caixa de texto | somente leitura |           |
-| Tipo de serviço | Caixa de texto | somente leitura |                |
-| Status          | Caixa de texto | somente leitura (aberta / em andamento / concluída / recusada) | |
-| Data de criação | Data      | somente leitura |                   |
+| **Campo**       | **Tipo**  | **Restrições**                               |
+| ---             | ---       | ---                                          |
+| Lista de solicitações | Tabela | somente leitura |                         |
+| ID da solicitação | Caixa de texto | somente leitura |                     |
+| Tipo de serviço | Caixa de texto | somente leitura |                       |
+| Status          | Caixa de texto | somente leitura (aceita/ em andamento   |
+                                                    em andamento/ concluida) |
+| Data de criação | Data      | somente leitura |                   
 
-| **Comandos**        | **Destino**            | **Tipo**  |
-| ---                 | ---                    | ---       |
-| Filtrar             | Filtrar resultados      | default   |
-| Ver detalhes        | Ver detalhes           | default   |
+| **Comandos**        | **Destino**            | 
+| ---                 | ---                    | 
+| Filtrar             | Filtrar resultados     | 
+| Ver detalhes        | Ver detalhes           |
 | Nova solicitação    | Preencher solicitação  | default   |
 
 ---
 
 **Filtrar resultados**
 
-| **Campo**       | **Tipo**      | **Restrições**                                    | **Valor default** |
+| **Campo**       | **Tipo**      | **Restrições**                                    |     **Valor**     |
 | ---             | ---           | ---                                               | ---               |
 | Status          | Seleção múltipla | aberta / em andamento / concluída / recusada   | todos             |
 | Data inicial    | Data          | anterior ou igual à data final                    |                   |
@@ -81,12 +81,12 @@ Painel de acompanhamento de todas as solicitações do cliente.
 
 **Ver detalhes**
 
-| **Campo**              | **Tipo**       | **Restrições**  | **Valor default** |
+| **Campo**              | **Tipo**       | **Restrições**  |   **Valor**       |
 | ---                    | ---            | ---             | ---               |
 | ID da solicitação      | Caixa de texto | somente leitura |                   |
 | Status atual           | Caixa de texto | somente leitura |                   |
 | Nome do prestador      | Caixa de texto | somente leitura |                   |
-| Avaliação do prestador | Número         | somente leitura (0 a 5 estrelas) |        |
+| Avaliação do prestador | Número         | somente leitura |   (0 a 5 estrelas)|        
 | Histórico de atualizações | Tabela      | somente leitura |                   |
 | Data e hora do serviço | Data e Hora    | somente leitura |                   |
 

@@ -22,16 +22,16 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                  | Tipo   | Restrições                                              | Valor Default |
-|------------------------|--------|---------------------------------------------------------|--------------|
-| Código de verificação  | Número | 6 dígitos, gerado automaticamente, válido por 10 minutos | —            |
+| Campo                  | Tipo   | Restrições                                              | 
+|------------------------|--------|---------------------------------------------------------|
+| Código de verificação  | Número | 6 dígitos, gerado automaticamente, válido por 10 minutos| 
 
 ### Comandos
 
 | Comando           | Destino                         | Tipo    |
 |------------------|----------------------------------|---------|
-| Confirmar chegada | Gerar e enviar código ao cliente | default |
-| Cancelar          | Cancelar atendimento             | cancel  |
+| Confirmar chegada | Gerar e enviar código ao cliente| default |
+| Cancelar          | Cancelar atendimento            | cancel  |
 
 ---
 
@@ -39,10 +39,10 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                        | Tipo   | Restrições                              | Valor Default |
-|-----------------------------|--------|-----------------------------------------|--------------|
-| Código informado pelo cliente | Número | 6 dígitos, obrigatório                  | —            |
-| Tentativas realizadas        | Número | Preenchido automaticamente, máximo 3    | —            |
+| Campo                        | Tipo   | Restrições                              | 
+|-----------------------------|--------|----------------------------------------- |
+| Código informado pelo cliente | Número | 6 dígitos, obrigatório                 | 
+| Tentativas realizadas        | Número | Preenchido automaticamente, máximo 3    | 
 
 ### Comandos
 
@@ -57,16 +57,16 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                    | Tipo    | Restrições                                              | Valor Default |
-|--------------------------|---------|---------------------------------------------------------|--------------|
-| Hora de início           | Hora    | Preenchido automaticamente pelo sistema                 | —            |
-| Fotos do estado inicial  | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada                  | —            |
-| Observações do serviço   | Texto   | Máximo de 300 caracteres                                | —            |
-| Fotos do estado final    | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada                  | —            |
+| Campo                    | Tipo    | Restrições                                       | 
+|--------------------------|---------|--------------------------------------------------|
+| Hora de início           | Hora    | Preenchido automaticamente pelo sistema          | 
+| Fotos do estado inicial  | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada            | 
+| Observações do serviço   | Texto   | Máximo de 300 caracteres                         |  
+| Fotos do estado final    | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada            |     
 
 ### Comandos
 
-| Comando            | Destino               | Tipo    |
+| Comando            | Destino                | Tipo    |
 |--------------------|------------------------|---------|
 | Concluir execução  | Concluir atendimento   | default |
 
@@ -76,11 +76,11 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                 | Tipo    | Restrições                      | Valor Default |
-|------------------------|---------|--------------------------------|--------------|
-| Hora de conclusão      | Hora    | Preenchido automaticamente     | —            |
-| Valor final cobrado    | Número  | Valor positivo (R$)            | —            |
-| Método de pagamento    | Seleção | Pix / Cartão / Dinheiro        | —            |
+| Campo                 | Tipo    | Restrições                      | 
+|------------------------|---------|--------------------------------|
+| Hora de conclusão      | Hora    | Preenchido automaticamente     | 
+| Valor final cobrado    | Número  | Valor positivo (R$)            | 
+| Método de pagamento    | Seleção | Pix / Cartão / Dinheiro        | 
 
 ### Comandos
 
@@ -95,16 +95,16 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                 | Tipo   | Restrições                 | Valor Default |
+| Campo                 | Tipo   | Restrições                | Valor        |
 |----------------------|--------|----------------------------|--------------|
 | Nome do prestador    | Texto  | Somente leitura            | Automático   |
 | Serviço contratado   | Texto  | Somente leitura            | Automático   |
-| Código de verificação| Número | 6 dígitos, obrigatório     | —            |
+| Código de verificação| Número | 6 dígitos, obrigatório     |              |
 
 ### Comandos
 
 | Comando                   | Destino                         | Tipo    |
-|---------------------------|----------------------------------|---------|
+|---------------------------|---------------------------------|---------|
 | Confirmar e enviar código | Prestador insere código         | default |
 | Recusar presença          | Cancelar atendimento            | cancel  |
 
@@ -114,12 +114,12 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                   | Tipo    | Restrições        | Valor Default |
-|--------------------------|---------|-------------------|--------------|
-| Fotos do estado inicial  | Imagem  | Somente leitura   | —            |
-| Fotos do estado final    | Imagem  | Somente leitura   | —            |
-| Observações do prestador | Texto   | Somente leitura   | —            |
-| Valor cobrado            | Número  | Somente leitura   | —            |
+| Campo                   | Tipo    | Restrições         | 
+|--------------------------|---------|-------------------|
+| Fotos do estado inicial  | Imagem  | Somente leitura   | 
+| Fotos do estado final    | Imagem  | Somente leitura   | 
+| Observações do prestador | Texto   | Somente leitura   | 
+| Valor cobrado            | Número  | Somente leitura   | 
 
 ### Comandos
 
@@ -134,11 +134,11 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                | Tipo    | Restrições                   | Valor Default            |
-|---------------------|---------|------------------------------|--------------------------|
-| Método de pagamento | Seleção | Pix / Cartão / Dinheiro      | —                        |
-| Valor a pagar       | Número  | Somente leitura              | —                        |
-| Status do pagamento | Texto   | Preenchido automaticamente   | Aguardando confirmação   |
+| Campo                | Tipo    | Restrições                  | 
+|---------------------|---------|------------------------------|
+| Método de pagamento | Seleção | Pix / Cartão / Dinheiro      | 
+| Valor a pagar       | Número  | Somente leitura              | 
+| Status do pagamento | Texto   | Preenchido automaticamente   | 
 
 ### Comandos
 
@@ -154,15 +154,15 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo               | Tipo     | Restrições                           | Valor Default |
-|---------------------|----------|--------------------------------------|--------------|
-| Nota                | Seleção  | 1 a 5 estrelas, obrigatório          | —            |
-| Comentário          | Texto    | Máx. 200 caracteres, opcional        | —            |
-| Prazo para avaliação| Hora     | Até 48h após encerramento da OS      | —            |
+| Campo               | Tipo     | Restrições                           | 
+|---------------------|----------|--------------------------------------|
+| Nota                | Seleção  | 1 a 5 estrelas, obrigatório          | 
+| Comentário          | Texto    | Máx. 200 caracteres, opcional        | 
+| Prazo para avaliação| Hora     | Até 48h após encerramento da OS      | 
 
 ### Comandos
 
-| Comando            | Destino                                   | Tipo    |
+| Comando            | Destino                                    | Tipo    |
 |--------------------|--------------------------------------------|---------|
 | Enviar avaliação   | Registrar e atualizar reputação            | default |
 | Pular avaliação    | Registrar OS sem avaliação                 | cancel  |

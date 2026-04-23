@@ -40,12 +40,13 @@ Os tipos de dados utilizados nas atividades são:
 
 **Preencher cadastro**
 
-| **Campo**       | **Tipo**        | **Restrições**                          | **Valor default** |
-| ---             | ---             | ---                                     | ---               |
-| Nome completo   | Caixa de texto  | mínimo de 10 caracteres                 |                   |
-| Telefone        | Caixa de texto  | formato (XX) 00000-0000                 |                   |
-| E-mail          | Caixa de texto  | formato de e-mail válido, único         |                   |
-| Senha           | Caixa de texto  |mínimo de 8 caracteres, pelo menos 1 letra maiúscula, 1 número e 1 caractere especial                  |                   |
+| **Campo**       | **Tipo**        | **Restrições**                                      |
+| ---             | ---             | ---                                                 |
+| Nome completo   | Caixa de texto  | mínimo de 10 caracteres                             |
+| Telefone        | Caixa de texto  | formato (XX) 00000-0000                             |
+| E-mail          | Caixa de texto  | formato de e-mail válido, único                     |
+| Senha           | Caixa de texto  |mínimo de 8 caracteres, pelo menos 1 letra maiúscula,|
+                                    | 1 número e 1 caractere especial                     |                   
 
 | **Comandos**    | **Destino**                        | **Tipo**  |
 | ---             | ---                                | ---       |
@@ -57,10 +58,10 @@ Os tipos de dados utilizados nas atividades são:
 
 **Inserir credenciais**
 
-| **Campo** | **Tipo**       | **Restrições**           | **Valor default** |
-| ---       | ---            | ---                      | ---               |
-| E-mail    | Caixa de texto | formato de e-mail válido |                   |
-| Senha     | Caixa de texto | mínimo de 8 caracteres   |                   |
+| **Campo** | **Tipo**       | **Restrições**           |
+| ---       | ---            | ---                      | 
+| E-mail    | Caixa de texto |formato de e-mail válido |
+|   Senha   | Caixa de texto |mínimo de 8 caracteres                 
 
 | **Comandos**     | **Destino**                  | **Tipo**  |
 | ---              | ---                          | ---       |
@@ -72,11 +73,11 @@ Os tipos de dados utilizados nas atividades são:
 
 ### Configurar perfil do cliente
 
-| Campo                    | Tipo             | Restrições                                      | Valor default |
-|--------------------------|------------------|-------------------------------------------------|---------------|
-| Endereço                 | Caixa de texto   | logradouro, número, bairro, cidade, CEP         |               |
-| Foto de perfil           | Imagem           | JPG ou PNG, máximo de 2 MB                      |               |
-| Foto do local (opcional) | Imagem           | JPG ou PNG, máximo de 5 MB                      |               |
+| Campo                    | Tipo             | Restrições                                 | 
+|--------------------------|------------------|--------------------------------------------|
+| Endereço                 | Caixa de texto   | logradouro, número, bairro, cidade, CEP    |               
+| Foto de perfil           | Imagem           | JPG ou PNG, máximo de 2 MB                 |               
+| Foto do local (opcional) | Imagem           | JPG ou PNG, máximo de 5 MB                 |               
 
 | Comandos         | Destino                       | Tipo    |
 |------------------|-------------------------------|---------|
