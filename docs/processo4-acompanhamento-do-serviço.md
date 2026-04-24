@@ -1,6 +1,6 @@
-### 3.3.4 Processo 4 – EXECUÇÃO DE SERVIÇO
+### 3.3.4 Processo 4 – ACOMPANHAMENTO DO PEDIDO
 
-Atualmente, a execução de serviços por prestadores ocorre de forma bastante informal e pouco estruturada, o que gera diversos problemas tanto para o cliente quanto para o profissional. A ausência de um canal centralizado dificulta o acompanhamento do andamento do serviço e torna a comunicação desorganizada, muitas vezes dependente de mensagens dispersas ou contatos informais. Como consequência, o cliente não possui visibilidade sobre o que está sendo feito, o que gera insegurança, principalmente em situações em que precisa se ausentar do local durante a execução. Além disso, a falta de registros e atualizações sobre o serviço impede um controle adequado e dificulta a construção de confiança entre as partes.
+Atualmente, o acompanhamento de serviços por prestadores ocorre de forma bastante informal e pouco estruturada, o que gera diversos problemas tanto para o cliente quanto para o profissional. A ausência de um canal centralizado dificulta o acompanhamento do andamento do serviço e torna a comunicação desorganizada, muitas vezes dependente de mensagens dispersas ou contatos informais. Como consequência, o cliente não possui visibilidade sobre o que está sendo feito, o que gera insegurança, principalmente em situações em que precisa se ausentar do local durante a execução. Além disso, a falta de registros e atualizações sobre o serviço impede um controle adequado e dificulta a construção de confiança entre as partes.
 
 Com a implementação de uma plataforma digital, esse cenário tende a melhorar significativamente. O processo passa a ser mais estruturado, permitindo que o cliente acompanhe o andamento do serviço em tempo real, receba atualizações e  fotos. A comunicação se torna mais organizada e transparente, reduzindo falhas e incertezas. Dessa forma, mesmo quando o cliente precisa sair de casa, ele continua tendo controle sobre o serviço, o que aumenta a sensação de segurança e melhora a experiência como um todo.
 
@@ -40,16 +40,16 @@ Modelo BPMN do Processo 4
 ### Campos
 
 | Campo                        | Tipo   | Restrições                              | 
-|-----------------------------|--------|----------------------------------------- |
-| Código informado pelo cliente | Número | 6 dígitos, obrigatório                 | 
+|---------------------------- -|--------|----------------------------------------- |
+| Código informado pelo cliente| Número | 6 dígitos, obrigatório                 | 
 | Tentativas realizadas        | Número | Preenchido automaticamente, máximo 3    | 
 
 ### Comandos
 
 | Comando         | Destino                     | Tipo    |
-|----------------|-----------------------------|---------|
-| Validar código | Gateway "Código válido?"    | default |
-| Reenviar código | Gerar novo código ao cliente | default |
+|----------------|---------------------------- -|---------|
+| Validar código | Gateway "Código válido?"     | default |
+| Reenviar código | Gerar novo código ao cliente| default |
 
 ---
 
@@ -85,9 +85,8 @@ Modelo BPMN do Processo 4
 ### Comandos
 
 | Comando                    | Destino              | Tipo    |
-|---------------------------|----------------------|---------|
+|-------------------------- -|----------------------|---------|
 | Enviar cobrança ao cliente | Notificar cliente    | default |
-| Cancelar conclusão         | Executar serviço     | cancel  |
 
 ---
 
