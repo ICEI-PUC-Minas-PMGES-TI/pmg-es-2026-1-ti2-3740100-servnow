@@ -1,13 +1,14 @@
 package com.servnow.backend.auth;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.auth.dto.AuthRequest;
 import com.servnow.backend.auth.dto.AuthResponse;
 import com.servnow.backend.auth.dto.RegisterRequest;
+import com.servnow.backend.security.JwtService;
 import com.servnow.backend.user.TipoUsuario;
 import com.servnow.backend.user.Usuario;
 import com.servnow.backend.user.UsuarioRepository;
@@ -16,10 +17,17 @@ import com.servnow.backend.user.UsuarioRepository;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UsuarioRepository usuarioRepository) {
+    public AuthService(
+        UsuarioRepository usuarioRepository,
+        PasswordEncoder passwordEncoder,
+        JwtService jwtService
+    ) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public AuthResponse cadastrar(RegisterRequest request) {
@@ -73,6 +81,7 @@ public class AuthService {
             usuario.getNome(),
             usuario.getEmail(),
             usuario.getTipoUsuario().name(),
+            jwtService.gerarToken(usuario),
             mensagem
         );
     }
