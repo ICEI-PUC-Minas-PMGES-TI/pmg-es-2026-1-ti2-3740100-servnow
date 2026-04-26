@@ -8,7 +8,7 @@ Modelo BPMN do Processo 4
 
 
 
-<img width="6840" height="2490" alt="image" src="https://github.com/user-attachments/assets/6dc8e62e-c7ca-4e49-8374-71f5d5ec029a" />
+![Processo 4](images/ACOMPANHARPROCESSO.svg)
 
 
 
