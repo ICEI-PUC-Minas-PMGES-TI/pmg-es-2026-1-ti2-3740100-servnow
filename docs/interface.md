@@ -10,11 +10,20 @@ O protótipo completo e interativo das telas pode ser acessado no Figma através
 
 ## 6.1. Tela principal do sistema
 
-_Descrição da tela principal do sistema (home page), acessada por clientes e prestadores ao ingressarem na plataforma._
+Na tela da Home Page, serão apresentadas informações gerais sobre a plataforma, explicando de forma clara como ela funciona e qual é o seu propósito.
 
-> Tela principal do sistema — _a ser adicionada_
+Também serão exibidas as principais categorias de serviços disponíveis, destacando os tipos de atividades nas quais os prestadores podem se cadastrar e atuar.
+
+Além disso, a página contará com uma seção dedicada às vantagens da plataforma, evidenciando seus benefícios tanto para clientes quanto para prestadores de serviço.
+
+Por fim, serão exibidos feedbacks e avaliações de clientes, com o objetivo de gerar confiança e demonstrar a qualidade dos serviços oferecidos.
+
+![!\[> Home page\](images/homepage.jpg)](<images/homepage (1).jpg>)
 
 ---
+## 6.1.2 Tela  de Login
+![!\[Tela login\](images/telalogin.png)!\[alt text\](image.png)](images/telalogin.png)
+
 
 ## 6.2. Telas do processo 1 — Gestão de Clientes
 
@@ -22,7 +31,7 @@ _As telas referentes ao processo de Gestão de Clientes serão adicionadas nesta
 
 ### 6.2.1. Tela de cadastro de cliente
 
-![!\Cadastro Clientes \](image.png)](images/cadastroclientes.png)
+![Cadastro Clientes](images/telacadastrocliente.png)
 
 Tela destinada ao cadastro de novos  clientes na plataforma ServNow. Nela, o cliente informa seus dados pessoais (nome, CPF, e-mail, telefone e CEP), e define sua senha de acesso. O layout segue o padrão visual da plataforma, com uma seção ilustrativa à esquerda reforçando os benefícios de se tornar um cliente e o formulário de cadastro à direita. O usuário também pode alternar entre as opções "Sou cliente" e "Sou prestador" no topo do formulário.
 
