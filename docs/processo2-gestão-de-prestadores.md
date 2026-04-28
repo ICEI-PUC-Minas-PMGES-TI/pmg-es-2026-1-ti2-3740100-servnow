@@ -33,17 +33,16 @@ Os tipos de dados utilizados nas atividades são:
 
 ### Preencher cadastro
 
-| Campo           | Tipo            | Restrições                                             | 
-|------------------|-----------------|-------------------------------------------------------|
-| Nome completo    | Caixa de texto  | mínimo de 10 caracteres                               |               
-| Endereço         | Caixa de texto  | logradouro, número, bairro, cidade, CEP               |              
-| Telefone         | Caixa de texto  | formato (XX) 00000-0000                               |                  
-| E-mail           | Caixa de texto  | formato de e-mail válido, único                       |              
-| Senha            | Caixa de texto  | mínimo de 8 caracteres, pelo menos 1 letra maiúscula, |      
-                                     |      1 número e 1 caractere especial                  |              
+| Campo         | Tipo           | Restrições                                                     |
+|---------------|---------------|---------------------------------------------------------------- |
+| Nome completo | Caixa de texto | mínimo de 10 caracteres                                        |
+| Endereço      | Caixa de texto | logradouro, número, bairro, cidade, CEP                        |
+| Telefone      | Caixa de texto | formato (XX) 00000-0000                                        |
+| E-mail        | Caixa de texto | formato de e-mail válido, único                                |
+| Senha         | Caixa de texto | mínimo de 8 caracteres, pelo menos 1 letra maiúscula, 1 número e 1 caractere especial |         
 
-| Comandos         | Destino                        | Tipo    |
-|------------------|--------------------------------|---------|
+| Comandos         | Destino                       | Tipo    |
+|------------------|-------------------------------|---------|
 | Cadastrar        | Validar dados (sistema)       | default |
 | Cancelar         | Home page                     | cancel  |
 

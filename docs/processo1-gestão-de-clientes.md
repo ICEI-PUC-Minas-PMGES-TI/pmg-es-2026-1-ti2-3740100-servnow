@@ -10,10 +10,9 @@ O processo de gestão de clientes envolve o cadastro e a autenticação do usuá
 
 
 =======
-<img width="1350" height="791" alt="image" src="https://github.com/user-attachments/assets/849df7fa-6228-47a4-8d77-05a05cb70c44" />
->>>>>>> f2a6274338d7c39c54c5bf5c1d7eed81191181de
+![Processo 1](images/Gestaoclientes.svg)
 
----
+
 
 #### Detalhamento das atividades
 
@@ -46,8 +45,9 @@ Os tipos de dados utilizados nas atividades são:
 | Telefone        | Caixa de texto  | formato (XX) 00000-0000                             |
 | E-mail          | Caixa de texto  | formato de e-mail válido, único                     |
 | Senha           | Caixa de texto  |mínimo de 8 caracteres, pelo menos 1 letra maiúscula,|
-                                    | 1 número e 1 caractere especial                     |                   
+|1 número e 1 caractere especial|                   
 
+                                    
 | **Comandos**    | **Destino**                        | **Tipo**  |
 | ---             | ---                                | ---       |
 | Cadastrar       | Validar dados (sistema)            | default   |
@@ -60,8 +60,8 @@ Os tipos de dados utilizados nas atividades são:
 
 | **Campo** | **Tipo**       | **Restrições**           |
 | ---       | ---            | ---                      | 
-| E-mail    | Caixa de texto |formato de e-mail válido |
-|   Senha   | Caixa de texto |mínimo de 8 caracteres                 
+| E-mail    | Caixa de texto |formato de e-mail válido  |
+|   Senha   | Caixa de texto |mínimo de 8 caracteres    |                
 
 | **Comandos**     | **Destino**                  | **Tipo**  |
 | ---              | ---                          | ---       |
