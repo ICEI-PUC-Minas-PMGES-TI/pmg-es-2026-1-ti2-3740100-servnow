@@ -2,11 +2,6 @@
 
 _Visão geral da interação do usuário por meio das telas do sistema. Abaixo são apresentadas as principais interfaces da plataforma ServNow._
 
-O protótipo completo e interativo das telas pode ser acessado no Figma através do link abaixo:
-
-**[Acessar protótipo no Figma](https://www.figma.com/design/Dz35BgnfCH8mxOi2D4STXs/html.to.design-—-by-‹div›RIOTS-—-Import-websites-to-Figma-designs--web-html-css---Comunidade-?node-id=0-1&)**
-
----
 
 ## 6.1. Tela principal do sistema
 
@@ -18,11 +13,11 @@ Além disso, a página contará com uma seção dedicada às vantagens da plataf
 
 Por fim, serão exibidos feedbacks e avaliações de clientes, com o objetivo de gerar confiança e demonstrar a qualidade dos serviços oferecidos.
 
-![!\[> Home page\](images/homepage.jpg)](<images/homepage (1).jpg>)
+![ Home page)](<images/design/homepage (1).jpg>)
 
 ---
 ## 6.1.2 Tela  de Login
-![!\[Tela login\](images/telalogin.png)!\[alt text\](image.png)](images/telalogin.png)
+![Tela login](images/design/telalogin.png)
 
 
 ## 6.2. Telas do processo 1 — Gestão de Clientes
