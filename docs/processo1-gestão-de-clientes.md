@@ -10,7 +10,7 @@ O processo de gestão de clientes envolve o cadastro e a autenticação do usuá
 
 
 =======
-![Processo 1](images/Gestaoclientes.svg)
+![Processo 1](images/BPMN/Gestaoclientes.svg)
 
 
 

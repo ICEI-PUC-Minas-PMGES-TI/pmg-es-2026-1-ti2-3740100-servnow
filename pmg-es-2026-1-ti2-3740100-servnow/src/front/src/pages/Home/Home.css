@@ -2,8 +2,8 @@
 
 /* HERO */
 .hero {
-  background: linear-gradient(135deg, #071f36 0%, #0a2e52 60%, #0d3860 100%);
-  color: white;
+  background: var(--hero-bg);
+  color: var(--hero-text);
   padding: 100px 64px;
   display: flex;
   align-items: center;
@@ -48,12 +48,12 @@
   line-height: 1.15;
   letter-spacing: -1px;
   margin-bottom: 18px;
-  color: #fff;
+  color: var(--hero-text);
 }
 
 .hero p {
   font-size: 17px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--hero-muted);
   margin-bottom: 36px;
   line-height: 1.7;
 }
@@ -81,12 +81,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #051727;
-  border: 1px solid rgba(13, 17, 233, 0.12);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   backdrop-filter: blur(10px);
   padding: 12px 18px;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-strong);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
@@ -98,7 +98,7 @@
 
 /* STATS */
 .stats-bar {
-  background:#021527;
+  background: var(--dark-band);
   display: flex;
   justify-content: center;
 }
@@ -136,8 +136,8 @@
 }
 
 .step {
-  background: #fff;
-  border: 1px solid rgba(10, 46, 82, 0.08);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   border-radius: 16px;
   padding: 36px 32px;
   flex: 1;
@@ -162,12 +162,12 @@
   font-size: 17px;
   font-weight: 600;
   margin: 14px 0 10px;
-  color: #0a2e52;
+  color: var(--text-strong);
 }
 
 .step p {
   font-size: 14px;
-  color: #5a7a9a;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -184,8 +184,8 @@
 }
 
 .categoria-card {
-  background: #fff;
-  border: 1px solid rgba(10, 46, 82, 0.08);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   border-radius: 14px;
   padding: 28px 24px;
   cursor: pointer;
@@ -213,13 +213,13 @@
 .categoria-card h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #0a2e52;
+  color: var(--text-strong);
   margin-bottom: 6px;
 }
 
 .categoria-card p {
   font-size: 13px;
-  color: #5a7a9a;
+  color: var(--text-muted);
   margin-bottom: 16px;
 }
 
@@ -241,8 +241,8 @@
 }
 
 .beneficio-card {
-  background: #fff;
-  border: 1px solid rgba(10, 46, 82, 0.08);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   border-radius: 14px;
   padding: 30px 24px;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -256,13 +256,13 @@
 .beneficio-card h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #0a2e52;
+  color: var(--text-strong);
   margin: 16px 0 10px;
 }
 
 .beneficio-card p {
   font-size: 14px;
-  color: #5a7a9a;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -275,8 +275,8 @@
 }
 
 .avaliacao-card {
-  background: #fff;
-  border: 1px solid rgba(10, 46, 82, 0.08);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
   border-radius: 14px;
   padding: 28px 24px;
   display: flex;
@@ -288,7 +288,7 @@
 
 .avaliacao-card p {
   font-size: 14px;
-  color: #3a5a75;
+  color: var(--text-body);
   line-height: 1.65;
   flex: 1;
 }
@@ -313,7 +313,7 @@
 .avaliacao-autor strong {
   display: block;
   font-size: 14px;
-  color: #0a2e52;
+  color: var(--text-strong);
 }
 
 .avaliacao-autor span {
@@ -324,7 +324,7 @@
 
 /* CTA FINAL */
 .cta-section {
-  background: linear-gradient(135deg, #071f36 0%, #0a2e52 60%, #0d3860 100%);
+  background: var(--hero-bg);
   padding: 96px 64px;
 }
 

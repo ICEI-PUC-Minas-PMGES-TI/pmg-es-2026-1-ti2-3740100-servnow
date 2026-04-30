@@ -10,7 +10,9 @@ import prestadorImg from "../../assets/prestador.svg";
 import fechandoAcordoImg from "../../assets/fechandoacordo.svg";
 import grafico from "../../assets/grafico.svg";
 import completo from "../../assets/completo.svg";
+import { getAuthSession } from "../../services/auth";
 export function Home() {
+  const isLoggedIn = Boolean(getAuthSession());
   const categorias = [
     { icon: Zap,        titulo: "Elétrica",           descricao: "Instalação e reparo elétrico" },
     { icon: Droplet,    titulo: "Hidráulica",          descricao: "Encanamento e vazamentos" },
@@ -69,10 +71,10 @@ export function Home() {
           <h1>Serviços profissionais<br />na palma da sua mão</h1>
           <p>Conectamos você aos melhores profissionais da sua região de forma rápida, segura e sem complicação.</p>
           <div className="hero-buttons">
-            <Link to="/cadastro">
+            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
               <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
             </Link>
-            <Link to="/cadastro">
+            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
               <button className="btn-outline">Sou prestador</button>
             </Link>
           </div>
@@ -177,7 +179,7 @@ export function Home() {
               <li><CheckCircle size={17} className="icon-sky" /> Agendamento online em minutos</li>
               <li><CheckCircle size={17} className="icon-sky" /> Suporte durante todo o atendimento</li>
             </ul>
-            <Link to="/cadastro">
+            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
               <button className="btn-primary">Quero contratar <ArrowRight size={15} /></button>
             </Link>
           </div>
@@ -203,7 +205,7 @@ export function Home() {
               <li><CheckCircle size={17} className="icon-sky" /> Gerencie sua agenda com facilidade</li>
               <li><CheckCircle size={17} className="icon-sky" /> Pagamento garantido pela plataforma</li>
             </ul>
-            <Link to="/cadastro">
+            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
               <button className="btn-primary">Quero me cadastrar <ArrowRight size={15} /></button>
             </Link>
           </div>
@@ -289,10 +291,10 @@ export function Home() {
             <h2>Pronto para começar?</h2>
             <p>Cadastre-se gratuitamente e encontre o profissional ideal hoje mesmo.</p>
             <div className="hero-buttons">
-              <Link to="/cadastro">
+              <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
                 <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
               </Link>
-              <Link to="/cadastro">
+              <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
                 <button className="btn-outline">Sou prestador</button>
               </Link>
             </div>

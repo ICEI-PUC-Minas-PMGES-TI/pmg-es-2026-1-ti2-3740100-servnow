@@ -1,67 +1,92 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Moon, Sun, UserCircle } from "lucide-react";
 import "./Header.css";
 import logo from "../../assets/logo2.png";
+import { Notificacoes } from "../Notificacoes/Notificacoes";
+import { getAuthSession, getDashboardRoute } from "../../services/auth";
+import { applyTheme, getNextTheme, getStoredTheme } from "../../services/theme";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
   onLogin?: () => void;
   onLogout?: () => void;
-  userName?: string;
 }
 
 export function Header({
   isLoggedIn = false,
   onLogin,
   onLogout,
-  userName,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(getStoredTheme);
   const navigate = useNavigate();
+  const session = getAuthSession();
+  const loggedIn = isLoggedIn || Boolean(session);
+  const dashboardRoute = session ? getDashboardRoute(session.tipoUsuario) : "/login";
+
+  function handleToggleTheme() {
+    const nextTheme = getNextTheme(theme);
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
+  }
 
   return (
     <header className="header">
       <div className="header-inner">
-
-        {/* LOGO */}
         <Link to="/" className="header-logo">
           <img src={logo} alt="Servnow" className="logo-img" />
           <span className="logo-text">Servnow</span>
         </Link>
 
-        {/* NAV */}
         <nav className="header-nav">
-          <a href="#" className="nav-link">Início</a>
-          <a href="#" className="nav-link">Solicitações</a>
-          <a href="#" className="nav-link">Painel</a>
+          <Link to="/" className="nav-link">Inicio</Link>
+          {loggedIn && (
+            <>
+              <Link to={dashboardRoute} className="nav-link">Painel</Link>
+              <a href="#" className="nav-link">Acompanhamento</a>
+            </>
+          )}
         </nav>
 
-        {/* AÇÕES */}
         <div className="header-actions">
-          {isLoggedIn ? (
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={handleToggleTheme}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+            title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+          >
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          {loggedIn ? (
             <>
-              {userName && (
-                <span className="header-username">Olá, {userName}</span>
-              )}
-              <button className="btn-logout" onClick={onLogout}>
-                Logout
+              <button
+                type="button"
+                className="header-profile-icon"
+                aria-label="Perfil"
+              >
+                <UserCircle size={24} />
+              </button>
+              <Notificacoes />
+              <button type="button" className="btn-logout" onClick={onLogout}>
+                Sair
               </button>
             </>
           ) : (
-              <button
-                  className="btn-login"
-                  onClick={() => {
-                    onLogin?.();
-                    navigate("/login");
-                  }}
+            <button
+              className="btn-login"
+              onClick={() => {
+                onLogin?.();
+                navigate("/login");
+              }}
             >
               Login
             </button>
           )}
         </div>
 
-        {/* HAMBURGUER */}
         <button
           className="header-hamburger"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -73,17 +98,43 @@ export function Header({
         </button>
       </div>
 
-      {/* MENU MOBILE */}
       {menuOpen && (
         <div className="header-mobile-menu">
-          <a href="#" className="nav-link">Início</a>
-          <a href="#" className="nav-link">Serviços</a>
-          <a href="#" className="nav-link">Sobre</a>
+          <Link to="/" className="nav-link">Inicio</Link>
+          {loggedIn && (
+            <>
+              <Link to={dashboardRoute} className="nav-link">Painel</Link>
+              <a href="#" className="nav-link">Acompanhamento</a>
+            </>
+          )}
           <div className="mobile-auth">
-            {isLoggedIn ? (
-              <button className="btn-logout" onClick={onLogout}>Logout</button>
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={handleToggleTheme}
+              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
+            {loggedIn ? (
+              <>
+                <button type="button" className="mobile-user-info" aria-label="Perfil">
+                  <UserCircle size={22} />
+                </button>
+                <Notificacoes />
+                <button type="button" className="btn-logout" onClick={onLogout}>Sair</button>
+              </>
             ) : (
-              <button className="btn-login" onClick={onLogin}></button>
+              <button
+                className="btn-login"
+                onClick={() => {
+                  onLogin?.();
+                  navigate("/login");
+                }}
+              >
+                Login
+              </button>
             )}
           </div>
         </div>

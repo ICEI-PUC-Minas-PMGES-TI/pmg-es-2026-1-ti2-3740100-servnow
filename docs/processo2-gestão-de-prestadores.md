@@ -8,7 +8,7 @@ O processo de gestão de prestadores inicia com o preenchimento dos dados de cad
 
 Se os dados forem aprovados, o prestador segue para a configuração do perfil profissional, onde define suas informações de atuação. Em seguida, informa seus dias e horários disponíveis. Após isso, o prestador passa a aguardar solicitações de serviço e, a partir desse momento, torna-se ativo na plataforma, estando apto a receber e atender clientes.
 
-![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/bpmn_gestao_prestadores.png "Modelo BPMN do Processo 2.")
+![Modelo BPMN do Processo 2 – Gestão de Prestadores](images/BPMN/bpmn_gestao_prestadores.png "Modelo BPMN do Processo 2.")
 
 ---
 

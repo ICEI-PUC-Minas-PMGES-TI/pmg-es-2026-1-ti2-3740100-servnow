@@ -1,7 +1,8 @@
 .footer {
-  background: #0a2e52;
+  background: var(--footer-bg);
   padding: 60px 32px 24px;
   color: white;
+  transition: background 0.2s;
 }
 
 /* CONTAINER */

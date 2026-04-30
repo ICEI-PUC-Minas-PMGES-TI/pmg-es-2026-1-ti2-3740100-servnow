@@ -1,22 +1,16 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import "./Login.css";
 
 import loginImg from "../../../assets/login.svg";
+import { API_URL, saveAuthSession, type AuthResponse } from "../../../services/auth";
 
 type UserType = "cliente" | "prestador";
 
-type LoginResponse = {
-  id: number;
-  nome: string;
-  email: string;
-  tipoUsuario: "CLIENTE" | "PRESTADOR";
-  mensagem: string;
-};
-
 export function Login() {
+  const navigate = useNavigate();
   const [userType, setUserType] = useState<UserType>("cliente");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -32,7 +26,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,17 +38,20 @@ export function Login() {
         }),
       });
 
-      const data = (await response.json()) as LoginResponse | { detail?: string };
+      const data = (await response.json()) as AuthResponse | { detail?: string };
 
       if (!response.ok) {
         throw new Error("detail" in data ? data.detail || "Nao foi possivel fazer login." : "Nao foi possivel fazer login.");
       }
 
-      const loginData = data as LoginResponse;
-      localStorage.setItem("servnow.user", JSON.stringify(loginData));
+      const loginData = data as AuthResponse;
+      saveAuthSession(loginData);
       setSuccessMessage(`Login realizado como ${loginData.tipoUsuario.toLowerCase()}.`);
       setEmail("");
       setPassword("");
+      window.setTimeout(() => {
+        navigate("/");
+      }, 500);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Nao foi possivel fazer login.");
     } finally {
