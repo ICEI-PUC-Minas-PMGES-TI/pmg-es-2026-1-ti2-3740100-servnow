@@ -30,7 +30,10 @@ _As telas referentes ao processo de Gestão de Clientes serão adicionadas nesta
 
 Tela destinada ao cadastro de novos  clientes na plataforma ServNow. Nela, o cliente informa seus dados pessoais (nome, CPF, e-mail, telefone e CEP), e define sua senha de acesso. O layout segue o padrão visual da plataforma, com uma seção ilustrativa à esquerda reforçando os benefícios de se tornar um cliente e o formulário de cadastro à direita. O usuário também pode alternar entre as opções "Sou cliente" e "Sou prestador" no topo do formulário.
 
-### 6.2.2. Tela de configuração de perfil
+### 6.2.2. Tela de configuração de perfil ![alt text](Perfil(cliente).jpeg)
+
+Visão do Cliente
+Tela de configuração de perfil do cliente. Permite inserir nome completo, endereço detalhado (rua, número, CEP, bairro, cidade e estado) e uma foto do local/endereço. Ao final, o botão "Salvar alterações" confirma as informações cadastradas.
 
 
 
@@ -48,19 +51,30 @@ Tela destinada ao cadastro de novos prestadores na plataforma ServNow. Nela, o p
 ![Tela cadastro prestador](images/design/telacadastroprestador.png)
 
 
-### 6.2.2. Tela de configuração de perfil
-
+### 6.2.2. Tela de configuração de perfil ![alt text](Perfil(prestador).jpeg)
+Visão do Prestador
+Tela de configuração de perfil do prestador de serviço. Além do nome completo, o prestador preenche uma descrição profissional destacando sua experiência e especialidades, e seleciona os tipos de serviço que realiza (como Elétrico, Hidráulico, Limpeza, Pintura, entre outros). O botão "Salvar alterações" confirma o perfil.
 
 ---
 
+<<<<<<< HEAD
 
 ## 6.4. Telas do processo 3 — Solicitação de Serviço
+=======
+## 6.4. Telas do processo 3 — Solicitação de Serviço ![alt text](Solicitação.jpeg)
+
+Tela onde o cliente cria uma nova solicitação de serviço. Ele preenche o título da solicitação, seleciona o tipo de serviço em um menu dropdown, descreve detalhadamente o que precisa ser feito e pode adicionar fotos ilustrativas. Ao final, pode salvar como rascunho ou publicar a solicitação para que prestadores façam suas ofertas.
+>>>>>>> 87963cb (Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md)
 
 
 ### 6.4.1. Painel do cliente
 
+<<<<<<< HEAD
 ![Painel do Cliente](images/design/telapainelcliente.png)
 
+=======
+![alt text](Painel(cliente).jpeg)
+>>>>>>> 87963cb (Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md)
 
 Após a aprovação do cadastro e do login, o cliente é direcionado ao seu painel de controle. O painel apresenta um resumo das solicitações (solicitações publicadas por ele, solicitações concluídas e gastos mensais).
 
@@ -84,9 +98,10 @@ Após a aprovação do cadastro e login, o prestador é direcionado ao seu paine
 
 
 
-## 6.5. Telas do processo 4 — Acompanhamento do serviço
+## 6.5. Telas do processo 4 — Acompanhamento do serviço ![alt text](Perfil(prestador)-1.jpeg)
 
-_As telas referentes ao processo de execução e finalização do serviço serão adicionadas nesta seção._
+_ Visão do Prestador
+Tela onde o prestador de serviço acompanha e gerencia um serviço em andamento. Exibe o nome do serviço, o cliente, horário de início e previsão de término. O prestador pode enviar atualizações em texto e fotos sobre o progresso do trabalho, além de visualizar o histórico de atualizações já enviadas anteriormente.
 
 ### 6.5.1. Tela de confirmação de chegada do prestador
 
@@ -98,9 +113,10 @@ _Descrição da tela de confirmação de chegada com código de verificação._
 
 _Descrição do serviço realizado, fotos, materiais usados
 
-### 6.5.3. Tela de acompanhamento da ordem de serviço-cliente
+### 6.5.3. Tela de acompanhamento da ordem de serviço-cliente ![alt text](Acompanhar(cliente).png)
 
-_Descrição da tela de acompanhamento a ordem de serviço pelo cliente.
+Visão do Cliente
+Tela onde o cliente acompanha um serviço concluído. Exibe as atualizações enviadas pelo prestador com fotos e descrições do trabalho realizado. Inclui uma seção de avaliação do prestador com estrelas e comentário opcional, e uma seção de pagamento onde o cliente escolhe a forma de pagamento (PIX, Cartão de Crédito ou Débito) e confirma o valor do serviço.
 
 ### 6.5.4. Tela de pagamento
 
