@@ -8,7 +8,7 @@ Modelo BPMN do Processo 4
 
 
 
-![Processo 4](images/ACOMPANHARPROCESSO.svg)
+![Processo 4](images/BPMN/ACOMPANHARPROCESSO.svg)
 
 
 
@@ -29,7 +29,7 @@ Modelo BPMN do Processo 4
 ### Comandos
 
 | Comando           | Destino                         | Tipo    |
-|------------------|----------------------------------|---------|
+|------------------ |---------------------------------|---------|
 | Confirmar chegada | Gerar e enviar código ao cliente| default |
 | Cancelar          | Cancelar atendimento            | cancel  |
 
@@ -40,16 +40,16 @@ Modelo BPMN do Processo 4
 ### Campos
 
 | Campo                        | Tipo   | Restrições                              | 
-|---------------------------- -|--------|----------------------------------------- |
-| Código informado pelo cliente| Número | 6 dígitos, obrigatório                 | 
+|---------------------------- -|--------|-----------------------------------------|
+| Código informado pelo cliente| Número | 6 dígitos, obrigatório                  | 
 | Tentativas realizadas        | Número | Preenchido automaticamente, máximo 3    | 
 
 ### Comandos
 
-| Comando         | Destino                     | Tipo    |
+| Comando        | Destino                      | Tipo    |
 |----------------|---------------------------- -|---------|
 | Validar código | Gateway "Código válido?"     | default |
-| Reenviar código | Gerar novo código ao cliente| default |
+| Reenviar código| Gerar novo código ao cliente | default |
 
 ---
 
@@ -76,7 +76,7 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                 | Tipo    | Restrições                      | 
+| Campo                  | Tipo    | Restrições                      | 
 |------------------------|---------|--------------------------------|
 | Hora de conclusão      | Hora    | Preenchido automaticamente     | 
 | Valor final cobrado    | Número  | Valor positivo (R$)            | 
@@ -94,7 +94,7 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                 | Tipo   | Restrições                | Valor        |
+| Campo                | Tipo   | Restrições                | Valor        |
 |----------------------|--------|----------------------------|--------------|
 | Nome do prestador    | Texto  | Somente leitura            | Automático   |
 | Serviço contratado   | Texto  | Somente leitura            | Automático   |
@@ -113,7 +113,7 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                   | Tipo    | Restrições         | 
+| Campo                    | Tipo    | Restrições        | 
 |--------------------------|---------|-------------------|
 | Fotos do estado inicial  | Imagem  | Somente leitura   | 
 | Fotos do estado final    | Imagem  | Somente leitura   | 
@@ -122,7 +122,7 @@ Modelo BPMN do Processo 4
 
 ### Comandos
 
-| Comando            | Destino                           | Tipo    |
+| Comando            | Destino                            | Tipo    |
 |--------------------|------------------------------------|---------|
 | Aceitar e pagar    | Processar pagamento                | default |
 | Contestar valor    | Notificar prestador                | cancel  |
@@ -133,7 +133,7 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo                | Tipo    | Restrições                  | 
+| Campo               | Tipo    | Restrições                   | 
 |---------------------|---------|------------------------------|
 | Método de pagamento | Seleção | Pix / Cartão / Dinheiro      | 
 | Valor a pagar       | Número  | Somente leitura              | 
@@ -141,7 +141,7 @@ Modelo BPMN do Processo 4
 
 ### Comandos
 
-| Comando             | Destino                                 | Tipo    |
+| Comando             | Destino                                  | Tipo    |
 |---------------------|------------------------------------------|---------|
 | Confirmar pagamento | Emitir comprovante e encerrar OS         | default |
 | Tentar novamente    | Selecionar método de pagamento           | default |

@@ -2,8 +2,8 @@
 
 ### 4.1. Modelo de dados
 
-![!\[Modelo de dados](<images/Modelo de dados Servnow (1).svg>)
-adiconar campo especialidade no prestador
+![Modelo de dados](images/Modelodedados.svg)
+
 ---
 
 ### 4.2. Tecnologias
@@ -25,5 +25,3 @@ Este projeto utiliza um conjunto de tecnologias modernas para desenvolvimento fu
 | IDE             | VS Code                                                                    |
 
 
-
-VS Code 
