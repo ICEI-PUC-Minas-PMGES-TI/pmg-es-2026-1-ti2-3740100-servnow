@@ -9,7 +9,6 @@ Além disso, o sistema busca permitir o cadastro de clientes e prestadores, poss
 * Fábio Garcia Martins
 * Gabriel Henrique Fernandes Vieira
 * Lucas Silva Borges
-* Marco Túlio Sales de Deus
 
 ## Professor
 
