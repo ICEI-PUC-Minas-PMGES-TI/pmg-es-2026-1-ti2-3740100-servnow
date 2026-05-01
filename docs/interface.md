@@ -30,7 +30,9 @@ _As telas referentes ao processo de Gestão de Clientes serão adicionadas nesta
 
 Tela destinada ao cadastro de novos  clientes na plataforma ServNow. Nela, o cliente informa seus dados pessoais (nome, CPF, e-mail, telefone e CEP), e define sua senha de acesso. O layout segue o padrão visual da plataforma, com uma seção ilustrativa à esquerda reforçando os benefícios de se tornar um cliente e o formulário de cadastro à direita. O usuário também pode alternar entre as opções "Sou cliente" e "Sou prestador" no topo do formulário.
 
-### 6.2.2. Tela de configuração de perfil ![alt text](Perfil(cliente).jpeg)
+### 6.2.2. Tela de configuração de perfil !
+
+![Configurar perfil cliente](images/design/Painel(cliente).jpeg)
 
 Visão do Cliente
 Tela de configuração de perfil do cliente. Permite inserir nome completo, endereço detalhado (rua, número, CEP, bairro, cidade e estado) e uma foto do local/endereço. Ao final, o botão "Salvar alterações" confirma as informações cadastradas.
@@ -51,30 +53,22 @@ Tela destinada ao cadastro de novos prestadores na plataforma ServNow. Nela, o p
 ![Tela cadastro prestador](images/design/telacadastroprestador.png)
 
 
-### 6.2.2. Tela de configuração de perfil ![alt text](Perfil(prestador).jpeg)
-Visão do Prestador
+### 6.2.2. Tela de configuração de perfil 
+
+![Configurar perfil prestador](images/design/Perfil(prestador).jpeg)
+
 Tela de configuração de perfil do prestador de serviço. Além do nome completo, o prestador preenche uma descrição profissional destacando sua experiência e especialidades, e seleciona os tipos de serviço que realiza (como Elétrico, Hidráulico, Limpeza, Pintura, entre outros). O botão "Salvar alterações" confirma o perfil.
 
 ---
 
-<<<<<<< HEAD
 
 ## 6.4. Telas do processo 3 — Solicitação de Serviço
-=======
-## 6.4. Telas do processo 3 — Solicitação de Serviço ![alt text](Solicitação.jpeg)
-
-Tela onde o cliente cria uma nova solicitação de serviço. Ele preenche o título da solicitação, seleciona o tipo de serviço em um menu dropdown, descreve detalhadamente o que precisa ser feito e pode adicionar fotos ilustrativas. Ao final, pode salvar como rascunho ou publicar a solicitação para que prestadores façam suas ofertas.
->>>>>>> 87963cb (Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md)
 
 
 ### 6.4.1. Painel do cliente
 
-<<<<<<< HEAD
-![Painel do Cliente](images/design/telapainelcliente.png)
+![Painel CLiente](images/design/Painel(cliente).jpeg)
 
-=======
-![alt text](Painel(cliente).jpeg)
->>>>>>> 87963cb (Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md)
 
 Após a aprovação do cadastro e do login, o cliente é direcionado ao seu painel de controle. O painel apresenta um resumo das solicitações (solicitações publicadas por ele, solicitações concluídas e gastos mensais).
 
@@ -85,47 +79,46 @@ O painel também permite acesso ao gerenciamento do perfil do cliente
 
 ### 6.4.2. Tela de nova solicitação
 
-_Descrição da tela de nova solicitação de serviço._ implementar
+![Criar solicitação](images/design/Solicitação.jpeg)
 
 
 ### 6.3.3. Painel do prestador
 
-Após a aprovação do cadastro e login, o prestador é direcionado ao seu painel de controle. O painel apresenta um resumo das principais informações do profissional, incluindo indicadores de desempenho (solicitações novas, serviços concluídos no mês, ganhos acumulados e avaliação média). Na seção central, o prestador pode visualizar e filtrar as solicitações de clientes por proximidade, valor, data ou urgência, com informações detalhadas sobre cada serviço — valor proposto, duração estimada, localização e dados do cliente. O painel também exibe o histórico de serviços recentes e a barra lateral permite acesso ao gerenciamento do perfil profissional 
-
-
 ![Painel do prestador](images/design//figma-tela-prestador.png)
 
+Após a aprovação do cadastro e login, o prestador é direcionado ao seu painel de controle. O painel apresenta um resumo das principais informações do profissional, incluindo indicadores de desempenho (solicitações novas, serviços concluídos no mês, ganhos acumulados e avaliação média). Na seção central, o prestador pode visualizar e filtrar as solicitações de clientes por proximidade, valor, data ou urgência, com informações detalhadas sobre cada serviço, podendo recusar ou aceitar solicitações. O painel também exibe o histórico de serviços recentes e a barra lateral permite acesso ao gerenciamento do perfil profissional 
 
 
 
-## 6.5. Telas do processo 4 — Acompanhamento do serviço ![alt text](Perfil(prestador)-1.jpeg)
 
-_ Visão do Prestador
-Tela onde o prestador de serviço acompanha e gerencia um serviço em andamento. Exibe o nome do serviço, o cliente, horário de início e previsão de término. O prestador pode enviar atualizações em texto e fotos sobre o progresso do trabalho, além de visualizar o histórico de atualizações já enviadas anteriormente.
+
+
+## 6.5. Telas do processo 4 — Acompanhamento do serviço 
+
 
 ### 6.5.1. Tela de confirmação de chegada do prestador
 
-_Descrição da tela de confirmação de chegada com código de verificação._
+Esta tela tem como objetivo validar a chegada do prestador ao local do cliente de forma segura, utilizando um código de verificação de 4 dígitos. Após aceitar o serviço, o cliente visualiza um código único gerado automaticamente, com validade limitada, que deve ser informado ao prestador no momento da chegada. Ao chegar ao local, o prestador acessa a tela de confirmação de chegada e insere o código fornecido pelo cliente, garantindo que o serviço só seja iniciado com a presença física confirmada no local correto. Após a validação correta do código, o sistema libera automaticamente o início do serviço, avançando o fluxo para a próxima etapa.
 
-> _A ser adicionada_
+Visão do Prestador
+![Codigo Prestador](images/design/Codigoprestador.png)
 
-### 6.5.2. Tela de preenchimento da ordem de serviço-prestador
 
-_Descrição do serviço realizado, fotos, materiais usados
 
-### 6.5.3. Tela de acompanhamento da ordem de serviço-cliente ![alt text](Acompanhar(cliente).png)
+Visão do Cliente 
+![Codigo Cliente](images/design/Codigocliente.png)
+
+
+### 6.5.2. Tela de acompanhamento da ordem de Serviço 
+
 
 Visão do Cliente
+![Acompanhar serviço-Cliente](images/design/Acompanhar(cliente).png)
 Tela onde o cliente acompanha um serviço concluído. Exibe as atualizações enviadas pelo prestador com fotos e descrições do trabalho realizado. Inclui uma seção de avaliação do prestador com estrelas e comentário opcional, e uma seção de pagamento onde o cliente escolhe a forma de pagamento (PIX, Cartão de Crédito ou Débito) e confirma o valor do serviço.
 
-### 6.5.4. Tela de pagamento
 
 
+Visão do Prestador 
+![Acompanhar serviço-Prestador](images/design/Acompanhar(prestador).jpeg)
+Tela onde o prestador de serviço acompanha e gerencia um serviço em andamento. Exibe o nome do serviço, o cliente, horário de início e previsão de término. O prestador pode enviar atualizações em texto e fotos sobre o progresso do trabalho, além de visualizar o histórico de atualizações já enviadas anteriormente.
 
-> _A ser adicionada_
-
-### 6.5.5. Tela de avaliação do serviço
-
-_Descrição da tela de avaliação do serviço pelo cliente após a conclusão._
-
-> _A ser adicionada_
