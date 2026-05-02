@@ -80,7 +80,7 @@ O painel também permite acesso ao gerenciamento do perfil do cliente
 ### 6.4.2. Tela de nova solicitação
 
 ![Criar solicitação](images/design/Solicitação.jpeg)
-
+colocar pagamento e descrever 
 
 ### 6.3.3. Painel do prestador
 

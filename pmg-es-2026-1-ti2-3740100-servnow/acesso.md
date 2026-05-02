@@ -9,3 +9,8 @@
   5 cd backend startar o back: (necessario ter o postgress rodando na maquina)  .\mvnw spring-boot:run
 
   é preciso ter dois terminais abertos para startar o back e o front
+
+
+  Contaparatestes
+  Contaparatestes@gmail.com
+  12345678
