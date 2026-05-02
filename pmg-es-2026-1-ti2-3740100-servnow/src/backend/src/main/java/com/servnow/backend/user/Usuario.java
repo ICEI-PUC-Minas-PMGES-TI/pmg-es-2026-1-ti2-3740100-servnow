@@ -36,6 +36,35 @@ public class Usuario {
     @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;
 
+    // ===== Campos do perfil do cliente =====
+    @Column(length = 200)
+    private String rua;
+
+    @Column(length = 20)
+    private String numero;
+
+    @Column(length = 20)
+    private String cep;
+
+    @Column(length = 100)
+    private String bairro;
+
+    @Column(length = 100)
+    private String cidade;
+
+    @Column(length = 2)
+    private String estado;
+
+    @Column(name = "foto_base64", length = 200000)
+    private String fotoBase64;
+
+    // ===== Campos do perfil do prestador =====
+    @Column(name = "descricao_profissional", length = 500)
+    private String descricaoProfissional;
+
+    @Column(length = 255)
+    private String especialidades;
+
     @PrePersist
     public void prePersist() {
         if (criadoEm == null) {
@@ -89,5 +118,77 @@ public class Usuario {
 
     public void setCriadoEm(OffsetDateTime criadoEm) {
         this.criadoEm = criadoEm;
+    }
+
+    public String getRua() {
+        return rua;
+    }
+
+    public void setRua(String rua) {
+        this.rua = rua;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getFotoBase64() {
+        return fotoBase64;
+    }
+
+    public void setFotoBase64(String fotoBase64) {
+        this.fotoBase64 = fotoBase64;
+    }
+
+    public String getDescricaoProfissional() {
+        return descricaoProfissional;
+    }
+
+    public void setDescricaoProfissional(String descricaoProfissional) {
+        this.descricaoProfissional = descricaoProfissional;
+    }
+
+    public String getEspecialidades() {
+        return especialidades;
+    }
+
+    public void setEspecialidades(String especialidades) {
+        this.especialidades = especialidades;
     }
 }

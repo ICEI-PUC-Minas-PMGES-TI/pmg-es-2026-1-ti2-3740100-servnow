@@ -1,6 +1,6 @@
-package com.servnow.backend.auth.dto;
+package com.servnow.backend.perfil.dto;
 
-public record CurrentUserResponse(
+public record PerfilResponse(
     Long id,
     String nome,
     String email,
