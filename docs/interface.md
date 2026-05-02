@@ -32,12 +32,9 @@ Tela destinada ao cadastro de novos  clientes na plataforma ServNow. Nela, o cli
 
 ### 6.2.2. Tela de configuração de perfil !
 
-![Configurar perfil cliente](images/design/Painel(cliente).jpeg)
+![Configurar perfil](images/design/Perfil(cliente).jpeg)
 
-Visão do Cliente
 Tela de configuração de perfil do cliente. Permite inserir nome completo, endereço detalhado (rua, número, CEP, bairro, cidade e estado) e uma foto do local/endereço. Ao final, o botão "Salvar alterações" confirma as informações cadastradas.
-
-
 
 ---
 
