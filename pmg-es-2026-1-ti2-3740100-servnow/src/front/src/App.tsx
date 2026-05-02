@@ -5,8 +5,7 @@ import { Home } from "./pages/Home";
 import Layout from "./Layout/Layout";
 import { Login } from "./pages/Home/Login";
 import { Cadastro } from "./pages/Home/Cadastro";
-import { Dashboard } from "./pages/Dashboard";
-import { Prestador } from "./pages/Prestador";
+
 import { getAuthSession } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";
 import "react-toastify/dist/ReactToastify.css";
@@ -70,22 +69,7 @@ function App() {
             </PublicOnlyRoute>
           )}
         />
-        <Route
-          path="/painel/cliente"
-          element={(
-            <ProtectedRoute>
-              <Dashboard perfil="CLIENTE" />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/painel/prestador"
-          element={(
-            <ProtectedRoute>
-              <Prestador />
-            </ProtectedRoute>
-          )}
-        />
+     
       </Routes>
 
       <ToastContainer
