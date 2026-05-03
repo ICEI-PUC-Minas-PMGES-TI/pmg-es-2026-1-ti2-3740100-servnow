@@ -61,10 +61,9 @@ Tela de configuração de perfil do prestador de serviço. Além do nome complet
 
 ## 6.4. Telas do processo 3 — Solicitação de Serviço
 =======
-## 6.4. Telas do processo 3 — Solicitação de Serviço ![alt text](Solicitação.jpeg)
+## 6.4. Telas do processo 3 — Solicitação de Serviço ![alt text](image.png)
 
-Tela onde o cliente cria uma nova solicitação de serviço. Ele preenche o título da solicitação, seleciona o tipo de serviço em um menu dropdown, descreve detalhadamente o que precisa ser feito e pode adicionar fotos ilustrativas. Ao final, pode salvar como rascunho ou publicar a solicitação para que prestadores façam suas ofertas.
->>>>>>> 87963cb (Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md)
+Tela de criação de nova solicitação de serviço pelo cliente. O usuário preenche o título, tipo e descrição do serviço, adiciona fotos opcionais e publica para que prestadores próximos recebam e enviem propostas. Também é possível salvar como rascunho para publicar depois.
 
 
 ### 6.4.1. Painel do cliente
