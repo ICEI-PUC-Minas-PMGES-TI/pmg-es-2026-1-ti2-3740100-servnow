@@ -28,11 +28,37 @@ public class PerfilController {
         return perfilService.buscar(usuario);
     }
 
+    @GetMapping("/cliente")
+    public PerfilResponse buscarCliente(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return perfilService.buscarCliente(usuario);
+    }
+
+    @GetMapping("/prestador")
+    public PerfilResponse buscarPrestador(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return perfilService.buscarPrestador(usuario);
+    }
+
     @PutMapping
     public PerfilResponse atualizar(
         @AuthenticationPrincipal UsuarioAutenticado usuario,
         @Valid @RequestBody PerfilUpdateRequest request
     ) {
         return perfilService.atualizar(usuario, request);
+    }
+
+    @PutMapping("/cliente")
+    public PerfilResponse atualizarCliente(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @Valid @RequestBody PerfilUpdateRequest request
+    ) {
+        return perfilService.atualizarCliente(usuario, request);
+    }
+
+    @PutMapping("/prestador")
+    public PerfilResponse atualizarPrestador(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @Valid @RequestBody PerfilUpdateRequest request
+    ) {
+        return perfilService.atualizarPrestador(usuario, request);
     }
 }

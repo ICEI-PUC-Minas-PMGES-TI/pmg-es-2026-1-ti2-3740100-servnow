@@ -2,17 +2,11 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  ArrowLeft,
-  Building,
-  Hash,
-  Image as ImageIcon,
-  MapPin,
-  Save,
-  User,
-} from "lucide-react";
+import { ArrowLeft, Save, User } from "lucide-react";
 
 import { Header } from "../../Components/Header/Header";
+import { ClientePerfil } from "../Configurarperfil/Cliente";
+import { PrestadorPerfil } from "../Configurarperfil/Prestador";
 import {
   API_URL,
   clearAuthSession,
@@ -22,22 +16,7 @@ import {
 } from "../../services/auth";
 import "./Perfil.css";
 
-const ESTADOS_BR = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
-];
-
-const TIPOS_SERVICO = [
-  { value: "ELETRICO", label: "Elétrico" },
-  { value: "HIDRAULICO", label: "Hidráulico" },
-  { value: "PINTURA", label: "Pintura" },
-  { value: "MONTAGEM", label: "Montagem" },
-  { value: "LIMPEZA", label: "Limpeza" },
-  { value: "MANUTENCAO_GERAL", label: "Manutenção geral" },
-];
-
-type FormState = {
+export type FormState = {
   nome: string;
   rua: string;
   numero: string;
@@ -63,9 +42,13 @@ const initialState: FormState = {
   especialidades: [],
 };
 
+const MAX_FOTO_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_FOTO_BASE64_LENGTH = 190000;
+
 export function Perfil() {
   const navigate = useNavigate();
   const session = getAuthSession();
+  const isCliente = session?.tipoUsuario === "CLIENTE";
   const [form, setForm] = useState<FormState>(initialState);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -78,12 +61,20 @@ export function Perfil() {
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/perfil`, {
+        const endpoint = `${API_URL}/api/perfil/${session.tipoUsuario === "CLIENTE" ? "cliente" : "prestador"}`;
+        const response = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${session.token}` },
         });
 
+        if (response.status === 401) {
+          clearAuthSession();
+          toast.error("Sessao expirada. Entre novamente.");
+          navigate("/login");
+          return;
+        }
+
         if (!response.ok) {
-          throw new Error("Não foi possível carregar o perfil.");
+          throw new Error(await getResponseError(response, "Nao foi possivel carregar o perfil."));
         }
 
         const data = (await response.json()) as PerfilResponse;
@@ -132,54 +123,61 @@ export function Perfil() {
     });
   }
 
-  function handleFotoChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem precisa ter no máximo 2 MB.");
+    if (file.size > MAX_FOTO_FILE_BYTES) {
+      toast.error("A imagem precisa ter no maximo 5 MB.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      updateField("fotoBase64", result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const fotoBase64 = await otimizarFoto(file);
+      updateField("fotoBase64", fotoBase64);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!session?.token) {
-      toast.error("Sessão expirou. Entre novamente.");
+      toast.error("Sessao expirou. Entre novamente.");
       navigate("/login");
       return;
     }
 
     if (!form.nome.trim()) {
-      toast.error("O nome é obrigatório.");
+      toast.error("O nome e obrigatorio.");
       return;
     }
 
     setIsSaving(true);
 
-    const payload: PerfilUpdateRequest = {
-      nome: form.nome.trim(),
-      rua: form.rua,
-      numero: form.numero,
-      cep: form.cep,
-      bairro: form.bairro,
-      cidade: form.cidade,
-      estado: form.estado,
-      fotoBase64: form.fotoBase64,
-      descricaoProfissional: form.descricaoProfissional,
-      especialidades: form.especialidades.join(","),
-    };
+    const payload: PerfilUpdateRequest = session.tipoUsuario === "CLIENTE"
+      ? {
+          nome: form.nome.trim(),
+          rua: form.rua,
+          numero: form.numero,
+          cep: form.cep,
+          bairro: form.bairro,
+          cidade: form.cidade,
+          estado: form.estado,
+          fotoBase64: form.fotoBase64,
+        }
+      : {
+          nome: form.nome.trim(),
+          descricaoProfissional: form.descricaoProfissional,
+          especialidades: form.especialidades.join(","),
+        };
 
     try {
-      const response = await fetch(`${API_URL}/api/perfil`, {
+      const endpoint = `${API_URL}/api/perfil/${session.tipoUsuario === "CLIENTE" ? "cliente" : "prestador"}`;
+      const response = await fetch(endpoint, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -188,12 +186,19 @@ export function Perfil() {
         body: JSON.stringify(payload),
       });
 
+      if (response.status === 401) {
+        clearAuthSession();
+        toast.error("Sessao expirada. Entre novamente.");
+        navigate("/login");
+        return;
+      }
+
       if (!response.ok) {
-        const data = (await response.json()) as { detail?: string };
-        throw new Error(data.detail || "Não foi possível salvar o perfil.");
+        throw new Error(await getResponseError(response, "Nao foi possivel salvar o perfil."));
       }
 
       toast.success("Perfil atualizado com sucesso.");
+      setTimeout(() => navigate("/"), 1000);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao salvar o perfil.");
     } finally {
@@ -205,39 +210,37 @@ export function Perfil() {
     return null;
   }
 
-  const isCliente = session.tipoUsuario === "CLIENTE";
-
   return (
     <>
       <Header onLogout={handleLogout} />
 
-      <div className="perfil-page">
-        <div className="perfil-container">
-          <button type="button" className="perfil-voltar" onClick={() => navigate(-1)}>
+      <div className="workspace-page perfil-page">
+        <div className="workspace-container">
+          <button type="button" className="workspace-back-button" onClick={() => navigate(-1)}>
             <ArrowLeft size={16} />
             Voltar
           </button>
 
-          <header className="perfil-header">
-            <span className="perfil-eyebrow">Configurar perfil</span>
-            <h1>{isCliente ? "Meu perfil de cliente" : "Meu perfil de prestador"}</h1>
-            <p>
+          <header className="workspace-card workspace-header perfil-header">
+            <span className="workspace-eyebrow">Configurar perfil</span>
+            <h1 className="workspace-title">{isCliente ? "Meu perfil de cliente" : "Meu perfil de prestador"}</h1>
+            <p className="workspace-description">
               {isCliente
-                ? "Atualize seus dados e o endereço onde você costuma solicitar serviços."
-                : "Mantenha seu perfil profissional atualizado para que mais clientes encontrem você."}
+                ? "Atualize seus dados e o endereco onde voce costuma solicitar servicos."
+                : "Mantenha seu perfil profissional atualizado para que mais clientes encontrem voce."}
             </p>
           </header>
 
           {isLoading ? (
-            <div className="perfil-loading">Carregando seus dados...</div>
+            <div className="workspace-card workspace-loading">Carregando seus dados...</div>
           ) : (
-            <form className="perfil-form" onSubmit={handleSubmit}>
-              <section className="perfil-section">
+            <form className="workspace-form" onSubmit={handleSubmit}>
+              <section className="workspace-card workspace-section">
                 <h2>Dados pessoais</h2>
 
-                <label className="perfil-field perfil-field-full">
-                  <span>Nome completo</span>
-                  <div className="perfil-input">
+                <label className="form-field form-field-full">
+                  <span className="form-label">Nome completo</span>
+                  <div className="form-control">
                     <User size={16} />
                     <input
                       type="text"
@@ -251,173 +254,31 @@ export function Perfil() {
               </section>
 
               {isCliente ? (
-                <>
-                  <section className="perfil-section">
-                    <h2>Endereço</h2>
-
-                    <div className="perfil-grid">
-                      <label className="perfil-field">
-                        <span>CEP</span>
-                        <div className="perfil-input">
-                          <Hash size={16} />
-                          <input
-                            type="text"
-                            value={form.cep}
-                            onChange={(event) => updateField("cep", event.target.value)}
-                            placeholder="00000-000"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="perfil-field perfil-field-wide">
-                        <span>Rua</span>
-                        <div className="perfil-input">
-                          <MapPin size={16} />
-                          <input
-                            type="text"
-                            value={form.rua}
-                            onChange={(event) => updateField("rua", event.target.value)}
-                            placeholder="Nome da rua ou avenida"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="perfil-field">
-                        <span>Número</span>
-                        <div className="perfil-input">
-                          <input
-                            type="text"
-                            value={form.numero}
-                            onChange={(event) => updateField("numero", event.target.value)}
-                            placeholder="Ex: 123"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="perfil-field">
-                        <span>Bairro</span>
-                        <div className="perfil-input">
-                          <Building size={16} />
-                          <input
-                            type="text"
-                            value={form.bairro}
-                            onChange={(event) => updateField("bairro", event.target.value)}
-                            placeholder="Bairro"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="perfil-field">
-                        <span>Cidade</span>
-                        <div className="perfil-input">
-                          <input
-                            type="text"
-                            value={form.cidade}
-                            onChange={(event) => updateField("cidade", event.target.value)}
-                            placeholder="Cidade"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="perfil-field">
-                        <span>Estado</span>
-                        <div className="perfil-input">
-                          <select
-                            value={form.estado}
-                            onChange={(event) => updateField("estado", event.target.value)}
-                          >
-                            <option value="">UF</option>
-                            {ESTADOS_BR.map((uf) => (
-                              <option key={uf} value={uf}>{uf}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </label>
-                    </div>
-                  </section>
-
-                  <section className="perfil-section">
-                    <h2>Foto do local</h2>
-                    <p className="perfil-hint">Adicione uma foto do imóvel para que o prestador encontre o local com facilidade.</p>
-
-                    <label className="perfil-upload">
-                      <ImageIcon size={18} />
-                      <span>{form.fotoBase64 ? "Trocar foto" : "Selecionar foto"}</span>
-                      <input type="file" accept="image/*" onChange={handleFotoChange} />
-                    </label>
-
-                    {form.fotoBase64 && (
-                      <div className="perfil-foto-preview">
-                        <img src={form.fotoBase64} alt="Pré-visualização do local" />
-                        <button
-                          type="button"
-                          className="perfil-foto-remover"
-                          onClick={() => updateField("fotoBase64", "")}
-                        >
-                          Remover foto
-                        </button>
-                      </div>
-                    )}
-                  </section>
-                </>
+                <ClientePerfil
+                  form={form}
+                  updateField={updateField}
+                  handleFotoChange={handleFotoChange}
+                />
               ) : (
-                <>
-                  <section className="perfil-section">
-                    <h2>Descrição profissional</h2>
-                    <p className="perfil-hint">Conte sobre sua experiência e o que você faz de melhor (até 500 caracteres).</p>
-
-                    <label className="perfil-field perfil-field-full">
-                      <span>Sobre você</span>
-                      <div className="perfil-input perfil-input-textarea">
-                        <textarea
-                          rows={6}
-                          maxLength={500}
-                          value={form.descricaoProfissional}
-                          onChange={(event) => updateField("descricaoProfissional", event.target.value)}
-                          placeholder="Ex: Eletricista com 10 anos de experiência em residências e comércios..."
-                        />
-                      </div>
-                      <small className="perfil-counter">
-                        {form.descricaoProfissional.length}/500
-                      </small>
-                    </label>
-                  </section>
-
-                  <section className="perfil-section">
-                    <h2>Tipos de serviço</h2>
-                    <p className="perfil-hint">Escolha pelo menos uma especialidade que você atende.</p>
-
-                    <div className="perfil-checkboxes">
-                      {TIPOS_SERVICO.map((tipo) => {
-                        const ativo = form.especialidades.includes(tipo.value);
-                        return (
-                          <button
-                            type="button"
-                            key={tipo.value}
-                            className={`perfil-tag ${ativo ? "ativo" : ""}`}
-                            onClick={() => toggleEspecialidade(tipo.value)}
-                          >
-                            {tipo.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </section>
-                </>
+                <PrestadorPerfil
+                  form={form}
+                  updateField={updateField}
+                  toggleEspecialidade={toggleEspecialidade}
+                />
               )}
 
-              <div className="perfil-actions">
+              <div className="form-actions perfil-actions">
                 <button
                   type="button"
-                  className="perfil-button-secondary"
+                  className="btn-secondary"
                   onClick={() => navigate(-1)}
                   disabled={isSaving}
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="perfil-button-primary" disabled={isSaving}>
+                <button type="submit" className="btn-primary perfil-button-primary" disabled={isSaving}>
                   <Save size={16} />
-                  {isSaving ? "Salvando..." : "Salvar alterações"}
+                  {isSaving ? "Salvando..." : "Salvar alteracoes"}
                 </button>
               </div>
             </form>
@@ -426,6 +287,61 @@ export function Perfil() {
       </div>
     </>
   );
+}
+
+async function getResponseError(response: Response, fallback: string) {
+  try {
+    const data = (await response.json()) as { detail?: string; message?: string };
+    return data.detail || data.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function carregarImagem(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Arquivo de imagem invalido."));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+async function otimizarFoto(file: File) {
+  const image = await carregarImagem(file);
+  const maxSide = 900;
+  const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Nao foi possivel processar a imagem.");
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  context.drawImage(image, 0, 0, width, height);
+
+  for (let quality = 0.82; quality >= 0.45; quality -= 0.08) {
+    const result = canvas.toDataURL("image/jpeg", quality);
+    if (result.length <= MAX_FOTO_BASE64_LENGTH) {
+      return result;
+    }
+  }
+
+  throw new Error("A imagem ficou grande demais. Tente uma foto menor.");
 }
 
 export default Perfil;

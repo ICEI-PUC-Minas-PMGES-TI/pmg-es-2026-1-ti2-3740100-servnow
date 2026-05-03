@@ -171,6 +171,211 @@ body {
   border-color: rgba(255, 255, 255, 0.7);
 }
 
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--workspace-muted);
+  border: 1px solid var(--workspace-border);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.btn-secondary:hover {
+  background: var(--workspace-surface-soft);
+  color: var(--workspace-text);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* WORKSPACE / FORM PATTERNS */
+.workspace-page {
+  min-height: calc(100vh - 130px);
+  background: var(--workspace-bg);
+  padding: 32px 24px 56px;
+}
+
+.workspace-container {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.workspace-card {
+  background: var(--workspace-surface);
+  border: 1px solid var(--workspace-border);
+  border-radius: 20px;
+  box-shadow: var(--workspace-shadow);
+}
+
+.workspace-header {
+  padding: 28px 30px;
+}
+
+.workspace-eyebrow {
+  display: inline-block;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.workspace-title {
+  margin: 0;
+  color: var(--workspace-text);
+}
+
+.workspace-description {
+  margin: 8px 0 0;
+  color: var(--workspace-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.workspace-loading {
+  padding: 32px;
+  text-align: center;
+  color: var(--workspace-muted);
+  border-style: dashed;
+}
+
+.workspace-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.workspace-section {
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.workspace-section h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--workspace-text);
+}
+
+.workspace-hint {
+  margin: -6px 0 6px;
+  color: var(--workspace-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.workspace-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--workspace-border);
+  color: var(--workspace-muted);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.workspace-back-button:hover {
+  background: rgba(56, 189, 248, 0.08);
+  color: var(--workspace-text);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field-full {
+  width: 100%;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--workspace-muted);
+}
+
+.form-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface-soft);
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.form-control:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+.form-control svg {
+  color: var(--workspace-muted);
+  flex-shrink: 0;
+}
+
+.form-control input,
+.form-control select,
+.form-control textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  color: var(--workspace-text);
+}
+
+.form-control-textarea {
+  align-items: flex-start;
+  padding: 14px;
+}
+
+.form-control-textarea textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+.form-counter {
+  align-self: flex-end;
+  color: var(--workspace-muted);
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
 /* COMPONENTE REAPROVEITÁVEL: TEXTO DE UM LADO, IMAGEM DO OUTRO */
 .split-section .section-inner { padding-top: 0; padding-bottom: 0; }
 
