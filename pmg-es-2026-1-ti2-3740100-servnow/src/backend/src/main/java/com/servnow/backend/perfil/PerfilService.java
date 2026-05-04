@@ -49,6 +49,7 @@ public class PerfilService {
         usuario.setBairro(normalizarTexto(request.bairro()));
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
+        usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
         usuario.setFotoBase64(normalizarFoto(request.fotoBase64()));
         usuario.setDescricaoProfissional(normalizarTextoLongo(request.descricaoProfissional()));
         usuario.setEspecialidades(normalizarTexto(request.especialidades()));
@@ -68,6 +69,7 @@ public class PerfilService {
         usuario.setBairro(normalizarTexto(request.bairro()));
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
+        usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
         usuario.setFotoBase64(normalizarFoto(request.fotoBase64()));
 
         Usuario salvo = usuarioRepository.save(usuario);
@@ -79,6 +81,7 @@ public class PerfilService {
         validarTipo(usuario, TipoUsuario.PRESTADOR);
         atualizarNome(usuario, request);
 
+        usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
         usuario.setDescricaoProfissional(normalizarTextoLongo(request.descricaoProfissional()));
         usuario.setEspecialidades(normalizarTexto(request.especialidades()));
 
@@ -143,6 +146,7 @@ public class PerfilService {
             usuario.getBairro(),
             usuario.getCidade(),
             usuario.getEstado(),
+            usuario.getFotoPerfilBase64(),
             usuario.getFotoBase64(),
             usuario.getDescricaoProfissional(),
             usuario.getEspecialidades()

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { ArrowLeft, Save, User } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, Save, User } from "lucide-react";
 
 import { Header } from "../../Components/Header/Header";
 import { ClientePerfil } from "../Configurarperfil/Cliente";
@@ -24,6 +24,7 @@ export type FormState = {
   bairro: string;
   cidade: string;
   estado: string;
+  fotoPerfilBase64: string;
   fotoBase64: string;
   descricaoProfissional: string;
   especialidades: string[];
@@ -37,6 +38,7 @@ const initialState: FormState = {
   bairro: "",
   cidade: "",
   estado: "",
+  fotoPerfilBase64: "",
   fotoBase64: "",
   descricaoProfissional: "",
   especialidades: [],
@@ -86,6 +88,7 @@ export function Perfil() {
           bairro: data.bairro ?? "",
           cidade: data.cidade ?? "",
           estado: data.estado ?? "",
+          fotoPerfilBase64: data.fotoPerfilBase64 ?? "",
           fotoBase64: data.fotoBase64 ?? "",
           descricaoProfissional: data.descricaoProfissional ?? "",
           especialidades: data.especialidades
@@ -123,7 +126,7 @@ export function Perfil() {
     });
   }
 
-  async function handleFotoChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFotoChange(event: ChangeEvent<HTMLInputElement>, field: "fotoPerfilBase64" | "fotoBase64") {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -134,7 +137,7 @@ export function Perfil() {
 
     try {
       const fotoBase64 = await otimizarFoto(file);
-      updateField("fotoBase64", fotoBase64);
+      updateField(field, fotoBase64);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
     } finally {
@@ -167,10 +170,12 @@ export function Perfil() {
           bairro: form.bairro,
           cidade: form.cidade,
           estado: form.estado,
+          fotoPerfilBase64: form.fotoPerfilBase64,
           fotoBase64: form.fotoBase64,
         }
       : {
           nome: form.nome.trim(),
+          fotoPerfilBase64: form.fotoPerfilBase64,
           descricaoProfissional: form.descricaoProfissional,
           especialidades: form.especialidades.join(","),
         };
@@ -251,13 +256,43 @@ export function Perfil() {
                     />
                   </div>
                 </label>
+
+                <div className="perfil-upload-group">
+                  <div>
+                    <h3>Foto de perfil</h3>
+                    <p className="workspace-hint">Adicione uma foto para identificar seu perfil na plataforma.</p>
+                  </div>
+
+                  <label className="perfil-upload">
+                    <ImageIcon size={18} />
+                    <span>{form.fotoPerfilBase64 ? "Trocar foto" : "Selecionar foto"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => handleFotoChange(event, "fotoPerfilBase64")}
+                    />
+                  </label>
+
+                  {form.fotoPerfilBase64 && (
+                    <div className="perfil-foto-preview perfil-foto-preview-avatar">
+                      <img src={form.fotoPerfilBase64} alt="Pre-visualizacao da foto de perfil" />
+                      <button
+                        type="button"
+                        className="perfil-foto-remover"
+                        onClick={() => updateField("fotoPerfilBase64", "")}
+                      >
+                        Remover foto
+                      </button>
+                    </div>
+                  )}
+                </div>
               </section>
 
               {isCliente ? (
                 <ClientePerfil
                   form={form}
                   updateField={updateField}
-                  handleFotoChange={handleFotoChange}
+                  handleFotoChange={(event) => handleFotoChange(event, "fotoBase64")}
                 />
               ) : (
                 <PrestadorPerfil

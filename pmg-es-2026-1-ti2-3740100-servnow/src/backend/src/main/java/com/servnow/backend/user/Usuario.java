@@ -55,6 +55,9 @@ public class Usuario {
     @Column(length = 2)
     private String estado;
 
+    @Column(name = "foto_perfil_base64", length = 200000)
+    private String fotoPerfilBase64;
+
     @Column(name = "foto_base64", length = 200000)
     private String fotoBase64;
 
@@ -166,6 +169,14 @@ public class Usuario {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getFotoPerfilBase64() {
+        return fotoPerfilBase64;
+    }
+
+    public void setFotoPerfilBase64(String fotoPerfilBase64) {
+        this.fotoPerfilBase64 = fotoPerfilBase64;
     }
 
     public String getFotoBase64() {

@@ -59,6 +59,7 @@ public class AuthController {
             completo.getBairro(),
             completo.getCidade(),
             completo.getEstado(),
+            completo.getFotoPerfilBase64(),
             completo.getFotoBase64(),
             completo.getDescricaoProfissional(),
             completo.getEspecialidades()

@@ -20,6 +20,7 @@ export type CurrentUserResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
+  fotoPerfilBase64: string | null;
   fotoBase64: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
@@ -36,6 +37,7 @@ export type PerfilResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
+  fotoPerfilBase64: string | null;
   fotoBase64: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
@@ -49,6 +51,7 @@ export type PerfilUpdateRequest = {
   bairro?: string;
   cidade?: string;
   estado?: string;
+  fotoPerfilBase64?: string;
   fotoBase64?: string;
   descricaoProfissional?: string;
   especialidades?: string;

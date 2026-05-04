@@ -29,6 +29,19 @@
   gap: 10px;
 }
 
+.perfil-upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.perfil-upload-group h3 {
+  margin: 0 0 4px;
+  color: var(--workspace-text);
+  font-size: 16px;
+}
+
 .perfil-tag {
   display: inline-flex;
   align-items: center;
@@ -94,6 +107,12 @@
   object-fit: cover;
   border-radius: 14px;
   border: 1px solid var(--workspace-border);
+}
+
+.perfil-foto-preview-avatar img {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
 }
 
 .perfil-foto-remover {
