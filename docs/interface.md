@@ -22,7 +22,7 @@ Por fim, serão exibidos feedbacks e avaliações de clientes, com o objetivo de
 
 ## 6.2. Telas do processo 1 — Gestão de Clientes
 
-_As telas referentes ao processo de Gestão de Clientes serão adicionadas nesta seção._
+Telas referentes ao processo de cadastro, login e configuração de perfil do Cliente na plataforma.
 
 ### 6.2.1. Tela de cadastro de cliente
 
@@ -40,7 +40,7 @@ Tela de configuração de perfil do cliente. Permite inserir nome completo, ende
 
 ## 6.3. Telas do processo 2 — Gestão de Prestadores
 
-_Telas referentes ao processo de cadastro, login e gerenciamento do prestador de serviços na plataforma._
+Telas referentes ao processo de cadastro, login e configuração de perfil do Prestador se serviços na plataforma.
 
 
 ### 6.3.1. Tela de cadastro do prestador
@@ -60,37 +60,27 @@ Tela de configuração de perfil do prestador de serviço. Além do nome complet
 
 
 ## 6.4. Telas do processo 3 — Solicitação de Serviço
-<<<<<<< HEAD
+
 =======
-## 6.4. Telas do processo 3 — Solicitação de Serviço ![alt text](image-1.png)
-
-Tela de criação de nova solicitação de serviço pelo cliente. O usuário preenche o título, tipo e descrição do serviço, adiciona fotos opcionais e publica para que prestadores próximos recebam e enviem propostas. Também é possível salvar como rascunho para publicar depois.
-
 
 ### 6.4.1. Painel do cliente
 
-![Painel CLiente](images/design/Painel(cliente).jpeg)
+![Painel CLiente](images/design/painelcliente.png)
 
 
-Após a aprovação do cadastro e do login, o cliente é direcionado ao seu painel de controle. O painel apresenta um resumo das solicitações (solicitações publicadas por ele, solicitações concluídas e gastos mensais).
-
-Na seção central, o cliente pode visualizar e filtrar suas solicitações por status, como concluídas, aguardando aceite e com data mais recente , além de criar novas solicitações.
-
-O painel também permite acesso ao gerenciamento do perfil do cliente 
+Após a aprovação do cadastro e a realização do login, o cliente é  direcionado ao seu painel de controle, onde encontra uma visão geral organizada de suas atividades na plataforma. Nesse ambiente, são apresentados resumos importantes, como as solicitações já publicadas, solitações agendandas, o acompanhamento dos gastos mensais e de sua avaliação média. Na área central do painel, o cliente pode visualizar suas solicitações de forma detalhada, com a possibilidade de aplicar filtros por status como concluídas, aguardando aceite ou concluidas facilitando a navegação e o acompanhamento. Além disso, o painel oferece funcionalidades essenciais, como a criação de novas solicitações, a opção de aceitar ou recusar propostas recebidas e o acesso ao histórico completo de serviços realizados. Também é possível gerenciar informações pessoais por meio da área de perfil, garantindo autonomia e praticidade na atualização dos dados do cliente.
 
 
-### 6.4.2. Tela de nova solicitação
+## 6.4.2 Telas do processo 3 — Solicitação de Serviço ![Solicitação de Serviço](image-1.png)
 
-![Criar solicitação](images/design/Solicitação.jpeg)
-colocar pagamento e descrever 
+Tela de criação de nova solicitação de serviço pelo cliente. O usuário preenche o título, tipo e descrição do serviço, adiciona fotos opcionais e assim publica a solicitação para que prestadores próximos recebam e enviem propostas. Também é possível salvar como rascunho para publicar depois.
+
 
 ### 6.3.3. Painel do prestador
 
 ![Painel do prestador](images/design//figma-tela-prestador.png)
 
-Após a aprovação do cadastro e login, o prestador é direcionado ao seu painel de controle. O painel apresenta um resumo das principais informações do profissional, incluindo indicadores de desempenho (solicitações novas, serviços concluídos no mês, ganhos acumulados e avaliação média). Na seção central, o prestador pode visualizar e filtrar as solicitações de clientes por proximidade, valor, data ou urgência, com informações detalhadas sobre cada serviço, podendo recusar ou aceitar solicitações. O painel também exibe o histórico de serviços recentes e a barra lateral permite acesso ao gerenciamento do perfil profissional 
-
-
+Após a aprovação do cadastro e login, o prestador é direcionado ao seu painel de controle. O painel apresenta um resumo das principais informações do profissional, incluindo indicadores de desempenho solicitações novas, serviços concluídos no mês, ganhos acumulados e avaliação média. Na seção central, o prestador pode visualizar e filtrar as solicitações de clientes por proximidade, valor, data ou urgência, com informações detalhadas sobre cada serviço, podendo recusar, realizar propostas ou aceitar solicitações. O painel também exibe o histórico de serviços recentes e a barra lateral permite acesso ao gerenciamento do perfil profissional 
 
 
 
