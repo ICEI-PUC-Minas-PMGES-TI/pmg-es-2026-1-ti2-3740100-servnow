@@ -1,4 +1,4 @@
-import type { FormState } from "../../Perfil";
+import type { FormState } from "../../../Components/Perfil";
 
 const TIPOS_SERVICO = [
   { value: "ELETRICO", label: "Eletrico" },

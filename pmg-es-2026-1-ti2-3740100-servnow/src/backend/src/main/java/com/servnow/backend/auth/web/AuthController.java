@@ -1,4 +1,4 @@
-package com.servnow.backend.auth;
+package com.servnow.backend.auth.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,9 +14,10 @@ import com.servnow.backend.auth.dto.AuthRequest;
 import com.servnow.backend.auth.dto.AuthResponse;
 import com.servnow.backend.auth.dto.CurrentUserResponse;
 import com.servnow.backend.auth.dto.RegisterRequest;
+import com.servnow.backend.auth.service.AuthService;
 import com.servnow.backend.security.UsuarioAutenticado;
-import com.servnow.backend.user.Usuario;
-import com.servnow.backend.user.UsuarioRepository;
+import com.servnow.backend.usuario.domain.Usuario;
+import com.servnow.backend.usuario.repository.UsuarioRepository;
 
 import jakarta.validation.Valid;
 

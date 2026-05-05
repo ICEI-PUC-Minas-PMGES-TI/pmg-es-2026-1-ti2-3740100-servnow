@@ -5,7 +5,7 @@ import { Home } from "./pages/Home";
 import Layout from "./Layout/Layout";
 import { Login } from "./pages/Home/Login";
 import { Cadastro } from "./pages/Home/Cadastro";
-import { Perfil } from "./pages/Perfil";
+import { Perfil } from "./Components/Perfil";
 
 import { getAuthSession } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";

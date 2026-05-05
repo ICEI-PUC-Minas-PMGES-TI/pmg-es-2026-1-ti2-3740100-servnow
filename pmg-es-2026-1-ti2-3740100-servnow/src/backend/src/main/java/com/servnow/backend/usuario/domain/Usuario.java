@@ -1,4 +1,4 @@
-package com.servnow.backend.user;
+package com.servnow.backend.usuario.domain;
 
 import java.time.OffsetDateTime;
 

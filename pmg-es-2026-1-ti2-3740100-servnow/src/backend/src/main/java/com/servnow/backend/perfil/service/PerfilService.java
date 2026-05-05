@@ -1,4 +1,4 @@
-package com.servnow.backend.perfil;
+package com.servnow.backend.perfil.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -7,9 +7,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
 import com.servnow.backend.security.UsuarioAutenticado;
-import com.servnow.backend.user.TipoUsuario;
-import com.servnow.backend.user.Usuario;
-import com.servnow.backend.user.UsuarioRepository;
+import com.servnow.backend.usuario.domain.TipoUsuario;
+import com.servnow.backend.usuario.domain.Usuario;
+import com.servnow.backend.usuario.repository.UsuarioRepository;
 
 @Service
 public class PerfilService {

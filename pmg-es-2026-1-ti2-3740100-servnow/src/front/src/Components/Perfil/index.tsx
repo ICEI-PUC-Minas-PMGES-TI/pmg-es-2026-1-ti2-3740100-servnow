@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ArrowLeft, Image as ImageIcon, Save, User } from "lucide-react";
 
-import { Header } from "../../Components/Header/Header";
-import { ClientePerfil } from "../Configurarperfil/Cliente";
-import { PrestadorPerfil } from "../Configurarperfil/Prestador";
+import { Header } from "../Header/Header";
+import { ClientePerfil } from "../../pages/Configurarperfil/Cliente";
+import { PrestadorPerfil } from "../../pages/Configurarperfil/Prestador";
 import {
   API_URL,
   clearAuthSession,
@@ -110,9 +110,9 @@ export function Perfil() {
     navigate("/login");
   }
 
-  function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
+  const updateField = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
-  }
+  }, []);
 
   function toggleEspecialidade(value: string) {
     setForm((current) => {

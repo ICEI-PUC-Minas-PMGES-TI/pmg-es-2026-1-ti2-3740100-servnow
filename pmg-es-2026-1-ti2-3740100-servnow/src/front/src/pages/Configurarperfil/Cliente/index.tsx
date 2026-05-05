@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Building, Hash, Image as ImageIcon, MapPin } from "lucide-react";
+import { Building, Hash, Image as ImageIcon, LoaderCircle, MapPin } from "lucide-react";
 
-import type { FormState } from "../../Perfil";
+import type { FormState } from "../../../Components/Perfil";
 
 const ESTADOS_BR = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
@@ -15,28 +16,93 @@ type ClientePerfilProps = {
   handleFotoChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
+type ViaCepResponse = {
+  cep?: string;
+  logradouro?: string;
+  bairro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
+};
+
 export function ClientePerfil({
   form,
   updateField,
   handleFotoChange,
 }: ClientePerfilProps) {
+  const [cepStatus, setCepStatus] = useState<"idle" | "loading" | "found" | "not-found" | "error">("idle");
+  const cepDigits = onlyDigits(form.cep);
+
+  useEffect(() => {
+    if (cepDigits.length !== 8) {
+      setCepStatus("idle");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function buscarEnderecoPorCep() {
+      setCepStatus("loading");
+
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Nao foi possivel consultar o CEP.");
+        }
+
+        const data = (await response.json()) as ViaCepResponse;
+
+        if (data.erro) {
+          setCepStatus("not-found");
+          return;
+        }
+
+        updateField("cep", data.cep ?? formatCep(cepDigits));
+        updateField("rua", data.logradouro ?? "");
+        updateField("bairro", data.bairro ?? "");
+        updateField("cidade", data.localidade ?? "");
+        updateField("estado", data.uf ?? "");
+        setCepStatus("found");
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setCepStatus("error");
+        }
+      }
+    }
+
+    void buscarEnderecoPorCep();
+
+    return () => controller.abort();
+  }, [cepDigits, updateField]);
+
+  function handleCepChange(event: ChangeEvent<HTMLInputElement>) {
+    updateField("cep", formatCep(event.target.value));
+  }
+
   return (
     <>
       <section className="workspace-card workspace-section">
         <h2>Endereco</h2>
 
         <div className="perfil-grid">
-          <label className="form-field">
+          <label className="form-field perfil-field-cep">
             <span className="form-label">CEP</span>
             <div className="form-control">
-              <Hash size={16} />
+              {cepStatus === "loading" ? <LoaderCircle className="perfil-spin" size={16} /> : <Hash size={16} />}
               <input
                 type="text"
                 value={form.cep}
-                onChange={(event) => updateField("cep", event.target.value)}
+                onChange={handleCepChange}
                 placeholder="00000-000"
+                inputMode="numeric"
+                maxLength={9}
               />
             </div>
+            {cepStatus === "not-found" && <span className="perfil-cep-feedback">CEP nao encontrado.</span>}
+            {cepStatus === "error" && <span className="perfil-cep-feedback">Nao foi possivel consultar o CEP.</span>}
           </label>
 
           <label className="form-field perfil-field-wide">
@@ -134,3 +200,17 @@ export function ClientePerfil({
 }
 
 export default ClientePerfil;
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function formatCep(value: string) {
+  const digits = onlyDigits(value).slice(0, 8);
+
+  if (digits.length <= 5) {
+    return digits;
+  }
+
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+}

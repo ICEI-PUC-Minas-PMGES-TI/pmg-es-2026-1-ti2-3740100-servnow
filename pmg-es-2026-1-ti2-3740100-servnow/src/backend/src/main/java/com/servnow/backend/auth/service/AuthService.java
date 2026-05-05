@@ -1,4 +1,4 @@
-package com.servnow.backend.auth;
+package com.servnow.backend.auth.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,9 +9,9 @@ import com.servnow.backend.auth.dto.AuthRequest;
 import com.servnow.backend.auth.dto.AuthResponse;
 import com.servnow.backend.auth.dto.RegisterRequest;
 import com.servnow.backend.security.JwtService;
-import com.servnow.backend.user.TipoUsuario;
-import com.servnow.backend.user.Usuario;
-import com.servnow.backend.user.UsuarioRepository;
+import com.servnow.backend.usuario.domain.TipoUsuario;
+import com.servnow.backend.usuario.domain.Usuario;
+import com.servnow.backend.usuario.repository.UsuarioRepository;
 
 @Service
 public class AuthService {

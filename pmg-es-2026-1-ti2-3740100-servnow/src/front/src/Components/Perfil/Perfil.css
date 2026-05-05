@@ -23,6 +23,28 @@
   grid-column: span 2;
 }
 
+.perfil-grid .perfil-field-cep {
+  grid-column: span 2;
+}
+
+.perfil-cep-feedback {
+  display: block;
+  margin-top: 6px;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.perfil-spin {
+  animation: perfil-spin 0.8s linear infinite;
+}
+
+@keyframes perfil-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .perfil-checkboxes {
   display: flex;
   flex-wrap: wrap;

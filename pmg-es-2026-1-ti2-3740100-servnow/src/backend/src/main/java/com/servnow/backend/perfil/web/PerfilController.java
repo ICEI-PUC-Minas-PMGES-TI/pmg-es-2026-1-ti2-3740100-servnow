@@ -1,4 +1,4 @@
-package com.servnow.backend.perfil;
+package com.servnow.backend.perfil.web;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
+import com.servnow.backend.perfil.service.PerfilService;
 import com.servnow.backend.security.UsuarioAutenticado;
 
 import jakarta.validation.Valid;
