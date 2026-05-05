@@ -65,7 +65,9 @@ export function Header({
               <button
                 type="button"
                 className="header-profile-icon"
-                aria-label="Perfil"
+                aria-label="Configurar perfil"
+                title="Configurar perfil"
+                onClick={() => navigate("/perfil")}
               >
                 <UserCircle size={24} />
               </button>
@@ -119,7 +121,15 @@ export function Header({
 
             {loggedIn ? (
               <>
-                <button type="button" className="mobile-user-info" aria-label="Perfil">
+                <button
+                  type="button"
+                  className="mobile-user-info"
+                  aria-label="Configurar perfil"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/perfil");
+                  }}
+                >
                   <UserCircle size={22} />
                 </button>
                 <Notificacoes />

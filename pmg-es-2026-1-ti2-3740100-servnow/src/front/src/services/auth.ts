@@ -14,6 +14,47 @@ export type CurrentUserResponse = {
   nome: string;
   email: string;
   tipoUsuario: TipoUsuario;
+  rua: string | null;
+  numero: string | null;
+  cep: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  estado: string | null;
+  fotoPerfilBase64: string | null;
+  fotoBase64: string | null;
+  descricaoProfissional: string | null;
+  especialidades: string | null;
+};
+
+export type PerfilResponse = {
+  id: number;
+  nome: string;
+  email: string;
+  tipoUsuario: TipoUsuario;
+  rua: string | null;
+  numero: string | null;
+  cep: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  estado: string | null;
+  fotoPerfilBase64: string | null;
+  fotoBase64: string | null;
+  descricaoProfissional: string | null;
+  especialidades: string | null;
+};
+
+export type PerfilUpdateRequest = {
+  nome?: string;
+  rua?: string;
+  numero?: string;
+  cep?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  fotoPerfilBase64?: string;
+  fotoBase64?: string;
+  descricaoProfissional?: string;
+  especialidades?: string;
 };
 
 export type SolicitacaoServicoResponse = {

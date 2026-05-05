@@ -1,4 +1,4 @@
- 1 cd pmg-es-2026-1-ti2-3740100-servnow
+ 1 
  
  2 cd pmg-es-2026-1-ti2-3740100-servnow
  
@@ -11,6 +11,19 @@
   é preciso ter dois terminais abertos para startar o back e o front
 
 
-  Contaparatestes
-  Contaparatestes@gmail.com
-  12345678
+Perfil cliente
+
+
+Perfil prestador
+
+
+
+Padroes para commit
+
+feat: → nova funcionalidade
+fix: → correção de bug
+refactor: → mudança interna sem alterar comportamento
+chore: → coisas gerais (config, limpeza, etc.)
+docs: → documentação
+test: → testes
+style: → formatação (indentação, etc.)
