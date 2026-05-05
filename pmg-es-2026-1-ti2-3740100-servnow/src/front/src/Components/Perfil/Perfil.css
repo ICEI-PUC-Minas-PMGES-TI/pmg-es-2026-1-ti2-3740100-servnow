@@ -9,6 +9,10 @@
   gap: 12px;
 }
 
+.perfil-grid-spaced {
+  margin-top: 18px;
+}
+
 .perfil-grid .form-field {
   grid-column: span 3;
 }
@@ -149,6 +153,10 @@
 
 .perfil-foto-remover:hover {
   text-decoration: underline;
+}
+
+.perfil-documento-remover {
+  margin-top: 10px;
 }
 
 @media (max-width: 720px) {

@@ -11,6 +11,11 @@ public record PerfilUpdateRequest(
     String fotoPerfilBase64,
     String fotoBase64,
     String descricaoProfissional,
-    String especialidades
+    String especialidades,
+    String diasDisponiveis,
+    String horarioInicio,
+    String horarioFim,
+    Integer raioAtendimentoKm,
+    String documentoIdentidadeBase64
 ) {
 }

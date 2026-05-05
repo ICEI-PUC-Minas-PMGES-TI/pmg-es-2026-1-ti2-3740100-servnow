@@ -24,6 +24,11 @@ export type CurrentUserResponse = {
   fotoBase64: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
+  diasDisponiveis: string | null;
+  horarioInicio: string | null;
+  horarioFim: string | null;
+  raioAtendimentoKm: number | null;
+  documentoIdentidadeBase64: string | null;
 };
 
 export type PerfilResponse = {
@@ -41,6 +46,11 @@ export type PerfilResponse = {
   fotoBase64: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
+  diasDisponiveis: string | null;
+  horarioInicio: string | null;
+  horarioFim: string | null;
+  raioAtendimentoKm: number | null;
+  documentoIdentidadeBase64: string | null;
 };
 
 export type PerfilUpdateRequest = {
@@ -55,6 +65,11 @@ export type PerfilUpdateRequest = {
   fotoBase64?: string;
   descricaoProfissional?: string;
   especialidades?: string;
+  diasDisponiveis?: string;
+  horarioInicio?: string;
+  horarioFim?: string;
+  raioAtendimentoKm?: number;
+  documentoIdentidadeBase64?: string;
 };
 
 export type SolicitacaoServicoResponse = {

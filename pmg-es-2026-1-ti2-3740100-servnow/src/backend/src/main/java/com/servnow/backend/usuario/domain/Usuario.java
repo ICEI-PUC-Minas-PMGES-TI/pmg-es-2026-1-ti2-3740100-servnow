@@ -68,6 +68,21 @@ public class Usuario {
     @Column(length = 255)
     private String especialidades;
 
+    @Column(name = "dias_disponiveis", length = 120)
+    private String diasDisponiveis;
+
+    @Column(name = "horario_inicio", length = 5)
+    private String horarioInicio;
+
+    @Column(name = "horario_fim", length = 5)
+    private String horarioFim;
+
+    @Column(name = "raio_atendimento_km")
+    private Integer raioAtendimentoKm;
+
+    @Column(name = "documento_identidade_base64", columnDefinition = "TEXT")
+    private String documentoIdentidadeBase64;
+
     @PrePersist
     public void prePersist() {
         if (criadoEm == null) {
@@ -201,5 +216,45 @@ public class Usuario {
 
     public void setEspecialidades(String especialidades) {
         this.especialidades = especialidades;
+    }
+
+    public String getDiasDisponiveis() {
+        return diasDisponiveis;
+    }
+
+    public void setDiasDisponiveis(String diasDisponiveis) {
+        this.diasDisponiveis = diasDisponiveis;
+    }
+
+    public String getHorarioInicio() {
+        return horarioInicio;
+    }
+
+    public void setHorarioInicio(String horarioInicio) {
+        this.horarioInicio = horarioInicio;
+    }
+
+    public String getHorarioFim() {
+        return horarioFim;
+    }
+
+    public void setHorarioFim(String horarioFim) {
+        this.horarioFim = horarioFim;
+    }
+
+    public Integer getRaioAtendimentoKm() {
+        return raioAtendimentoKm;
+    }
+
+    public void setRaioAtendimentoKm(Integer raioAtendimentoKm) {
+        this.raioAtendimentoKm = raioAtendimentoKm;
+    }
+
+    public String getDocumentoIdentidadeBase64() {
+        return documentoIdentidadeBase64;
+    }
+
+    public void setDocumentoIdentidadeBase64(String documentoIdentidadeBase64) {
+        this.documentoIdentidadeBase64 = documentoIdentidadeBase64;
     }
 }

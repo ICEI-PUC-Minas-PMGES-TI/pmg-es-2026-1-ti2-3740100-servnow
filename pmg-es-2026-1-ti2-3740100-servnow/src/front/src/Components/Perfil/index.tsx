@@ -28,6 +28,11 @@ export type FormState = {
   fotoBase64: string;
   descricaoProfissional: string;
   especialidades: string[];
+  diasDisponiveis: string[];
+  horarioInicio: string;
+  horarioFim: string;
+  raioAtendimentoKm: string;
+  documentoIdentidadeBase64: string;
 };
 
 const initialState: FormState = {
@@ -42,9 +47,15 @@ const initialState: FormState = {
   fotoBase64: "",
   descricaoProfissional: "",
   especialidades: [],
+  diasDisponiveis: [],
+  horarioInicio: "",
+  horarioFim: "",
+  raioAtendimentoKm: "",
+  documentoIdentidadeBase64: "",
 };
 
 const MAX_FOTO_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_DOCUMENTO_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_FOTO_BASE64_LENGTH = 190000;
 
 export function Perfil() {
@@ -94,6 +105,13 @@ export function Perfil() {
           especialidades: data.especialidades
             ? data.especialidades.split(",").map((item) => item.trim()).filter(Boolean)
             : [],
+          diasDisponiveis: data.diasDisponiveis
+            ? data.diasDisponiveis.split(",").map((item) => item.trim()).filter(Boolean)
+            : [],
+          horarioInicio: data.horarioInicio ?? "",
+          horarioFim: data.horarioFim ?? "",
+          raioAtendimentoKm: data.raioAtendimentoKm ? String(data.raioAtendimentoKm) : "",
+          documentoIdentidadeBase64: data.documentoIdentidadeBase64 ?? "",
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar perfil.");
@@ -126,6 +144,18 @@ export function Perfil() {
     });
   }
 
+  function toggleDiaDisponivel(value: string) {
+    setForm((current) => {
+      const exists = current.diasDisponiveis.includes(value);
+      return {
+        ...current,
+        diasDisponiveis: exists
+          ? current.diasDisponiveis.filter((item) => item !== value)
+          : [...current.diasDisponiveis, value],
+      };
+    });
+  }
+
   async function handleFotoChange(event: ChangeEvent<HTMLInputElement>, field: "fotoPerfilBase64" | "fotoBase64") {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -145,6 +175,33 @@ export function Perfil() {
     }
   }
 
+  async function handleDocumentoChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const isValidType = file.type === "application/pdf" || file.type.startsWith("image/");
+
+    if (!isValidType) {
+      toast.error("O documento precisa ser PDF ou imagem.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_DOCUMENTO_FILE_BYTES) {
+      toast.error("O documento precisa ter no maximo 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      updateField("documentoIdentidadeBase64", await arquivoParaBase64(file));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar o documento.");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -156,6 +213,10 @@ export function Perfil() {
 
     if (!form.nome.trim()) {
       toast.error("O nome e obrigatorio.");
+      return;
+    }
+
+    if (session.tipoUsuario === "PRESTADOR" && !validarPerfilPrestador(form)) {
       return;
     }
 
@@ -178,6 +239,11 @@ export function Perfil() {
           fotoPerfilBase64: form.fotoPerfilBase64,
           descricaoProfissional: form.descricaoProfissional,
           especialidades: form.especialidades.join(","),
+          diasDisponiveis: form.diasDisponiveis.join(","),
+          horarioInicio: form.horarioInicio,
+          horarioFim: form.horarioFim,
+          raioAtendimentoKm: Number(form.raioAtendimentoKm),
+          documentoIdentidadeBase64: form.documentoIdentidadeBase64,
         };
 
     try {
@@ -299,6 +365,8 @@ export function Perfil() {
                   form={form}
                   updateField={updateField}
                   toggleEspecialidade={toggleEspecialidade}
+                  toggleDiaDisponivel={toggleDiaDisponivel}
+                  handleDocumentoChange={handleDocumentoChange}
                 />
               )}
 
@@ -350,6 +418,45 @@ function carregarImagem(file: File) {
 
     image.src = objectUrl;
   });
+}
+
+function arquivoParaBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Arquivo invalido."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function validarPerfilPrestador(form: FormState) {
+  if (form.especialidades.length === 0) {
+    toast.error("Escolha pelo menos um tipo de servico.");
+    return false;
+  }
+
+  if (form.diasDisponiveis.length === 0) {
+    toast.error("Selecione pelo menos um dia disponivel.");
+    return false;
+  }
+
+  if (!form.horarioInicio || !form.horarioFim || form.horarioInicio >= form.horarioFim) {
+    toast.error("Informe um horario de inicio anterior ao horario de fim.");
+    return false;
+  }
+
+  const raio = Number(form.raioAtendimentoKm);
+  if (!Number.isInteger(raio) || raio < 1 || raio > 30) {
+    toast.error("O raio de atendimento deve estar entre 1 e 30 km.");
+    return false;
+  }
+
+  if (!form.documentoIdentidadeBase64) {
+    toast.error("Envie seu documento de identidade.");
+    return false;
+  }
+
+  return true;
 }
 
 async function otimizarFoto(file: File) {

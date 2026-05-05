@@ -63,7 +63,12 @@ public class AuthController {
             completo.getFotoPerfilBase64(),
             completo.getFotoBase64(),
             completo.getDescricaoProfissional(),
-            completo.getEspecialidades()
+            completo.getEspecialidades(),
+            completo.getDiasDisponiveis(),
+            completo.getHorarioInicio(),
+            completo.getHorarioFim(),
+            completo.getRaioAtendimentoKm(),
+            completo.getDocumentoIdentidadeBase64()
         );
     }
 }

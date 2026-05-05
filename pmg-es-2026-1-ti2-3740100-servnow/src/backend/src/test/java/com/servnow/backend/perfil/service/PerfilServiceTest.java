@@ -70,6 +70,11 @@ class PerfilServiceTest {
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null
         );
 
@@ -99,7 +104,12 @@ class PerfilServiceTest {
             fotoMuitoGrande,
             null,
             null,
-            null
+            null,
+            "SEGUNDA",
+            "08:00",
+            "17:00",
+            10,
+            "data:application/pdf;base64,abc"
         );
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));

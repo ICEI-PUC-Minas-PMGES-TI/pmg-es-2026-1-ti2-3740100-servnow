@@ -50,16 +50,9 @@ Modelo BPMN do Processo 4
 | Comando                   | Destino                         | Tipo    |
 |---------------------------|---------------------------------|---------|
 | Confirmar e enviar código | Prestador insere código         | button  |
+| Reenviar código           | Gerar novo código ao cliente    | button  |
 | Recusar presença          | Cancelar atendimento            | cancel  |
 
-
-
-### Comandos
-
-| Comando        | Destino                      | Tipo    |
-|----------------|---------------------------- -|---------|
-| Validar código | Validar                      | button  |
-| Reenviar código| Gerar novo código ao cliente | button  |
 
 
 
@@ -100,7 +93,7 @@ Modelo BPMN do Processo 4
 | Comando                    | Destino              | Tipo    |
 |-------------------------- -|----------------------|---------|
 | Concluir                   | Notificar cliente    | button  |
-| Enviar cobrança ao cliente | Notificar cliente    |         |
+| Enviar cobrança ao cliente | Notificar cliente    | default |
 
 ---
 
