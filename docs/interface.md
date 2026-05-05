@@ -65,7 +65,7 @@ Tela de configuração de perfil do prestador de serviço. Além do nome complet
 
 ### 6.4.1. Painel do cliente
 
-![Painel CLiente](images/design/painelcliente.png)
+![Painel Cliente](images/design/painelcliente.png)
 
 
 Após a aprovação do cadastro e a realização do login, o cliente é  direcionado ao seu painel de controle, onde encontra uma visão geral organizada de suas atividades na plataforma. Nesse ambiente, são apresentados resumos importantes, como as solicitações já publicadas, solitações agendandas, o acompanhamento dos gastos mensais e de sua avaliação média. Na área central do painel, o cliente pode visualizar suas solicitações de forma detalhada, com a possibilidade de aplicar filtros por status como concluídas, aguardando aceite ou concluidas facilitando a navegação e o acompanhamento. Além disso, o painel oferece funcionalidades essenciais, como a criação de novas solicitações, a opção de aceitar ou recusar propostas recebidas e o acesso ao histórico completo de serviços realizados. Também é possível gerenciar informações pessoais por meio da área de perfil, garantindo autonomia e praticidade na atualização dos dados do cliente.
