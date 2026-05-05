@@ -65,8 +65,7 @@ Os tipos de dados utilizados nas atividades são:
 | Campo                      | Tipo               | Restrições                                      
 |----------------------------|--------------------|---------------------------------------------|
 | Descrição profissional     | Área de texto      | máximo de 500 caracteres                    | 
-|  Especialidades            | Área seleção       |  minimo de 1 especialidade na lista         | 
-| Preço médio por serviço    | Número             | valor positivo, em R$                       |               
+|  Especialidades            | Área seleção       |  minimo de 1 especialidade na lista         |           
 | Dias disponíveis           | Seleção múltipla   | pelo menos 1 dia selecionado                |               
 | Horário de início          | Hora               | anterior ao horário de fim                  |               
 | Horário de fim             | Hora               | posterior ao horário de início              |               
