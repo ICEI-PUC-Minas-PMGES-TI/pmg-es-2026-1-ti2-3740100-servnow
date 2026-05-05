@@ -18,7 +18,7 @@ Modelo BPMN do Processo 4
 
 ---
 
-## 1-Solicitar início do atendimento
+## 1-Solicitar início do serviço
 
 ### Campos
 
@@ -35,25 +35,35 @@ Modelo BPMN do Processo 4
 
 ---
 
-## 2-Inserir código de verificação
+## 2-Receber codigo e enviar codigo
 
 ### Campos
 
-| Campo                        | Tipo   | Restrições                              | 
-|---------------------------- -|--------|-----------------------------------------|
-| Código informado pelo cliente| Número | 6 dígitos, obrigatório                  | 
-| Tentativas realizadas        | Número | Preenchido automaticamente, máximo 3    | 
+| Campo                | Tipo   | Restrições                 |
+|----------------------|--------|----------------------------|
+| Nome do prestador    | Texto  | Somente leitura            |
+| Serviço contratado   | Texto  | Somente leitura            | 
+| Código de verificação| Número | 6 dígitos, obrigatório     | 
+
+### Comandos
+
+| Comando                   | Destino                         | Tipo    |
+|---------------------------|---------------------------------|---------|
+| Confirmar e enviar código | Prestador insere código         | button  |
+| Recusar presença          | Cancelar atendimento            | cancel  |
+
+
 
 ### Comandos
 
 | Comando        | Destino                      | Tipo    |
 |----------------|---------------------------- -|---------|
-| Validar código | Gateway "Código válido?"     | default |
-| Reenviar código| Gerar novo código ao cliente | default |
+| Validar código | Validar                      | button  |
+| Reenviar código| Gerar novo código ao cliente | button  |
 
----
 
-##  3- Executar serviço
+
+##  3- Registrar inicio do Serviço
 
 ### Campos
 
@@ -62,54 +72,41 @@ Modelo BPMN do Processo 4
 | Hora de início           | Hora    | Preenchido automaticamente pelo sistema          | 
 | Fotos do estado inicial  | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada            | 
 | Observações do serviço   | Texto   | Máximo de 300 caracteres                         |  
-| Fotos do estado final    | Imagem  | JPG/PNG, até 5 imagens, máx. 3MB cada            |     
+  
 
 ### Comandos
 
-| Comando            | Destino                | Tipo    |
-|--------------------|------------------------|---------|
-| Concluir execução  | Concluir atendimento   | default |
+| Comando            | Destino                         | Tipo    |
+|--------------------|  ------------------------       |---------|
+| Enviar             | Envio de dados para o cliente   |button   |
 
 ---
 
-##  4- Concluir atendimento
+##  4- Registrar Serviço concluido
 
 ### Campos
 
-| Campo                  | Tipo    | Restrições                      | 
+| Campo                  | Tipo    | Restrições                     | 
 |------------------------|---------|--------------------------------|
 | Hora de conclusão      | Hora    | Preenchido automaticamente     | 
 | Valor final cobrado    | Número  | Valor positivo (R$)            | 
-| Método de pagamento    | Seleção | Pix / Cartão / Dinheiro        | 
+| Método de pagamento    | Seleção | Pix / Cartão / Dinheiro        |
+| Fotos do estado final    | Imagem  | JPG/PNG, até 5 imagens,      | 
+| Observações do serviço   | Texto   | Máximo de 300 caracteres     |   
+    
 
 ### Comandos
 
 | Comando                    | Destino              | Tipo    |
 |-------------------------- -|----------------------|---------|
-| Enviar cobrança ao cliente | Notificar cliente    | default |
+| Concluir                   | Notificar cliente    | button  |
+| Enviar cobrança ao cliente | Notificar cliente    |         |
 
 ---
 
-## 5- Confirmar presença e fornecer código
 
-### Campos
 
-| Campo                | Tipo   | Restrições                | Valor        |
-|----------------------|--------|----------------------------|--------------|
-| Nome do prestador    | Texto  | Somente leitura            | Automático   |
-| Serviço contratado   | Texto  | Somente leitura            | Automático   |
-| Código de verificação| Número | 6 dígitos, obrigatório     |              |
-
-### Comandos
-
-| Comando                   | Destino                         | Tipo    |
-|---------------------------|---------------------------------|---------|
-| Confirmar e enviar código | Prestador insere código         | default |
-| Recusar presença          | Cancelar atendimento            | cancel  |
-
----
-
-##  6-Revisar serviço executado
+##  5-Revisar serviço executado
 
 ### Campos
 
@@ -124,7 +121,7 @@ Modelo BPMN do Processo 4
 
 | Comando            | Destino                            | Tipo    |
 |--------------------|------------------------------------|---------|
-| Aceitar e pagar    | Processar pagamento                | default |
+| Aceitar e pagar    | Processar pagamento                | button  |
 | Contestar valor    | Notificar prestador                | cancel  |
 
 ---

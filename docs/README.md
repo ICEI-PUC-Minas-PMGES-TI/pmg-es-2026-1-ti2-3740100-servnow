@@ -209,14 +209,11 @@ http://portal.pucminas.br/imagedb/documento/DOC_DSC_NOME_ARQUI20160217102425.pdf
 # APÊNDICES
 
 
-_Atualizar os links e adicionar novos links para que a estrutura do código esteja corretamente documentada._
-
-
 ## Apêndice A - Código fonte
 
-[Código do front-end](../src/front) -- repositório do código do front-end
+[\[Código do front-end](../pmg-es-2026-1-ti2-3740100-servnow/src/front)-- repositório do código do front-end
 
-[Código do back-end](../src/back)  -- repositório do código do back-end
+[\[Código do back-end](../pmg-es-2026-1-ti2-3740100-servnow/src/backend)-- repositório do código do back-end
 
 
 ## Apêndice B - Apresentação final
