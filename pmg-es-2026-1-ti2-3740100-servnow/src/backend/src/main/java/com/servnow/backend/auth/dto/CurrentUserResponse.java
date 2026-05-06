@@ -8,6 +8,7 @@ public record CurrentUserResponse(
     String rua,
     String numero,
     String cep,
+    String complemento,
     String bairro,
     String cidade,
     String estado,

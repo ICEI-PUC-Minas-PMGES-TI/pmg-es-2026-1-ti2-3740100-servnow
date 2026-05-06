@@ -61,7 +61,8 @@ Tela de configuração de perfil do prestador de serviço. Além do nome complet
 
 ## 6.4. Telas do processo 3 — Solicitação de Serviço
 
-=======
+
+## Cliente
 
 ### 6.4.1. Painel do cliente
 
@@ -70,19 +71,42 @@ Tela de configuração de perfil do prestador de serviço. Além do nome complet
 
 Após a aprovação do cadastro e a realização do login, o cliente é  direcionado ao seu painel de controle, onde encontra uma visão geral organizada de suas atividades na plataforma. Nesse ambiente, são apresentados resumos importantes, como as solicitações já publicadas, solitações agendandas, o acompanhamento dos gastos mensais e de sua avaliação média. Na área central do painel, o cliente pode visualizar suas solicitações de forma detalhada, com a possibilidade de aplicar filtros por status como concluídas, aguardando aceite ou concluidas facilitando a navegação e o acompanhamento. Além disso, o painel oferece funcionalidades essenciais, como a criação de novas solicitações, a opção de aceitar ou recusar propostas recebidas e o acesso ao histórico completo de serviços realizados. Também é possível gerenciar informações pessoais por meio da área de perfil, garantindo autonomia e praticidade na atualização dos dados do cliente.
 
+### 6.4.2. Criar Solitação
 
-## 6.4.2 Telas do processo 3 — Solicitação de Serviço ![Solicitação de Serviço](image-1.png)
 
+![Solicitação](images/design/Solicitarserviço-figma.png)
 Tela de criação de nova solicitação de serviço pelo cliente. O usuário preenche o título, tipo e descrição do serviço, adiciona fotos opcionais e assim publica a solicitação para que prestadores próximos recebam e enviem propostas. Também é possível salvar como rascunho para publicar depois.
 
 
-### 6.3.3. Painel do prestador
+### 6.4.2. Vizualizar Propostas Recebidas
+
+![Vizualizar Propostas Recebidas](images/design/Propostasclientes-figma.png)
+
+Esta tela permite que o cliente visualize todas as propostas enviadas por prestadores de serviço para as solicitações que ele criou. As propostas possuem  informações relevantes para a tomada de decisão. O cliente pode analisar cada proposta individualmente e optar por aceitar ou recusar. Ao aceitar uma proposta, a solicitação é automaticamente finalizada, impedindo novas interações e consolidando o acordo com o prestador selecionado.
+
+
+## Prestador
+
+### 6.4.4 Painel do prestador
 
 ![Painel do prestador](images/design//figma-tela-prestador.png)
 
 Após a aprovação do cadastro e login, o prestador é direcionado ao seu painel de controle. O painel apresenta um resumo das principais informações do profissional, incluindo indicadores de desempenho solicitações novas, serviços concluídos no mês, ganhos acumulados e avaliação média. Na seção central, o prestador pode visualizar e filtrar as solicitações de clientes por proximidade, valor, data ou urgência, com informações detalhadas sobre cada serviço, podendo recusar, realizar propostas ou aceitar solicitações. O painel também exibe o histórico de serviços recentes e a barra lateral permite acesso ao gerenciamento do perfil profissional 
 
+### 6.4.5 Vizualizar Propostas Enviadas
+//colocar foto
 
+Esta tela permite que o prestador visualize todas as propostas que ele enviou para solicitações de clientes. As propostas são listadas com informações relevantes, facilitando o acompanhamento do andamento de cada envio.
+Para cada proposta, é exibido o status atual, podendo ser aceita, recusada ou aguardando resposta do cliente. Isso possibilita ao prestador ter uma visão clara das oportunidades em aberto e das negociações já concluídas.
+
+## Telas Iguais entre os Usuarios
+
+### 6.4.6 Vizualizar Historico Serviços [Historico de Serviços](images/design/HistoricoServiços-figma.png)
+
+Esta tela apresenta o histórico de serviços concluídos, sendo compartilhada tanto pelo cliente quanto pelo prestador, com a mesma funcionalidade para ambos os perfis. Nela, são exibidas informações relevantes de cada serviço finalizado, como valor cobrado, forma de pagamento utilizada e um relatorio que é aberto em ver detalhes. Além disso, a tela permite visualizar os comentários e avaliações deixados entre as partes.
+
+### 6.4.7 Vizualizar Serviços Agendandos
+//fazer
 
 
 ## 6.5. Telas do processo 4 — Acompanhamento do serviço 

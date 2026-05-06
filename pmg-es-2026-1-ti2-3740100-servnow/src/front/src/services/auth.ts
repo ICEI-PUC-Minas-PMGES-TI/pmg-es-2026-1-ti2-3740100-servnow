@@ -17,6 +17,7 @@ export type CurrentUserResponse = {
   rua: string | null;
   numero: string | null;
   cep: string | null;
+  complemento: string | null;
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
@@ -39,6 +40,7 @@ export type PerfilResponse = {
   rua: string | null;
   numero: string | null;
   cep: string | null;
+  complemento: string | null;
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
@@ -58,6 +60,7 @@ export type PerfilUpdateRequest = {
   rua?: string;
   numero?: string;
   cep?: string;
+  complemento?: string;
   bairro?: string;
   cidade?: string;
   estado?: string;

@@ -8,6 +8,7 @@ public record PerfilResponse(
     String rua,
     String numero,
     String cep,
+    String complemento,
     String bairro,
     String cidade,
     String estado,

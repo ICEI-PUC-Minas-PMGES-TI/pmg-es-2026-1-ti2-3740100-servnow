@@ -64,6 +64,7 @@ class PerfilServiceTest {
             " Rua A ",
             " 123 ",
             " 30100-000 ",
+            " Apto 301 ",
             " Centro ",
             " Belo Horizonte ",
             " mg ",
@@ -86,6 +87,7 @@ class PerfilServiceTest {
         assertThat(response.nome()).isEqualTo("Maria Silva");
         assertThat(response.rua()).isEqualTo("Rua A");
         assertThat(response.numero()).isEqualTo("123");
+        assertThat(response.complemento()).isEqualTo("Apto 301");
         assertThat(response.estado()).isEqualTo("MG");
     }
 
@@ -94,6 +96,7 @@ class PerfilServiceTest {
         Usuario usuario = usuario(TipoUsuario.PRESTADOR);
         String fotoMuitoGrande = "a".repeat(200001);
         PerfilUpdateRequest request = new PerfilUpdateRequest(
+            null,
             null,
             null,
             null,

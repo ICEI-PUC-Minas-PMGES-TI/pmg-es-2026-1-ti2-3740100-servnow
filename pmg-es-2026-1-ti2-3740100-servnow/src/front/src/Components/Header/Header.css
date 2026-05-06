@@ -24,25 +24,25 @@
 .header-inner {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 64px;
-  height: 130px;
+  padding: 0 48px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 40px;
+  gap: 28px;
 }
 
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 18px;
   text-decoration: none;
   flex-shrink: 0;
 }
 
 .logo-img {
-  width: 110px;
-  height: 110px;
+  width: 64px;
+  height: 64px;
   border-radius: 14px;
   object-fit: cover;
   border: 2px solid rgba(56, 189, 248, 0.6);
@@ -56,9 +56,9 @@
 }
 
 .logo-text {
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
   color: var(--header-text);
 }
 
@@ -71,13 +71,21 @@
 .nav-link {
   position: relative;
   color: var(--header-muted);
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 500;
   text-decoration: none;
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 10px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
   transition: color 0.25s, background 0.25s;
+}
+
+button.nav-link {
+  border: 0;
+  background: transparent;
+  font-family: 'Sora', sans-serif;
+  text-align: left;
+  cursor: pointer;
 }
 
 .nav-link::after {
@@ -106,6 +114,13 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-shrink: 0;
+}
+
+.mobile-header-actions {
+  display: none;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -272,17 +287,58 @@
     display: flex;
   }
 
+  .mobile-header-actions {
+    display: flex;
+  }
+
   .header-inner {
-    padding: 0 24px;
-    height: 72px;
+    padding: 0 14px;
+    height: 64px;
+    gap: 10px;
   }
 
   .logo-img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .logo-text {
-    font-size: 24px;
+    font-size: 20px;
+  }
+
+  .mobile-header-action,
+  .mobile-header-actions .notification-trigger {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .mobile-header-actions .notification-dropdown {
+    width: min(320px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 430px) {
+  .header-logo {
+    gap: 8px;
+  }
+
+  .mobile-header-actions {
+    gap: 6px;
+  }
+
+  .mobile-header-action,
+  .mobile-header-actions .notification-trigger {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-text {
+    font-size: 17px;
   }
 }

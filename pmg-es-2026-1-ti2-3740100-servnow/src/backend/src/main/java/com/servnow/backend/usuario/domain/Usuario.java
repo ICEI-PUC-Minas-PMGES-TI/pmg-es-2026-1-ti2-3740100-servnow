@@ -47,6 +47,9 @@ public class Usuario {
     private String cep;
 
     @Column(length = 100)
+    private String complemento;
+
+    @Column(length = 100)
     private String bairro;
 
     @Column(length = 100)
@@ -160,6 +163,14 @@ public class Usuario {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
     }
 
     public String getBairro() {

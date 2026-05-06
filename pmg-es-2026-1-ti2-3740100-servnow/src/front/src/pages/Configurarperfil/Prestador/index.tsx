@@ -158,13 +158,27 @@ export function PrestadorPerfil({
         </label>
 
         {form.documentoIdentidadeBase64 && (
-          <button
-            type="button"
-            className="perfil-foto-remover perfil-documento-remover"
-            onClick={() => updateField("documentoIdentidadeBase64", "")}
-          >
-            Remover documento
-          </button>
+          <div className="perfil-documento-preview">
+            {isPdfBase64(form.documentoIdentidadeBase64) ? (
+              <iframe
+                src={form.documentoIdentidadeBase64}
+                title="Pre-visualizacao do documento de identidade"
+              />
+            ) : (
+              <img
+                src={form.documentoIdentidadeBase64}
+                alt="Pre-visualizacao do documento de identidade"
+              />
+            )}
+
+            <button
+              type="button"
+              className="perfil-foto-remover perfil-documento-remover"
+              onClick={() => updateField("documentoIdentidadeBase64", "")}
+            >
+              Remover documento
+            </button>
+          </div>
         )}
       </section>
     </>
@@ -172,3 +186,7 @@ export function PrestadorPerfil({
 }
 
 export default PrestadorPerfil;
+
+function isPdfBase64(value: string) {
+  return value.startsWith("data:application/pdf");
+}

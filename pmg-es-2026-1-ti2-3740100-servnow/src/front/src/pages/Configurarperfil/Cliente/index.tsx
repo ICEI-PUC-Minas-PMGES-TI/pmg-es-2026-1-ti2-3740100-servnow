@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Building, Hash, Image as ImageIcon, LoaderCircle, MapPin } from "lucide-react";
+import { Building, Hash, Home, Image as ImageIcon, LoaderCircle, MapPin } from "lucide-react";
 
 import type { FormState } from "../../../Components/Perfil";
 
@@ -126,6 +126,19 @@ export function ClientePerfil({
                 value={form.numero}
                 onChange={(event) => updateField("numero", event.target.value)}
                 placeholder="Ex: 123"
+              />
+            </div>
+          </label>
+
+          <label className="form-field">
+            <span className="form-label">Complemento (opcional)</span>
+            <div className="form-control">
+              <Home size={16} />
+              <input
+                type="text"
+                value={form.complemento}
+                onChange={(event) => updateField("complemento", event.target.value)}
+                placeholder="Apto, bloco, casa..."
               />
             </div>
           </label>

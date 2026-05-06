@@ -21,10 +21,14 @@ export type FormState = {
   rua: string;
   numero: string;
   cep: string;
+  complemento: string;
   bairro: string;
   cidade: string;
   estado: string;
   fotoPerfilBase64: string;
+  fotoPerfilAjusteX: string;
+  fotoPerfilAjusteY: string;
+  fotoPerfilEnquadramento: "cover" | "contain";
   fotoBase64: string;
   descricaoProfissional: string;
   especialidades: string[];
@@ -40,10 +44,14 @@ const initialState: FormState = {
   rua: "",
   numero: "",
   cep: "",
+  complemento: "",
   bairro: "",
   cidade: "",
   estado: "",
   fotoPerfilBase64: "",
+  fotoPerfilAjusteX: "50",
+  fotoPerfilAjusteY: "50",
+  fotoPerfilEnquadramento: "cover",
   fotoBase64: "",
   descricaoProfissional: "",
   especialidades: [],
@@ -96,10 +104,14 @@ export function Perfil() {
           rua: data.rua ?? "",
           numero: data.numero ?? "",
           cep: data.cep ?? "",
+          complemento: data.complemento ?? "",
           bairro: data.bairro ?? "",
           cidade: data.cidade ?? "",
           estado: data.estado ?? "",
           fotoPerfilBase64: data.fotoPerfilBase64 ?? "",
+          fotoPerfilAjusteX: "50",
+          fotoPerfilAjusteY: "50",
+          fotoPerfilEnquadramento: "cover",
           fotoBase64: data.fotoBase64 ?? "",
           descricaoProfissional: data.descricaoProfissional ?? "",
           especialidades: data.especialidades
@@ -168,6 +180,11 @@ export function Perfil() {
     try {
       const fotoBase64 = await otimizarFoto(file);
       updateField(field, fotoBase64);
+      if (field === "fotoPerfilBase64") {
+        updateField("fotoPerfilAjusteX", "50");
+        updateField("fotoPerfilAjusteY", "50");
+        updateField("fotoPerfilEnquadramento", "cover");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
     } finally {
@@ -228,6 +245,7 @@ export function Perfil() {
           rua: form.rua,
           numero: form.numero,
           cep: form.cep,
+          complemento: form.complemento,
           bairro: form.bairro,
           cidade: form.cidade,
           estado: form.estado,
@@ -340,15 +358,63 @@ export function Perfil() {
                   </label>
 
                   {form.fotoPerfilBase64 && (
-                    <div className="perfil-foto-preview perfil-foto-preview-avatar">
-                      <img src={form.fotoPerfilBase64} alt="Pre-visualizacao da foto de perfil" />
-                      <button
-                        type="button"
-                        className="perfil-foto-remover"
-                        onClick={() => updateField("fotoPerfilBase64", "")}
-                      >
-                        Remover foto
-                      </button>
+                    <div className="perfil-logo-editor">
+                      <div className="perfil-logo-preview">
+                        <img
+                          src={form.fotoPerfilBase64}
+                          alt="Pre-visualizacao da foto de perfil"
+                          style={{
+                            objectFit: form.fotoPerfilEnquadramento,
+                            objectPosition: `${form.fotoPerfilAjusteX}% ${form.fotoPerfilAjusteY}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div className="perfil-logo-controls">
+                        <label className="perfil-logo-control">
+                          <span>Enquadramento</span>
+                          <select
+                            value={form.fotoPerfilEnquadramento}
+                            onChange={(event) => updateField(
+                              "fotoPerfilEnquadramento",
+                              event.target.value as FormState["fotoPerfilEnquadramento"],
+                            )}
+                          >
+                            <option value="cover">Preencher</option>
+                            <option value="contain">Mostrar inteira</option>
+                          </select>
+                        </label>
+
+                        <label className="perfil-logo-control">
+                          <span>Horizontal</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={form.fotoPerfilAjusteX}
+                            onChange={(event) => updateField("fotoPerfilAjusteX", event.target.value)}
+                          />
+                        </label>
+
+                        <label className="perfil-logo-control">
+                          <span>Vertical</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={form.fotoPerfilAjusteY}
+                            onChange={(event) => updateField("fotoPerfilAjusteY", event.target.value)}
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          className="perfil-foto-remover"
+                          onClick={() => updateField("fotoPerfilBase64", "")}
+                        >
+                          Remover foto
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

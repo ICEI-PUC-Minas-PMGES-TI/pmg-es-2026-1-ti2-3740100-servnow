@@ -89,6 +89,23 @@ export function Header({
           )}
         </div>
 
+        <div className="mobile-header-actions">
+          {loggedIn && (
+            <>
+              <button
+                type="button"
+                className="header-profile-icon mobile-header-action"
+                aria-label="Configurar perfil"
+                title="Configurar perfil"
+                onClick={() => navigate("/perfil")}
+              >
+                <UserCircle size={21} />
+              </button>
+              <Notificacoes />
+            </>
+          )}
+        </div>
+
         <button
           className="header-hamburger"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -107,46 +124,11 @@ export function Header({
             <>
               <Link to={dashboardRoute} className="nav-link">Painel</Link>
               <a href="#" className="nav-link">Acompanhamento</a>
+              <button type="button" className="nav-link mobile-logout-link" onClick={onLogout}>
+                Sair
+              </button>
             </>
           )}
-          <div className="mobile-auth">
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={handleToggleTheme}
-              aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-
-            {loggedIn ? (
-              <>
-                <button
-                  type="button"
-                  className="mobile-user-info"
-                  aria-label="Configurar perfil"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/perfil");
-                  }}
-                >
-                  <UserCircle size={22} />
-                </button>
-                <Notificacoes />
-                <button type="button" className="btn-logout" onClick={onLogout}>Sair</button>
-              </>
-            ) : (
-              <button
-                className="btn-login"
-                onClick={() => {
-                  onLogin?.();
-                  navigate("/login");
-                }}
-              >
-                Login
-              </button>
-            )}
-          </div>
         </div>
       )}
     </header>

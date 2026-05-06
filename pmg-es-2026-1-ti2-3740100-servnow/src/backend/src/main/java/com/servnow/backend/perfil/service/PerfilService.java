@@ -47,6 +47,7 @@ public class PerfilService {
         usuario.setRua(normalizarTexto(request.rua()));
         usuario.setNumero(normalizarTexto(request.numero()));
         usuario.setCep(normalizarTexto(request.cep()));
+        usuario.setComplemento(normalizarTexto(request.complemento()));
         usuario.setBairro(normalizarTexto(request.bairro()));
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
@@ -70,6 +71,7 @@ public class PerfilService {
         usuario.setRua(normalizarTexto(request.rua()));
         usuario.setNumero(normalizarTexto(request.numero()));
         usuario.setCep(normalizarTexto(request.cep()));
+        usuario.setComplemento(normalizarTexto(request.complemento()));
         usuario.setBairro(normalizarTexto(request.bairro()));
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
@@ -203,6 +205,7 @@ public class PerfilService {
             usuario.getRua(),
             usuario.getNumero(),
             usuario.getCep(),
+            usuario.getComplemento(),
             usuario.getBairro(),
             usuario.getCidade(),
             usuario.getEstado(),

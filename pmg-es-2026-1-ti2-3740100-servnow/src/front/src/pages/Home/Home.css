@@ -397,3 +397,20 @@
   .avaliacoes-grid { grid-template-columns: 1fr; }
   .cta-section { padding: 64px 24px; }
 }
+
+@media (max-width: 430px) {
+  .categorias-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .categoria-card {
+    padding: 20px 18px;
+  }
+
+  .categoria-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+  }
+}

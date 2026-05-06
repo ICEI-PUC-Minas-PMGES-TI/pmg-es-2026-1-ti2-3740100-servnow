@@ -57,6 +57,7 @@ public class AuthController {
             completo.getRua(),
             completo.getNumero(),
             completo.getCep(),
+            completo.getComplemento(),
             completo.getBairro(),
             completo.getCidade(),
             completo.getEstado(),
