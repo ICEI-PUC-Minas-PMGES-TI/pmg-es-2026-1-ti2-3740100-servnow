@@ -1,4 +1,4 @@
-### 3.3.4 Processo 4 – ACOMPANHAMENTO DO PEDIDO
+### 3.3.4 Processo 4 – ACOMPANHAMENTO DO SERVIÇO
 
 Atualmente, o acompanhamento de serviços por prestadores ocorre de forma bastante informal e pouco estruturada, o que gera diversos problemas tanto para o cliente quanto para o profissional. A ausência de um canal centralizado dificulta o acompanhamento do andamento do serviço e torna a comunicação desorganizada, muitas vezes dependente de mensagens dispersas ou contatos informais. Como consequência, o cliente não possui visibilidade sobre o que está sendo feito, o que gera insegurança, principalmente em situações em que precisa se ausentar do local durante a execução. Além disso, a falta de registros e atualizações sobre o serviço impede um controle adequado e dificulta a construção de confiança entre as partes.
 
