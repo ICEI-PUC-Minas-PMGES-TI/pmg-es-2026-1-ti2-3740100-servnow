@@ -1,0 +1,109 @@
+[33m0accf93[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mprocesso3[m[33m, [m[1;32morigin[m[33m)[m  Atualização do bpmn solicitar serviço e o modelo do banco de dados
+[33m29fc259[m Format technology stack table in solution design
+[33m2cc5ec3[m Update PROCESSO 4 link text in README.md
+[33m3a063c9[m Revise Processo 4 para Acompanhamento do Serviço
+[33m0806ce0[m Update README with improved project overview
+[33m2495e2b[m Revise README.md for improved project overview
+[33m4a61e2f[m fix:Ajustes na responsividade para mobile Feat: Adiçao do campo Complemento no perfil do cliente, Ajuste de  enquadramento na foto dos usuarios chore: Melhor organizaçao de pastas e exclusão de duplicações dosc: Descriçoes das novas telas que surgiram
+[33ma7d8cb0[m  refactor:configurar perfil do prestador:
+[33m3be921e[m .
+[33md38aa65[m doscs: correções e adequações no detalhamento das atividades dos processos  para atender a nova modelagem a ser realizada pelo gabriel
+[33m9f44d4f[m[33m ([m[1;33mtag: [m[1;33mv0.1.1[m[33m)[m correção no merge
+[33ma018c27[m Merge remote-tracking branch 'origin/Processo2'
+[33m42f2889[m[33m ([m[1;31morigin/Processo2[m[33m)[m Instruções gerais
+[33m93b1309[m Backend   chore: organização de pastas por funcionalidade Test: cadastro/login, regras de perfil, geração/validação de JWT e prePersist
+[33m746d798[m Feat: adiciona imagem(perfil) na configuração de perfil dos usuarios em base 64 no banco de dados
+[33m2dad525[m docs: atualiza figma e melhora descriçoes
+[33me9e7a68[m atualização da tela de solicitação de serviço
+[33m0a55897[m atualização da tela de solicitação de serviço
+[33m997fd75[m Correção deautenticação
+[33m6b09553[m feat: tela de configurar perfil do cliente e prestador
+[33m8f97f74[m Criação de pastas e exclusao de pastas com conflitos
+[33m2818ebf[m docs: Corrigindo erro de imports
+[33m1c4062d[m Resolvendo conflitos
+[33mf30013e[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33m6d5e026[m feat(front): cria nova tela do painel do prestador
+[33m59eb722[m feat(front): cria nova tela do painel do prestador
+[33mbd1e9e6[m docs:interface: Descriçoes melhoradas e correção de imagens que estavam quebradas
+[33mc137bef[m Adição das imagens do figma na pasta imagens e descrição das mesmas em interface.md
+[33me1e8c03[m[33m ([m[1;31morigin/Processo4[m[33m)[m Correçao de link
+[33m8602e76[m[33m ([m[1;33mtag: [m[1;33mv0.1.0[m[33m)[m Update contributors list in README.md
+[33mbb54690[m feat(front): implementar melhorias no cadastro, processo 3 e notificações
+[33mff8b1a4[m Atualiza figmas e remove pastas e arquivos duplicados, fix: Modelo de dados (alterações propostas pelo prof: Lucca)
+[33m00a471d[m Melhorando  o detalhamento sobre as tecnologias utilizadas e refatoramento dos figmas
+[33m15c2b56[m docs:Alteraçoes na formatação do detalhamento das atividades dos processos
+[33m602d591[m docs/interface: Mudanças nas telas
+[33m186a0f1[m docs: atualiza processo1, telas processo 1
+[33m493f82f[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33me891d88[m docs:Correção de processos BPMNpropostos pela prof:Michelle
+[33m9098501[m Telas do FIGMA da parte do prestador e alteração no interface.md
+[33m79e985f[m feat: adiciona autenticação com JWT e criação de solicitações de serviço
+[33m2432790[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33m8d2e89f[m Fix:modelo de dados, fix: nome do processo4 e rostas no readme
+[33m4cfd015[m Update processo-4-execução-de-serviço.md
+[33m93eb64a[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33m80b4d4e[m fix:  front/login, feat: adiciona entidade User e estrutura inicial de usuários no banco, feat: integra aplicação com banco PostgreSQL usando JPA
+[33mbccb53d[m Atualização proposta pelo professor
+[33me53e9fd[m Fix: detalhamento atividades e Modelo de dados
+[33m43989e4[m fix-Modelo de dadsos (alteraçoes propostas pela prof Michelle)
+[33m3d85b90[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33ma14726d[m "src/front fix global.css    src/backend inicio da configuração do springboot
+[33md047d3e[m Atualizacao processo 2
+[33mb2daabd[m correçao processo 1
+[33m5a8d02d[m Alteraçoes no processo 3: Revisão realizada pelo prof Lucca
+[33mf2a6274[m Update processo1-gestão-de-clientes.md
+[33md9dc753[m Merge branch 'main' of https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow
+[33m3ada0c3[m Update BPMN image for Processo 4
+[33m130e7cb[m Atualiza nome dos processos
+[33mbcaab96[m Atualiza descrição do Processo 3 e propõe melhorias
+[33m293b6e5[m Replace old image with new one in documentation
+[33mb0f62b8[m Atualizando BPMN processo 4
+[33mcd6554b[m Processo 2
+[33m1c2e03d[m Update customer management process documentation
+[33m117ae1b[m Update Processo 2
+[33m0eefae9[m Revisa seção sobre execução de serviço Processo 4
+[33m60548b4[m Atualização BPMN processo 1
+[33m885fb17[m Novo diagrama de prestadores
+[33m468442e[m Update Process 4 documentation with BPMN model
+[33m809058b[m Update processo-4-nome-do-processo.md
+[33md5faa28[m docs: Detalhamento das atividades processo1 e processo 2
+[33m58e4c69[m fix(front): fix header buttons and navigation links
+[33m1ca9721[m Docs: Atualizando Processos
+[33mf0ecc5c[m Update README.md
+[33m189a481[m movendo pastas
+[33m356a048[m docs: Atualiza nome processo 4
+[33m8abe70b[m docs: Refinamento do processo 4
+[33m6fa4281[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m)[m Png do diagrama de prestadores
+[33m392eeaf[m Adicionei as fotos do diagrama de prestadores e de clientes
+[33mc8c9c07[m docs: Atualizando processos
+[33md3ab965[m docs: processo 4
+[33m0b40ca2[m docs: detalhamento dos processos 1 e 2
+[33md3604ca[m Alterações no nome dos participantes
+[33mc09f15c[m Update processo-4-nome-do-processo.md
+[33m3733479[m Update processo-3-nome-do-processo.md
+[33m1da278f[m Update processo-2-nome-do-processo.md
+[33m9acda7b[m Update processo-1-nome-do-processo.md
+[33m3759f09[m Update README.md
+[33mf233268[m Update README.md
+[33m4fc2464[m Update README.md
+[33m95da91e[m Update README.md
+[33mc402fa6[m Update links and formatting in README.md
+[33m1e5de0f[m Mecanismos de segurança
+[33m7b80b0b[m Update README.md
+[33ma2a9068[m Update README.md
+[33m02ab2a7[m Feat-Loguin/Não funcional
+[33m28276ac[m Feat- Home page
+[33m45957ee[m Update process names and add image in README
+[33m88b0d3a[m Add link to presentation slides in README
+[33mab036b6[m Add presentation README file
+[33mb3d2c43[m Update README.md
+[33m892099a[m Remove platform/system description from README
+[33mf6f7566[m Update README.md
+[33m8896663[m Fix formatting issues in README.md
+[33m0a8228d[m Update README.md to remove author details and fix formatting
+[33m6efd284[m Update README.md
+[33m09bf363[m Update README.md
+[33mde97809[m Relatorio.pdf
+[33m78d0c56[m Atualização README nas campos de nome do projeto, participantes, alunos, objetivos, introdução e justificativas.
+[33m196f31d[m Atualização do README.md nós campos de: 0 nome do projeto / Objetivo / Nome dos professores
+[33mac5b5f4[m Initial commit
