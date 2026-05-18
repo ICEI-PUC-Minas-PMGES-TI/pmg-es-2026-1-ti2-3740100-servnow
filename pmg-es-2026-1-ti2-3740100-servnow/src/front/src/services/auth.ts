@@ -165,7 +165,7 @@ export function clearAuthSession() {
 }
 
 export function getDashboardRoute(tipoUsuario: TipoUsuario) {
-  return tipoUsuario === "CLIENTE" ? "/painel/cliente" : "/perfil";
+  return tipoUsuario === "CLIENTE" ? "/painel/cliente" : "/painel/prestador";
 }
 
 export function authHeader(token: string) {

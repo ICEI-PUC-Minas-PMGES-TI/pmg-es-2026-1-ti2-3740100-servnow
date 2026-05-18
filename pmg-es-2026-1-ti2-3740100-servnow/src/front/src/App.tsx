@@ -9,7 +9,7 @@ import Layout from "./Layout/Layout";
 import { Home } from "./pages/Home";
 import { Cadastro } from "./pages/Home/Cadastro";
 import { Login } from "./pages/Home/Login";
-import { PainelPrestador } from "./pages/PainelPrestador";
+import { PainelPrestador } from "./Components/Painel/Prestador";
 import { getValidAuthSession } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";
 
@@ -52,14 +52,6 @@ function App() {
         {/* Rotas COM header e footer */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/painel/prestador"
-            element={(
-              <ProtectedRoute>
-                <PainelPrestador />
-              </ProtectedRoute>
-            )}
-          />
         </Route>
 
         {/* Rotas SEM header e footer */}
@@ -92,6 +84,14 @@ function App() {
           element={(
             <ProtectedRoute>
               <PainelCliente />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/painel/prestador"
+          element={(
+            <ProtectedRoute>
+              <PainelPrestador />
             </ProtectedRoute>
           )}
         />

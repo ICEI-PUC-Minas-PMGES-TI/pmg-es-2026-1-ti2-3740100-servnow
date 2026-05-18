@@ -142,7 +142,7 @@ export function Home() {
   const ctaRoute = session
     ? session.tipoUsuario === "CLIENTE"
       ? "/painel/cliente"
-      : "/perfil"
+      : "/painel/prestador"
     : "/cadastro";
 
   return (

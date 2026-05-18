@@ -2,42 +2,40 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Activity,
+  BarChart3,
   Calendar,
   FileText,
   HandCoins,
   History as HistoryIcon,
   LayoutDashboard,
-  Pencil,
-  PlusCircle,
   User,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { Header } from "../Header/Header";
-import { clearAuthSession, getAuthSession } from "../../services/auth";
+import { Header } from "../../Header/Header";
+import { PainelSidebar } from "../PainelSidebar";
+import { clearAuthSession, getAuthSession } from "../../../services/auth";
 
-import { Inicio } from "../../pages/Painel/Cliente/Inicio";
-import { CriarSolicitacao } from "../../pages/Painel/Cliente/CriarSolicitacao";
-import { Solicitacoes } from "../../pages/Painel/Cliente/Solicitacoes";
-import { Propostas } from "../../pages/Painel/Cliente/Propostas";
-import { Agendamentos } from "../../pages/Painel/Cliente/Agendamentos";
-import { Acompanhamento } from "../../pages/Painel/Cliente/Acompanhamento";
-import { Historico } from "../../pages/Painel/Cliente/Historico";
-import { Conta } from "../../pages/Painel/Cliente/Conta";
-import { PerfilCliente } from "../../pages/Painel/Cliente/Perfil";
+import { Inicio } from "../../../pages/Painel/Prestador/Inicio";
+import { Solicitacoes } from "../../../pages/Painel/Prestador/Solicitacoes";
+import { Propostas } from "../../../pages/Painel/Prestador/Propostas";
+import { Agendamentos } from "../../../pages/Painel/Prestador/Agendamentos";
+import { Ganhos } from "../../../pages/Painel/Prestador/Ganhos";
+import { Acompanhamento } from "../../../pages/Painel/Prestador/Acompanhamento";
+import { Historico } from "../../../pages/Painel/Prestador/Historico";
+import { PerfilPrestador } from "../../../pages/Painel/Prestador/Perfil";
 
-import "./PainelCliente.css";
+import "../PainelCliente.css";
 
 type Secao =
   | "inicio"
-  | "criar"
   | "solicitacoes"
   | "propostas"
   | "agendamentos"
+  | "ganhos"
   | "acompanhamento"
   | "historico"
-  | "perfil"
-  | "conta";
+  | "perfil";
 
 type ItemMenu = {
   id: Secao;
@@ -47,10 +45,10 @@ type ItemMenu = {
 
 const ITENS_MENU: ItemMenu[] = [
   { id: "inicio", label: "Inicio", icone: LayoutDashboard },
-  { id: "criar", label: "Criar solicitacao", icone: PlusCircle },
   { id: "solicitacoes", label: "Solicitacoes", icone: FileText },
   { id: "propostas", label: "Propostas", icone: HandCoins },
   { id: "agendamentos", label: "Agendamentos", icone: Calendar },
+  { id: "ganhos", label: "Ganhos", icone: BarChart3 },
   { id: "acompanhamento", label: "Acompanhamento", icone: Activity },
   { id: "historico", label: "Historico", icone: HistoryIcon },
   { id: "perfil", label: "Perfil", icone: User },
@@ -60,7 +58,7 @@ function isSecao(value: string | null): value is Secao {
   return ITENS_MENU.some((item) => item.id === value);
 }
 
-export function PainelCliente() {
+export function PainelPrestador() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const session = getAuthSession();
@@ -94,55 +92,49 @@ export function PainelCliente() {
     <>
       <Header onLogout={handleLogout} />
 
-      <div className="painel-cliente">
-        <aside className="painel-sidebar">
-          <span className="painel-sidebar-titulo">Menu</span>
-          <nav className="painel-nav">
-            {ITENS_MENU.map((item) => {
-              const Icone = item.icone;
-              const ativo = secaoAtiva === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`painel-nav-item ${ativo ? "ativo" : ""}`}
-                  onClick={() => handleSelecionarSecao(item.id)}
-                >
-                  <Icone size={18} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              className="painel-nav-item"
-              onClick={() => navigate("/perfil")}
-            >
-              <Pencil size={18} />
-              <span>Editar conta</span>
-            </button>
-          </nav>
-        </aside>
+      <div className="painel-cliente painel-prestador">
+        <PainelSidebar
+          nomeUsuario={session.nome}
+          papelLabel="Prestador"
+          onEditarConta={() => navigate("/perfil")}
+        >
+          {ITENS_MENU.map((item) => {
+            const Icone = item.icone;
+            const ativo = secaoAtiva === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`painel-nav-item ${ativo ? "ativo" : ""}`}
+                onClick={() => handleSelecionarSecao(item.id)}
+              >
+                <Icone size={18} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </PainelSidebar>
 
         <main className="painel-content">
           {secaoAtiva === "inicio" && (
             <Inicio
               onIrParaSolicitacoes={() => handleSelecionarSecao("solicitacoes")}
-              onIrParaCriar={() => handleSelecionarSecao("criar")}
+              onIrParaPropostas={() => handleSelecionarSecao("propostas")}
+              onIrParaGanhos={() => handleSelecionarSecao("ganhos")}
             />
           )}
-          {secaoAtiva === "criar" && <CriarSolicitacao />}
           {secaoAtiva === "solicitacoes" && <Solicitacoes />}
           {secaoAtiva === "propostas" && <Propostas />}
           {secaoAtiva === "agendamentos" && <Agendamentos />}
+          {secaoAtiva === "ganhos" && <Ganhos />}
           {secaoAtiva === "acompanhamento" && <Acompanhamento />}
           {secaoAtiva === "historico" && <Historico />}
-          {secaoAtiva === "perfil" && <PerfilCliente />}
-          {secaoAtiva === "conta" && <Conta />}
+          {secaoAtiva === "perfil" && <PerfilPrestador />}
         </main>
       </div>
     </>
   );
 }
 
-export default PainelCliente;
+export default PainelPrestador;
+
