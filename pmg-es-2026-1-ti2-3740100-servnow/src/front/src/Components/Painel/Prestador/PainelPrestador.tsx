@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Activity,
   BarChart3,
   Calendar,
   FileText,
@@ -21,7 +20,6 @@ import { Solicitacoes } from "../../../pages/Painel/Prestador/Solicitacoes";
 import { Propostas } from "../../../pages/Painel/Prestador/Propostas";
 import { Agendamentos } from "../../../pages/Painel/Prestador/Agendamentos";
 import { Ganhos } from "../../../pages/Painel/Prestador/Ganhos";
-import { Acompanhamento } from "../../../pages/Painel/Prestador/Acompanhamento";
 import { Historico } from "../../../pages/Painel/Prestador/Historico";
 import { PerfilPrestador } from "../../../pages/Painel/Prestador/Perfil";
 
@@ -33,7 +31,6 @@ type Secao =
   | "propostas"
   | "agendamentos"
   | "ganhos"
-  | "acompanhamento"
   | "historico"
   | "perfil";
 
@@ -49,7 +46,6 @@ const ITENS_MENU: ItemMenu[] = [
   { id: "propostas", label: "Propostas", icone: HandCoins },
   { id: "agendamentos", label: "Agendamentos", icone: Calendar },
   { id: "ganhos", label: "Ganhos", icone: BarChart3 },
-  { id: "acompanhamento", label: "Acompanhamento", icone: Activity },
   { id: "historico", label: "Historico", icone: HistoryIcon },
   { id: "perfil", label: "Perfil", icone: User },
 ];
@@ -127,7 +123,6 @@ export function PainelPrestador() {
           {secaoAtiva === "propostas" && <Propostas />}
           {secaoAtiva === "agendamentos" && <Agendamentos />}
           {secaoAtiva === "ganhos" && <Ganhos />}
-          {secaoAtiva === "acompanhamento" && <Acompanhamento />}
           {secaoAtiva === "historico" && <Historico />}
           {secaoAtiva === "perfil" && <PerfilPrestador />}
         </main>

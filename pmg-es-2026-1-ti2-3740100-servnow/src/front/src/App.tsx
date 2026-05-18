@@ -10,6 +10,7 @@ import { Home } from "./pages/Home";
 import { Cadastro } from "./pages/Home/Cadastro";
 import { Login } from "./pages/Home/Login";
 import { PainelPrestador } from "./Components/Painel/Prestador";
+import { AcompanhamentoPage } from "./pages/Acompanhamento";
 import { getValidAuthSession } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";
 
@@ -92,6 +93,14 @@ function App() {
           element={(
             <ProtectedRoute>
               <PainelPrestador />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/acompanhamento"
+          element={(
+            <ProtectedRoute>
+              <AcompanhamentoPage />
             </ProtectedRoute>
           )}
         />

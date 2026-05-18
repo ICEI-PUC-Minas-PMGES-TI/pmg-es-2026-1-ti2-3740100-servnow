@@ -55,8 +55,6 @@ export function Acompanhamento() {
   const [novaFoto, setNovaFoto] = useState<string>("");
   const [atualizacoes, setAtualizacoes] = useState<Atualizacao[]>(ATUALIZACOES_INICIAIS);
 
-  const codigoCompleto = codigo.every((c) => c.length === 1);
-
   function handleCodigoChange(index: number, valor: string) {
     const apenasDigito = valor.replace(/\D/g, "").slice(-1);
     const novo = [...codigo];
@@ -187,10 +185,12 @@ export function Acompanhamento() {
               type="button"
               className="acomp-btn-primary"
               onClick={confirmarChegada}
-              disabled={!codigoCompleto}
             >
-              Confirmar chegada
+              Codigo valido (mock)
             </button>
+            <span style={{ fontSize: 12, color: "var(--workspace-muted)", marginTop: -4 }}>
+              A validacao real sera feita pelo back-end. Por enquanto, qualquer codigo e aceito.
+            </span>
           </div>
         </section>
       )}

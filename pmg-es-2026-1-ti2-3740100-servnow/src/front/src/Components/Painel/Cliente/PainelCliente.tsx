@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Activity,
   Calendar,
   FileText,
   HandCoins,
@@ -21,7 +20,6 @@ import { CriarSolicitacao } from "../../../pages/Painel/Cliente/CriarSolicitacao
 import { Solicitacoes } from "../../../pages/Painel/Cliente/Solicitacoes";
 import { Propostas } from "../../../pages/Painel/Cliente/Propostas";
 import { Agendamentos } from "../../../pages/Painel/Cliente/Agendamentos";
-import { Acompanhamento } from "../../../pages/Painel/Cliente/Acompanhamento";
 import { Historico } from "../../../pages/Painel/Cliente/Historico";
 import { Conta } from "../../../pages/Painel/Cliente/Conta";
 import { PerfilCliente } from "../../../pages/Painel/Cliente/Perfil";
@@ -34,7 +32,6 @@ type Secao =
   | "solicitacoes"
   | "propostas"
   | "agendamentos"
-  | "acompanhamento"
   | "historico"
   | "perfil"
   | "conta";
@@ -51,7 +48,6 @@ const ITENS_MENU: ItemMenu[] = [
   { id: "solicitacoes", label: "Solicitacoes", icone: FileText },
   { id: "propostas", label: "Propostas", icone: HandCoins },
   { id: "agendamentos", label: "Agendamentos", icone: Calendar },
-  { id: "acompanhamento", label: "Acompanhamento", icone: Activity },
   { id: "historico", label: "Historico", icone: HistoryIcon },
   { id: "perfil", label: "Perfil", icone: User },
 ];
@@ -128,7 +124,6 @@ export function PainelCliente() {
           {secaoAtiva === "solicitacoes" && <Solicitacoes />}
           {secaoAtiva === "propostas" && <Propostas />}
           {secaoAtiva === "agendamentos" && <Agendamentos />}
-          {secaoAtiva === "acompanhamento" && <Acompanhamento />}
           {secaoAtiva === "historico" && <Historico />}
           {secaoAtiva === "perfil" && <PerfilCliente />}
           {secaoAtiva === "conta" && <Conta />}

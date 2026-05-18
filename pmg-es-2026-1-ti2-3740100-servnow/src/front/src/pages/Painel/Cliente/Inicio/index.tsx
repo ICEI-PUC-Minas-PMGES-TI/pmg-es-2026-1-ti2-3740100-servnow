@@ -1,4 +1,5 @@
-import { ArrowRight, Calendar, FileText, PlusCircle, Wallet } from "lucide-react";
+import { ArrowRight, Calendar, Clock, FileText, PlusCircle, Wallet } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 
 type InicioProps = {
@@ -34,6 +35,8 @@ const solicitacoesRecentes = [
 ];
 
 export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
+  const navigate = useNavigate();
+
   return (
     <>
       <PainelSectionHeader
@@ -41,6 +44,43 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
         title="Inicio"
         description="Acompanhe suas solicitacoes, agendamentos e gastos do mes."
       />
+
+      <section
+        className="painel-card"
+        style={{
+          marginBottom: 18,
+          background: "linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(20, 184, 166, 0.08))",
+          borderColor: "rgba(56, 189, 248, 0.35)",
+        }}
+      >
+        <div className="painel-card-cabecalho" style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: "rgba(56, 189, 248, 0.2)",
+                color: "var(--brand-strong)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Clock size={22} />
+            </div>
+            <div>
+              <h2 style={{ margin: 0 }}>Voce tem um servico para comecar hoje</h2>
+              <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--workspace-muted)" }}>
+                Troca de chuveiro eletrico - previsto para 14:00
+              </p>
+            </div>
+          </div>
+          <button type="button" className="btn-primary" onClick={() => navigate("/acompanhamento")}>
+            Acompanhar servico <ArrowRight size={14} />
+          </button>
+        </div>
+      </section>
 
       <section className="painel-stats-grid">
         <div className="painel-stat-card">
