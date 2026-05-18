@@ -212,6 +212,7 @@ body, .painel-root, .painel-main, .painel-sidebar { font-family: 'Sora', system-
 .filter-group.search {
   flex: 2.2;
   min-width: 260px;
+  margin-right: 12px;
 }
 
 .filter-input {

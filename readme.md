@@ -1,8 +1,8 @@
 # ServNow
 
-O objetivo do projeto é desenvolver um sistema digital de intermediação de serviços residenciais sob demanda, que conecte clientes a profissionais prestadores de serviço como eletricistas, encanadores e técnicos de manutenção. A proposta é facilitar a solicitação e a execução desses serviços por meio de uma plataforma organizada e acessível, proporcionando mais praticidade, segurança e eficiência tanto para quem solicita quanto para quem presta o serviço.
+O projeto tem como objetivo desenvolver uma plataforma digital de intermediação de serviços residenciais sob demanda, conectando clientes a profissionais prestadores de serviço, como eletricistas, encanadores e técnicos de manutenção. A proposta busca facilitar a solicitação e execução de serviços de forma prática, segura e eficiente, permitindo o cadastro de usuários, gerenciamento de chamados, localização de profissionais próximos por geolocalização e acompanhamento das solicitações em um ambiente organizado e acessível.
 
-Além disso, o sistema busca permitir o cadastro de clientes e prestadores, possibilitar a solicitação de serviços com descrição do problema, local e horário desejado, e utilizar geolocalização para encontrar profissionais próximos. A plataforma também pretende oferecer maior transparência de valores por meio de estimativas de preço, incluir um sistema de avaliações entre usuários e permitir que prestadores aceitem ou recusem chamados, além de implementar mecanismos de segurança para confirmar a identidade do profissional no momento do atendimento.
+Além disso, o sistema visa oferecer maior transparência e confiabilidade por meio de estimativas de preço, sistema de avaliações entre usuários e mecanismos de segurança para validação da identidade dos prestadores de serviço, proporcionando uma experiência mais segura e eficiente tanto para clientes quanto para profissionais.
 
 ## Integrantes
 
