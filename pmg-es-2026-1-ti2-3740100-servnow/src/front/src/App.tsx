@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { Home } from "./pages/Home";
-import Layout from "./Layout/Layout";
-import { Login } from "./pages/Home/Login";
-import { Cadastro } from "./pages/Home/Cadastro";
 import { Perfil } from "./Components/Perfil";
+import Layout from "./Layout/Layout";
+import { Home } from "./pages/Home";
+import { Cadastro } from "./pages/Home/Cadastro";
+import { Login } from "./pages/Home/Login";
+import { PainelPrestador } from "./pages/PainelPrestador";
 
-import { getAuthSession } from "./services/auth";
-import { applyTheme, getStoredTheme } from "./services/theme";
 import "react-toastify/dist/ReactToastify.css";
 import "./global.css";
+import { getAuthSession } from "./services/auth";
+import { applyTheme, getStoredTheme } from "./services/theme";
 
 function ProtectedRoute({
   children,
@@ -51,6 +52,14 @@ function App() {
         {/* Rotas COM header e footer */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
+          <Route
+            path="/painel/prestador"
+            element={(
+              <ProtectedRoute>
+                <PainelPrestador />
+              </ProtectedRoute>
+            )}
+          />
         </Route>
 
         {/* Rotas SEM header e footer */}

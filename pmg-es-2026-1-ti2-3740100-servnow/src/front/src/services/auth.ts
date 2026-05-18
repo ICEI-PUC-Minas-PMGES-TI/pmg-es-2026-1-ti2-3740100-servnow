@@ -126,6 +126,14 @@ export function getAuthSession(): AuthResponse | null {
   }
 }
 
+export function updateAuthSessionName(novoNome: string) {
+  const session = getAuthSession();
+  if (session) {
+    session.nome = novoNome;
+    saveAuthSession(session);
+  }
+}
+
 export function clearAuthSession() {
   localStorage.removeItem(AUTH_STORAGE_KEY);
 }

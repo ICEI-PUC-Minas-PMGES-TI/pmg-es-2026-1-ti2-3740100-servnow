@@ -1,11 +1,11 @@
+import { Moon, Sun, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Moon, Sun, UserCircle } from "lucide-react";
-import "./Header.css";
-import logo from "../../assets/logo2.png";
-import { Notificacoes } from "../Notificacoes/Notificacoes";
+import logo from "../../assets/logo_ServNow.jpeg";
 import { getAuthSession, getDashboardRoute } from "../../services/auth";
 import { applyTheme, getNextTheme, getStoredTheme } from "../../services/theme";
+import { Notificacoes } from "../Notificacoes/Notificacoes";
+import "./Header.css";
 
 interface HeaderProps {
   isLoggedIn?: boolean;

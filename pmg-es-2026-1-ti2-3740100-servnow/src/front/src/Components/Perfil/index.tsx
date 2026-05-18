@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { ArrowLeft, Image as ImageIcon, Save, User } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { ArrowLeft, Image as ImageIcon, Save, User } from "lucide-react";
 
-import { Header } from "../Header/Header";
 import { ClientePerfil } from "../../pages/Configurarperfil/Cliente";
 import { PrestadorPerfil } from "../../pages/Configurarperfil/Prestador";
 import {
-  API_URL,
-  clearAuthSession,
-  getAuthSession,
-  type PerfilResponse,
-  type PerfilUpdateRequest,
+    API_URL,
+    clearAuthSession,
+    getAuthSession,
+    updateAuthSessionName,
+    type PerfilResponse,
+    type PerfilUpdateRequest,
 } from "../../services/auth";
+import { Header } from "../Header/Header";
 import "./Perfil.css";
 
 export type FormState = {
@@ -286,6 +287,7 @@ export function Perfil() {
         throw new Error(await getResponseError(response, "Nao foi possivel salvar o perfil."));
       }
 
+      updateAuthSessionName(form.nome.trim());
       toast.success("Perfil atualizado com sucesso.");
       setTimeout(() => navigate("/"), 1000);
     } catch (error) {

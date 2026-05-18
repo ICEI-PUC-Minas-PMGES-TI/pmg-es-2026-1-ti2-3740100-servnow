@@ -1,0 +1,167 @@
+.relatorio-container {
+  padding: 24px;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.relatorio-header {
+  margin-bottom: 32px;
+}
+
+.relatorio-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.relatorio-header p {
+  font-size: 16px;
+  color: var(--text-secondary, #666);
+}
+
+.metricas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.metrica-card {
+  background: white;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.metrica-card:hover {
+  border-color: var(--primary, #0066ff);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
+}
+
+.metrica-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.metrica-icon {
+  color: var(--primary, #0066ff);
+}
+
+.metrica-trend {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success, #10b981);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.metrica-label {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  margin-bottom: 8px;
+}
+
+.metrica-valor {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.relatorio-table-container {
+  background: white;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.relatorio-table-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  background: var(--bg-secondary, #f8f9fa);
+}
+
+.relatorio-table-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.relatorio-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.relatorio-table thead th {
+  background: var(--bg-secondary, #f8f9fa);
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.relatorio-table tbody tr {
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  transition: background 0.2s ease;
+}
+
+.relatorio-table tbody tr:hover {
+  background: var(--bg-secondary, #f8f9fa);
+}
+
+.relatorio-table tbody td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.valor-cell {
+  font-weight: 600;
+  color: var(--primary, #0066ff);
+}
+
+.taxa-cell {
+  font-weight: 600;
+  color: var(--success, #10b981);
+}
+
+.relatorio-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary, #0066ff);
+  background: var(--bg-secondary, #f8f9fa);
+  color: var(--primary, #0066ff);
+}
