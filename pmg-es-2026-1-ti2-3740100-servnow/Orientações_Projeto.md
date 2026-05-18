@@ -21,6 +21,9 @@ Perfil prestador
 TestePrestador@gmail.com
 TestePrestador 
 
+ClienteSolicitacao@gmail.com
+ClienteSolicitacao
+
 
 Padroes para commit
 

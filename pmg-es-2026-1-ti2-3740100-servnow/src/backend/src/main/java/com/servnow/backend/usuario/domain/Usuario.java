@@ -61,6 +61,15 @@ public class Usuario {
     @Column(name = "foto_perfil_base64", length = 200000)
     private String fotoPerfilBase64;
 
+    @Column(name = "foto_perfil_ajuste_x")
+    private Integer fotoPerfilAjusteX;
+
+    @Column(name = "foto_perfil_ajuste_y")
+    private Integer fotoPerfilAjusteY;
+
+    @Column(name = "foto_perfil_enquadramento", length = 20)
+    private String fotoPerfilEnquadramento;
+
     @Column(name = "foto_base64", length = 200000)
     private String fotoBase64;
 
@@ -203,6 +212,30 @@ public class Usuario {
 
     public void setFotoPerfilBase64(String fotoPerfilBase64) {
         this.fotoPerfilBase64 = fotoPerfilBase64;
+    }
+
+    public Integer getFotoPerfilAjusteX() {
+        return fotoPerfilAjusteX;
+    }
+
+    public void setFotoPerfilAjusteX(Integer fotoPerfilAjusteX) {
+        this.fotoPerfilAjusteX = fotoPerfilAjusteX;
+    }
+
+    public Integer getFotoPerfilAjusteY() {
+        return fotoPerfilAjusteY;
+    }
+
+    public void setFotoPerfilAjusteY(Integer fotoPerfilAjusteY) {
+        this.fotoPerfilAjusteY = fotoPerfilAjusteY;
+    }
+
+    public String getFotoPerfilEnquadramento() {
+        return fotoPerfilEnquadramento;
+    }
+
+    public void setFotoPerfilEnquadramento(String fotoPerfilEnquadramento) {
+        this.fotoPerfilEnquadramento = fotoPerfilEnquadramento;
     }
 
     public String getFotoBase64() {

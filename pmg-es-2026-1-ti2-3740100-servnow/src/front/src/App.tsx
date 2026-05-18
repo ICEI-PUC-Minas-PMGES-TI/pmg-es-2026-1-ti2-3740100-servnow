@@ -1,16 +1,16 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { PainelCliente } from "./Components/Painel";
 import { Perfil } from "./Components/Perfil";
+import "./global.css";
 import Layout from "./Layout/Layout";
 import { Home } from "./pages/Home";
 import { Cadastro } from "./pages/Home/Cadastro";
 import { Login } from "./pages/Home/Login";
 import { PainelPrestador } from "./pages/PainelPrestador";
-
-import "react-toastify/dist/ReactToastify.css";
-import "./global.css";
-import { getAuthSession } from "./services/auth";
+import { getValidAuthSession } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";
 
 function ProtectedRoute({
@@ -18,7 +18,7 @@ function ProtectedRoute({
 }: {
   children: React.ReactNode;
 }) {
-  const session = getAuthSession();
+  const session = getValidAuthSession();
 
   if (!session) {
     return <Navigate to="/login" replace />;
@@ -32,7 +32,7 @@ function PublicOnlyRoute({
 }: {
   children: React.ReactNode;
 }) {
-  const session = getAuthSession();
+  const session = getValidAuthSession();
 
   if (session) {
     return <Navigate to="/" replace />;
@@ -84,6 +84,14 @@ function App() {
           element={(
             <ProtectedRoute>
               <Perfil />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/painel/cliente"
+          element={(
+            <ProtectedRoute>
+              <PainelCliente />
             </ProtectedRoute>
           )}
         />

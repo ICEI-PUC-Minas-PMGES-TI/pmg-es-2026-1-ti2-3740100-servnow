@@ -1,0 +1,13 @@
+package com.servnow.backend.solicitacao.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
+import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
+
+public interface SolicitacaoServicoRepository extends JpaRepository<SolicitacaoServico, Long> {
+    List<SolicitacaoServico> findByClienteIdOrderByCriadoEmDesc(Long clienteId);
+    List<SolicitacaoServico> findByStatusOrderByCriadoEmDesc(StatusSolicitacao status);
+}

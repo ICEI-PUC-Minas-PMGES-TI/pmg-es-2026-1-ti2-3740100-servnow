@@ -52,6 +52,7 @@ public class PerfilService {
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
         usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
+        atualizarEnquadramentoFotoPerfil(usuario, request);
         usuario.setFotoBase64(normalizarFoto(request.fotoBase64()));
         usuario.setDescricaoProfissional(normalizarTextoLongo(request.descricaoProfissional()));
         usuario.setEspecialidades(normalizarTexto(request.especialidades()));
@@ -76,6 +77,7 @@ public class PerfilService {
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
         usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
+        atualizarEnquadramentoFotoPerfil(usuario, request);
         usuario.setFotoBase64(normalizarFoto(request.fotoBase64()));
 
         Usuario salvo = usuarioRepository.save(usuario);
@@ -88,6 +90,7 @@ public class PerfilService {
         atualizarNome(usuario, request);
 
         usuario.setFotoPerfilBase64(normalizarFoto(request.fotoPerfilBase64()));
+        atualizarEnquadramentoFotoPerfil(usuario, request);
         usuario.setDescricaoProfissional(normalizarTextoLongo(request.descricaoProfissional()));
         usuario.setEspecialidades(normalizarTexto(request.especialidades()));
         atualizarDadosPrestador(usuario, request);
@@ -143,6 +146,27 @@ public class PerfilService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A foto e muito grande. Escolha uma imagem menor.");
         }
         return foto;
+    }
+
+    private void atualizarEnquadramentoFotoPerfil(Usuario usuario, PerfilUpdateRequest request) {
+        usuario.setFotoPerfilAjusteX(normalizarPercentual(request.fotoPerfilAjusteX()));
+        usuario.setFotoPerfilAjusteY(normalizarPercentual(request.fotoPerfilAjusteY()));
+        usuario.setFotoPerfilEnquadramento(normalizarEnquadramento(request.fotoPerfilEnquadramento()));
+    }
+
+    private Integer normalizarPercentual(Integer valor) {
+        if (valor == null) {
+            return 50;
+        }
+        return Math.max(0, Math.min(100, valor));
+    }
+
+    private String normalizarEnquadramento(String valor) {
+        String texto = normalizarTexto(valor);
+        if (texto == null) {
+            return "cover";
+        }
+        return "contain".equalsIgnoreCase(texto) ? "contain" : "cover";
     }
 
     private String normalizarEstado(String valor) {
@@ -210,6 +234,9 @@ public class PerfilService {
             usuario.getCidade(),
             usuario.getEstado(),
             usuario.getFotoPerfilBase64(),
+            usuario.getFotoPerfilAjusteX() == null ? 50 : usuario.getFotoPerfilAjusteX(),
+            usuario.getFotoPerfilAjusteY() == null ? 50 : usuario.getFotoPerfilAjusteY(),
+            usuario.getFotoPerfilEnquadramento() == null ? "cover" : usuario.getFotoPerfilEnquadramento(),
             usuario.getFotoBase64(),
             usuario.getDescricaoProfissional(),
             usuario.getEspecialidades(),

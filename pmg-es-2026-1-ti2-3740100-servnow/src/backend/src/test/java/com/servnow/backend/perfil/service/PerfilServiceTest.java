@@ -76,6 +76,9 @@ class PerfilServiceTest {
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
         );
 
@@ -105,6 +108,9 @@ class PerfilServiceTest {
             null,
             null,
             fotoMuitoGrande,
+            null,
+            null,
+            null,
             null,
             null,
             null,

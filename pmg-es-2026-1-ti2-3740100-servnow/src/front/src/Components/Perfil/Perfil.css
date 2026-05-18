@@ -1,6 +1,6 @@
 .perfil-header .workspace-title {
   font-size: 32px;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
 }
 
 .perfil-grid {
@@ -76,7 +76,7 @@
   border: 1px solid var(--workspace-border);
   background: var(--workspace-surface-soft);
   color: var(--workspace-text);
-  font-family: 'Sora', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   cursor: pointer;
   transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;

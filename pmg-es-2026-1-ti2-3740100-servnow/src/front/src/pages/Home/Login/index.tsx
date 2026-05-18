@@ -5,7 +5,14 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import "./Login.css";
 
 import loginImg from "../../../assets/login.svg";
-import { API_URL, saveAuthSession, type AuthResponse } from "../../../services/auth";
+import {
+  API_URL,
+  authHeader,
+  clearAuthSession,
+  getDashboardRoute,
+  saveAuthSession,
+  type AuthResponse,
+} from "../../../services/auth";
 
 type UserType = "cliente" | "prestador";
 
@@ -45,12 +52,21 @@ export function Login() {
       }
 
       const loginData = data as AuthResponse;
+      const validationResponse = await fetch(`${API_URL}/api/auth/me`, {
+        headers: authHeader(loginData.token),
+      });
+
+      if (!validationResponse.ok) {
+        clearAuthSession();
+        throw new Error("Login retornou um token que o backend nao aceitou. Reinicie o backend e tente novamente.");
+      }
+
       saveAuthSession(loginData);
       setSuccessMessage(`Login realizado como ${loginData.tipoUsuario.toLowerCase()}.`);
       setEmail("");
       setPassword("");
       window.setTimeout(() => {
-        navigate("/");
+        navigate(getDashboardRoute(loginData.tipoUsuario));
       }, 500);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Nao foi possivel fazer login.");

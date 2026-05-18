@@ -1,56 +1,69 @@
 import { Link } from "react-router-dom";
 import "./Footer.css";
 
+const footerGroups = [
+  {
+    title: "Produto",
+    links: [
+      { label: "Funcionalidades", to: "/funcionalidades" },
+      { label: "Planos", to: "/planos" },
+      { label: "Segurança", to: "/seguranca" },
+    ],
+  },
+  {
+    title: "Empresa",
+    links: [
+      { label: "Sobre", to: "/sobre" },
+      { label: "Carreiras", to: "/carreiras" },
+      { label: "Blog", to: "/blog" },
+    ],
+  },
+  {
+    title: "Suporte",
+    links: [
+      { label: "Central de ajuda", to: "/ajuda" },
+      { label: "Contato", to: "/contato" },
+      { label: "Status", to: "/status" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacidade", to: "/privacidade" },
+      { label: "Termos", to: "/termos" },
+      { label: "Cookies", to: "/cookies" },
+    ],
+  },
+];
+
 export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-
-        {/* MARCA */}
         <div className="footer-brand">
-          <h2>ServNow</h2>
+          <h2>Servnow</h2>
           <p>
-            Plataforma para conectar clientes e prestadores de serviços com praticidade.
+            Plataforma para conectar clientes e prestadores de serviços com uma
+            experiência simples, segura e confiável.
           </p>
         </div>
 
-        {/* LINKS */}
         <div className="footer-grid">
-
-          <div className="footer-col">
-            <span>Produto</span>
-            <Link to="/funcionalidades">Funcionalidades</Link>
-            <Link to="/planos">Planos</Link>
-            <Link to="/seguranca">Segurança</Link>
-          </div>
-
-          <div className="footer-col">
-            <span>Empresa</span>
-            <Link to="/sobre">Sobre</Link>
-            <Link to="/carreiras">Carreiras</Link>
-            <Link to="/blog">Blog</Link>
-          </div>
-
-          <div className="footer-col">
-            <span>Suporte</span>
-            <Link to="/ajuda">Central de ajuda</Link>
-            <Link to="/contato">Contato</Link>
-            <Link to="/status">Status</Link>
-          </div>
-
-          <div className="footer-col">
-            <span>Legal</span>
-            <Link to="/privacidade">Privacidade</Link>
-            <Link to="/termos">Termos</Link>
-            <Link to="/cookies">Cookies</Link>
-          </div>
-
+          {footerGroups.map((group) => (
+            <div className="footer-col" key={group.title}>
+              <span>{group.title}</span>
+              {group.links.map((link) => (
+                <Link to={link.to} key={link.to}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* LINHA FINAL */}
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} ServNow</p>
+        <p>© {new Date().getFullYear()} Servnow</p>
 
         <div className="footer-socials">
           <a href="#">Instagram</a>

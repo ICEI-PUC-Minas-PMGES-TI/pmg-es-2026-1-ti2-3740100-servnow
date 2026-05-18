@@ -10,7 +10,7 @@ import {
     API_URL,
     clearAuthSession,
     getAuthSession,
-    updateAuthSessionName,
+    saveAuthSession,
     type PerfilResponse,
     type PerfilUpdateRequest,
 } from "../../services/auth";
@@ -110,9 +110,9 @@ export function Perfil() {
           cidade: data.cidade ?? "",
           estado: data.estado ?? "",
           fotoPerfilBase64: data.fotoPerfilBase64 ?? "",
-          fotoPerfilAjusteX: "50",
-          fotoPerfilAjusteY: "50",
-          fotoPerfilEnquadramento: "cover",
+          fotoPerfilAjusteX: String(data.fotoPerfilAjusteX ?? 50),
+          fotoPerfilAjusteY: String(data.fotoPerfilAjusteY ?? 50),
+          fotoPerfilEnquadramento: data.fotoPerfilEnquadramento ?? "cover",
           fotoBase64: data.fotoBase64 ?? "",
           descricaoProfissional: data.descricaoProfissional ?? "",
           especialidades: data.especialidades
@@ -251,11 +251,17 @@ export function Perfil() {
           cidade: form.cidade,
           estado: form.estado,
           fotoPerfilBase64: form.fotoPerfilBase64,
+          fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
+          fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
+          fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
           fotoBase64: form.fotoBase64,
         }
       : {
           nome: form.nome.trim(),
           fotoPerfilBase64: form.fotoPerfilBase64,
+          fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
+          fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
+          fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
           descricaoProfissional: form.descricaoProfissional,
           especialidades: form.especialidades.join(","),
           diasDisponiveis: form.diasDisponiveis.join(","),
@@ -287,7 +293,16 @@ export function Perfil() {
         throw new Error(await getResponseError(response, "Nao foi possivel salvar o perfil."));
       }
 
-      updateAuthSessionName(form.nome.trim());
+      const perfilAtualizado = (await response.json()) as PerfilResponse;
+      saveAuthSession({
+        ...session,
+        nome: perfilAtualizado.nome,
+        email: perfilAtualizado.email,
+        fotoPerfilBase64: perfilAtualizado.fotoPerfilBase64,
+        fotoPerfilAjusteX: perfilAtualizado.fotoPerfilAjusteX,
+        fotoPerfilAjusteY: perfilAtualizado.fotoPerfilAjusteY,
+        fotoPerfilEnquadramento: perfilAtualizado.fotoPerfilEnquadramento,
+      });
       toast.success("Perfil atualizado com sucesso.");
       setTimeout(() => navigate("/"), 1000);
     } catch (error) {
