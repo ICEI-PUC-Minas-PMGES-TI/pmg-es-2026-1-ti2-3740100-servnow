@@ -2,7 +2,7 @@
 
 ### 4.1. Modelo de dados
 
-![Modelo de dados](images/Modelodedados.svg)
+![Modelo de dados](images/ModelodeDadosServNow.svg)
 
 ---
 
