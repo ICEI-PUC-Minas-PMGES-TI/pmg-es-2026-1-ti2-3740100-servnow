@@ -44,7 +44,7 @@ export function Header({
           {loggedIn && (
             <>
               <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <a href="#" className="nav-link">Acompanhamento</a>
+              <Link to="/acompanhamento" className="nav-link">Acompanhamento</Link>
             </>
           )}
         </nav>
@@ -121,7 +121,7 @@ export function Header({
           {loggedIn && (
             <>
               <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <a href="#" className="nav-link">Acompanhamento</a>
+              <Link to="/acompanhamento" className="nav-link">Acompanhamento</Link>
               <button type="button" className="nav-link mobile-logout-link" onClick={onLogout}>
                 Sair
               </button>

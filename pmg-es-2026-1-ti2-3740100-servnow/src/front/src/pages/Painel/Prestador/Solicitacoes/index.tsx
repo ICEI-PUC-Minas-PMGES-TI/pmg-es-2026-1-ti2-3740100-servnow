@@ -9,6 +9,8 @@ import {
   getValidAuthSession,
   type SolicitacaoServicoResponse,
 } from "../../../../services/auth";
+import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
+import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import {
@@ -27,6 +29,7 @@ export function Solicitacoes() {
   const [filtroPreco, setFiltroPreco] = useState("");
   const [filtroDistancia, setFiltroDistancia] = useState("");
   const [busca, setBusca] = useState("");
+  const [detalheAberto, setDetalheAberto] = useState<OportunidadeSolicitacao | null>(null);
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -196,6 +199,14 @@ export function Solicitacoes() {
 
               return (
                 <div key={item.id} className="painel-lista-item">
+                  {item.imagemUrl && (
+                    <SolicitacaoImagemThumb
+                      solicitacaoId={item.id}
+                      imagemUrl={item.imagemUrl}
+                      className="solicitacao-imagem-thumb"
+                      onClick={() => setDetalheAberto(item)}
+                    />
+                  )}
                   <div className="painel-lista-item-info">
                     <p className="painel-lista-item-titulo">
                       <IconComponent size={18} style={{ marginRight: "8px", verticalAlign: "text-bottom" }} />
@@ -225,6 +236,9 @@ export function Solicitacoes() {
                   </div>
                   <div className="painel-lista-item-acoes">
                     <span className="painel-status aguardando">Nova oportunidade</span>
+                    <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
+                      Ver detalhes
+                    </button>
                     <button type="button" className="painel-btn-aceitar">
                       Enviar proposta
                     </button>
@@ -235,6 +249,13 @@ export function Solicitacoes() {
           </div>
         )}
       </section>
+
+      <SolicitacaoDetalhesModal
+        solicitacao={detalheAberto}
+        onFechar={() => setDetalheAberto(null)}
+        mostrarCliente
+        distanciaKm={detalheAberto?.distanciaKm}
+      />
     </>
   );
 }

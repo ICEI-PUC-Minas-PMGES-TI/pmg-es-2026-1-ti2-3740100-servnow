@@ -9,8 +9,16 @@ import {
   getValidAuthSession,
   type SolicitacaoServicoResponse,
 } from "../../../../services/auth";
+import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
+import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import {
+  formatarDataSolicitacao,
+  getFaixaPrecoLabel,
+  getStatusClass,
+  getStatusLabel,
+} from "../../../../utils/solicitacaoLabels";
 
 type FiltroSolicitacao = "todas" | "aguardando" | "agendadas" | "concluidas";
 
@@ -26,6 +34,7 @@ export function Solicitacoes() {
   const [filtro, setFiltro] = useState<FiltroSolicitacao>("todas");
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [detalheAberto, setDetalheAberto] = useState<SolicitacaoServicoResponse | null>(null);
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -115,6 +124,14 @@ export function Solicitacoes() {
               const IconComponent = tipoServico?.icone || FileText;
               return (
                 <div key={item.id} className="painel-lista-item">
+                  {item.imagemUrl && (
+                    <SolicitacaoImagemThumb
+                      solicitacaoId={item.id}
+                      imagemUrl={item.imagemUrl}
+                      className="solicitacao-imagem-thumb"
+                      onClick={() => setDetalheAberto(item)}
+                    />
+                  )}
                   <div className="painel-lista-item-info">
                     <p className="painel-lista-item-titulo">
                       <IconComponent size={18} style={{ marginRight: "8px", verticalAlign: "text-bottom" }} />
@@ -127,7 +144,7 @@ export function Solicitacoes() {
                       </span>
                       {item.data && (
                         <span className="painel-lista-item-meta-detalhe">
-                          <Calendar size={13} /> {formatarData(item.data)}
+                          <Calendar size={13} /> {formatarDataSolicitacao(item.data)}
                         </span>
                       )}
                       {(item.status === "PUBLICADO" || item.status === "AGUARDANDO_PROPOSTAS") && (
@@ -141,7 +158,9 @@ export function Solicitacoes() {
                     <span className={`painel-status ${getStatusClass(item.status)}`}>
                       {getStatusLabel(item.status)}
                     </span>
-                    <button type="button" className="painel-btn-ghost">Ver detalhes</button>
+                    <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
+                      Ver detalhes
+                    </button>
                   </div>
                 </div>
               );
@@ -149,6 +168,11 @@ export function Solicitacoes() {
           </div>
         )}
       </section>
+
+      <SolicitacaoDetalhesModal
+        solicitacao={detalheAberto}
+        onFechar={() => setDetalheAberto(null)}
+      />
     </>
   );
 }
@@ -162,36 +186,4 @@ async function getResponseError(response: Response, fallback: string) {
   } catch {
     return fallback;
   }
-}
-
-function getStatusClass(status: string) {
-  if (status === "AGENDADA") return "agendado";
-  if (status === "CONCLUIDA") return "concluido";
-  return "aguardando";
-}
-
-function getStatusLabel(status: string) {
-  if (status === "AGENDADA") return "Agendada";
-  if (status === "CONCLUIDA") return "Concluida";
-  return "Aguardando propostas";
-}
-
-function getFaixaPrecoLabel(faixaPreco: string) {
-  const labels: Record<string, string> = {
-    ATE_150: "Ate R$ 150",
-    DE_150_A_300: "R$ 150 a R$ 300",
-    DE_300_A_600: "R$ 300 a R$ 600",
-    DE_600_A_1000: "R$ 600 a R$ 1.000",
-    ACIMA_1000: "Acima de R$ 1.000",
-  };
-
-  return labels[faixaPreco] ?? faixaPreco;
-}
-
-function formatarData(value: string) {
-  const [ano, mes, dia] = value.split("-");
-  if (!ano || !mes || !dia) {
-    return value;
-  }
-  return `${dia}/${mes}/${ano}`;
 }

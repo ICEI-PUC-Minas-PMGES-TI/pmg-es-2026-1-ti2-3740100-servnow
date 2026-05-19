@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
@@ -39,6 +40,9 @@ class SolicitacaoServicoServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private ArquivoStorage arquivoStorage;
+
     @InjectMocks
     private SolicitacaoServicoService solicitacaoService;
 
@@ -50,7 +54,7 @@ class SolicitacaoServicoServiceTest {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
         when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        SolicitacaoServicoResponse response = solicitacaoService.criar(usuarioAutenticadoCliente(), request);
+        SolicitacaoServicoResponse response = solicitacaoService.criar(usuarioAutenticadoCliente(), request, null);
 
         ArgumentCaptor<SolicitacaoServico> captor = ArgumentCaptor.forClass(SolicitacaoServico.class);
         verify(solicitacaoRepository).save(captor.capture());
@@ -91,7 +95,7 @@ class SolicitacaoServicoServiceTest {
 
     @Test
     void criarRecusaQuandoUsuarioNaoFoiAutenticado() {
-        assertThatThrownBy(() -> solicitacaoService.criar(null, request("Eletrica", "Trocar tomada")))
+        assertThatThrownBy(() -> solicitacaoService.criar(null, request("Eletrica", "Trocar tomada"), null))
             .isInstanceOfSatisfying(ResponseStatusException.class, exception ->
                 assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED)
             );
@@ -104,7 +108,7 @@ class SolicitacaoServicoServiceTest {
         Usuario prestador = usuario(2L, "Prestador", "prestador@email.com", TipoUsuario.PRESTADOR);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(prestador));
 
-        assertThatThrownBy(() -> solicitacaoService.criar(usuarioAutenticadoCliente(), request("Pintura", "Pintar sala")))
+        assertThatThrownBy(() -> solicitacaoService.criar(usuarioAutenticadoCliente(), request("Pintura", "Pintar sala"), null))
             .isInstanceOfSatisfying(ResponseStatusException.class, exception ->
                 assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN)
             );
@@ -126,8 +130,7 @@ class SolicitacaoServicoServiceTest {
             "Belo Horizonte",
             "mg",
             LocalDate.of(2026, 5, 20),
-            "14:00",
-            null
+            "14:00"
         );
     }
 

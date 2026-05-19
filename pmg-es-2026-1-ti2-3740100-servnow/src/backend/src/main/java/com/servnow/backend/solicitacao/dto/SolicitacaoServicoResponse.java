@@ -23,7 +23,7 @@ public record SolicitacaoServicoResponse(
     String descricao,
     LocalDate data,
     String horario,
-    String imagemBase64,
+    String imagemUrl,
     String status,
     OffsetDateTime criadoEm,
     OffsetDateTime aceitoEm

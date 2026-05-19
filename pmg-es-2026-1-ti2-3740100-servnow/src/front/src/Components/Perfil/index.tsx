@@ -8,12 +8,15 @@ import { ClientePerfil } from "../../pages/Configurarperfil/Cliente";
 import { PrestadorPerfil } from "../../pages/Configurarperfil/Prestador";
 import {
     API_URL,
+    authHeaders,
     clearAuthSession,
     getAuthSession,
     saveAuthSession,
     type PerfilResponse,
     type PerfilUpdateRequest,
 } from "../../services/auth";
+import { carregarArquivoAutenticado } from "../../utils/arquivoAutenticado";
+import { otimizarImagemParaUpload } from "../../utils/otimizarImagemArquivo";
 import { Header } from "../Header/Header";
 import "./Perfil.css";
 
@@ -26,18 +29,25 @@ export type FormState = {
   bairro: string;
   cidade: string;
   estado: string;
-  fotoPerfilBase64: string;
+  fotoPerfilPreview: string | null;
+  fotoPerfilPendente: File | null;
+  removerFotoPerfil: boolean;
   fotoPerfilAjusteX: string;
   fotoPerfilAjusteY: string;
   fotoPerfilEnquadramento: "cover" | "contain";
-  fotoBase64: string;
+  fotoLocalPreview: string | null;
+  fotoLocalPendente: File | null;
+  removerFotoLocal: boolean;
   descricaoProfissional: string;
   especialidades: string[];
   diasDisponiveis: string[];
   horarioInicio: string;
   horarioFim: string;
   raioAtendimentoKm: string;
-  documentoIdentidadeBase64: string;
+  documentoPreview: string | null;
+  documentoPendente: File | null;
+  documentoEhPdf: boolean;
+  removerDocumentoIdentidade: boolean;
 };
 
 const initialState: FormState = {
@@ -49,23 +59,29 @@ const initialState: FormState = {
   bairro: "",
   cidade: "",
   estado: "",
-  fotoPerfilBase64: "",
+  fotoPerfilPreview: null,
+  fotoPerfilPendente: null,
+  removerFotoPerfil: false,
   fotoPerfilAjusteX: "50",
   fotoPerfilAjusteY: "50",
   fotoPerfilEnquadramento: "cover",
-  fotoBase64: "",
+  fotoLocalPreview: null,
+  fotoLocalPendente: null,
+  removerFotoLocal: false,
   descricaoProfissional: "",
   especialidades: [],
   diasDisponiveis: [],
   horarioInicio: "",
   horarioFim: "",
   raioAtendimentoKm: "",
-  documentoIdentidadeBase64: "",
+  documentoPreview: null,
+  documentoPendente: null,
+  documentoEhPdf: false,
+  removerDocumentoIdentidade: false,
 };
 
 const MAX_FOTO_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_DOCUMENTO_FILE_BYTES = 5 * 1024 * 1024;
-const MAX_FOTO_BASE64_LENGTH = 190000;
 
 export function Perfil() {
   const navigate = useNavigate();
@@ -100,6 +116,18 @@ export function Perfil() {
         }
 
         const data = (await response.json()) as PerfilResponse;
+        const [fotoPerfilArquivo, fotoLocalArquivo, documentoArquivo] = await Promise.all([
+          data.fotoPerfilUrl
+            ? carregarArquivoAutenticado(data.fotoPerfilUrl, session.token).catch(() => null)
+            : Promise.resolve(null),
+          data.fotoLocalUrl
+            ? carregarArquivoAutenticado(data.fotoLocalUrl, session.token).catch(() => null)
+            : Promise.resolve(null),
+          data.documentoIdentidadeUrl
+            ? carregarArquivoAutenticado(data.documentoIdentidadeUrl, session.token).catch(() => null)
+            : Promise.resolve(null),
+        ]);
+
         setForm({
           nome: data.nome ?? "",
           rua: data.rua ?? "",
@@ -109,11 +137,15 @@ export function Perfil() {
           bairro: data.bairro ?? "",
           cidade: data.cidade ?? "",
           estado: data.estado ?? "",
-          fotoPerfilBase64: data.fotoPerfilBase64 ?? "",
+          fotoPerfilPreview: fotoPerfilArquivo?.url ?? null,
+          fotoPerfilPendente: null,
+          removerFotoPerfil: false,
           fotoPerfilAjusteX: String(data.fotoPerfilAjusteX ?? 50),
           fotoPerfilAjusteY: String(data.fotoPerfilAjusteY ?? 50),
           fotoPerfilEnquadramento: data.fotoPerfilEnquadramento ?? "cover",
-          fotoBase64: data.fotoBase64 ?? "",
+          fotoLocalPreview: fotoLocalArquivo?.url ?? null,
+          fotoLocalPendente: null,
+          removerFotoLocal: false,
           descricaoProfissional: data.descricaoProfissional ?? "",
           especialidades: data.especialidades
             ? data.especialidades.split(",").map((item) => item.trim()).filter(Boolean)
@@ -124,7 +156,10 @@ export function Perfil() {
           horarioInicio: data.horarioInicio ?? "",
           horarioFim: data.horarioFim ?? "",
           raioAtendimentoKm: data.raioAtendimentoKm ? String(data.raioAtendimentoKm) : "",
-          documentoIdentidadeBase64: data.documentoIdentidadeBase64 ?? "",
+          documentoPreview: documentoArquivo?.url ?? null,
+          documentoPendente: null,
+          documentoEhPdf: documentoArquivo?.mimeType === "application/pdf",
+          removerDocumentoIdentidade: false,
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar perfil.");
@@ -169,7 +204,13 @@ export function Perfil() {
     });
   }
 
-  async function handleFotoChange(event: ChangeEvent<HTMLInputElement>, field: "fotoPerfilBase64" | "fotoBase64") {
+  function revogarPreview(preview: string | null) {
+    if (preview?.startsWith("blob:")) {
+      URL.revokeObjectURL(preview);
+    }
+  }
+
+  async function handleFotoPerfilChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -179,18 +220,63 @@ export function Perfil() {
     }
 
     try {
-      const fotoBase64 = await otimizarFoto(file);
-      updateField(field, fotoBase64);
-      if (field === "fotoPerfilBase64") {
-        updateField("fotoPerfilAjusteX", "50");
-        updateField("fotoPerfilAjusteY", "50");
-        updateField("fotoPerfilEnquadramento", "cover");
-      }
+      const otimizado = await otimizarImagemParaUpload(file);
+      setForm((current) => {
+        revogarPreview(current.fotoPerfilPreview);
+        return {
+          ...current,
+          fotoPerfilPendente: otimizado,
+          fotoPerfilPreview: URL.createObjectURL(otimizado),
+          removerFotoPerfil: false,
+          fotoPerfilAjusteX: "50",
+          fotoPerfilAjusteY: "50",
+          fotoPerfilEnquadramento: "cover",
+        };
+      });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
     } finally {
       event.target.value = "";
     }
+  }
+
+  async function handleFotoLocalChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FOTO_FILE_BYTES) {
+      toast.error("A imagem precisa ter no maximo 5 MB.");
+      return;
+    }
+
+    try {
+      const otimizado = await otimizarImagemParaUpload(file);
+      setForm((current) => {
+        revogarPreview(current.fotoLocalPreview);
+        return {
+          ...current,
+          fotoLocalPendente: otimizado,
+          fotoLocalPreview: URL.createObjectURL(otimizado),
+          removerFotoLocal: false,
+        };
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  function removerFotoPerfil() {
+    setForm((current) => {
+      revogarPreview(current.fotoPerfilPreview);
+      return {
+        ...current,
+        fotoPerfilPreview: null,
+        fotoPerfilPendente: null,
+        removerFotoPerfil: true,
+      };
+    });
   }
 
   async function handleDocumentoChange(event: ChangeEvent<HTMLInputElement>) {
@@ -211,13 +297,30 @@ export function Perfil() {
       return;
     }
 
-    try {
-      updateField("documentoIdentidadeBase64", await arquivoParaBase64(file));
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar o documento.");
-    } finally {
-      event.target.value = "";
-    }
+    setForm((current) => {
+      revogarPreview(current.documentoPreview);
+      return {
+        ...current,
+        documentoPendente: file,
+        documentoPreview: URL.createObjectURL(file),
+        documentoEhPdf: file.type === "application/pdf",
+        removerDocumentoIdentidade: false,
+      };
+    });
+    event.target.value = "";
+  }
+
+  function removerDocumentoIdentidade() {
+    setForm((current) => {
+      revogarPreview(current.documentoPreview);
+      return {
+        ...current,
+        documentoPreview: null,
+        documentoPendente: null,
+        documentoEhPdf: false,
+        removerDocumentoIdentidade: true,
+      };
+    });
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -250,36 +353,45 @@ export function Perfil() {
           bairro: form.bairro,
           cidade: form.cidade,
           estado: form.estado,
-          fotoPerfilBase64: form.fotoPerfilBase64,
           fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
           fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
           fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
-          fotoBase64: form.fotoBase64,
+          removerFotoPerfil: form.removerFotoPerfil,
+          removerFotoLocal: form.removerFotoLocal,
         }
       : {
           nome: form.nome.trim(),
-          fotoPerfilBase64: form.fotoPerfilBase64,
           fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
           fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
           fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
+          removerFotoPerfil: form.removerFotoPerfil,
           descricaoProfissional: form.descricaoProfissional,
           especialidades: form.especialidades.join(","),
           diasDisponiveis: form.diasDisponiveis.join(","),
           horarioInicio: form.horarioInicio,
           horarioFim: form.horarioFim,
           raioAtendimentoKm: Number(form.raioAtendimentoKm),
-          documentoIdentidadeBase64: form.documentoIdentidadeBase64,
+          removerDocumentoIdentidade: form.removerDocumentoIdentidade,
         };
+
+    const formData = new FormData();
+    formData.append("dados", new Blob([JSON.stringify(payload)], { type: "application/json" }));
+    if (form.fotoPerfilPendente) {
+      formData.append("fotoPerfil", form.fotoPerfilPendente);
+    }
+    if (session.tipoUsuario === "CLIENTE" && form.fotoLocalPendente) {
+      formData.append("fotoLocal", form.fotoLocalPendente);
+    }
+    if (session.tipoUsuario === "PRESTADOR" && form.documentoPendente) {
+      formData.append("documentoIdentidade", form.documentoPendente);
+    }
 
     try {
       const endpoint = `${API_URL}/api/perfil/${session.tipoUsuario === "CLIENTE" ? "cliente" : "prestador"}`;
       const response = await fetch(endpoint, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`,
-        },
-        body: JSON.stringify(payload),
+        headers: authHeaders(session.token),
+        body: formData,
       });
 
       if (response.status === 401) {
@@ -298,7 +410,7 @@ export function Perfil() {
         ...session,
         nome: perfilAtualizado.nome,
         email: perfilAtualizado.email,
-        fotoPerfilBase64: perfilAtualizado.fotoPerfilBase64,
+        fotoPerfilUrl: perfilAtualizado.fotoPerfilUrl,
         fotoPerfilAjusteX: perfilAtualizado.fotoPerfilAjusteX,
         fotoPerfilAjusteY: perfilAtualizado.fotoPerfilAjusteY,
         fotoPerfilEnquadramento: perfilAtualizado.fotoPerfilEnquadramento,
@@ -366,19 +478,19 @@ export function Perfil() {
 
                   <label className="perfil-upload">
                     <ImageIcon size={18} />
-                    <span>{form.fotoPerfilBase64 ? "Trocar foto" : "Selecionar foto"}</span>
+                    <span>{form.fotoPerfilPreview ? "Trocar foto" : "Selecionar foto"}</span>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(event) => handleFotoChange(event, "fotoPerfilBase64")}
+                      onChange={handleFotoPerfilChange}
                     />
                   </label>
 
-                  {form.fotoPerfilBase64 && (
+                  {form.fotoPerfilPreview && (
                     <div className="perfil-logo-editor">
                       <div className="perfil-logo-preview">
                         <img
-                          src={form.fotoPerfilBase64}
+                          src={form.fotoPerfilPreview}
                           alt="Pre-visualizacao da foto de perfil"
                           style={{
                             objectFit: form.fotoPerfilEnquadramento,
@@ -427,7 +539,7 @@ export function Perfil() {
                         <button
                           type="button"
                           className="perfil-foto-remover"
-                          onClick={() => updateField("fotoPerfilBase64", "")}
+                          onClick={removerFotoPerfil}
                         >
                           Remover foto
                         </button>
@@ -441,7 +553,7 @@ export function Perfil() {
                 <ClientePerfil
                   form={form}
                   updateField={updateField}
-                  handleFotoChange={(event) => handleFotoChange(event, "fotoBase64")}
+                  handleFotoChange={handleFotoLocalChange}
                 />
               ) : (
                 <PrestadorPerfil
@@ -450,6 +562,7 @@ export function Perfil() {
                   toggleEspecialidade={toggleEspecialidade}
                   toggleDiaDisponivel={toggleDiaDisponivel}
                   handleDocumentoChange={handleDocumentoChange}
+                  removerDocumento={removerDocumentoIdentidade}
                 />
               )}
 
@@ -484,34 +597,6 @@ async function getResponseError(response: Response, fallback: string) {
   }
 }
 
-function carregarImagem(file: File) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    const objectUrl = URL.createObjectURL(file);
-
-    image.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve(image);
-    };
-
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("Arquivo de imagem invalido."));
-    };
-
-    image.src = objectUrl;
-  });
-}
-
-function arquivoParaBase64(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Arquivo invalido."));
-    reader.readAsDataURL(file);
-  });
-}
-
 function validarPerfilPrestador(form: FormState) {
   if (form.especialidades.length === 0) {
     toast.error("Escolha pelo menos um tipo de servico.");
@@ -534,39 +619,12 @@ function validarPerfilPrestador(form: FormState) {
     return false;
   }
 
-  if (!form.documentoIdentidadeBase64) {
+  if (!form.documentoPendente && !form.documentoPreview) {
     toast.error("Envie seu documento de identidade.");
     return false;
   }
 
   return true;
-}
-
-async function otimizarFoto(file: File) {
-  const image = await carregarImagem(file);
-  const maxSide = 900;
-  const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
-  const width = Math.max(1, Math.round(image.width * scale));
-  const height = Math.max(1, Math.round(image.height * scale));
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-
-  if (!context) {
-    throw new Error("Nao foi possivel processar a imagem.");
-  }
-
-  canvas.width = width;
-  canvas.height = height;
-  context.drawImage(image, 0, 0, width, height);
-
-  for (let quality = 0.82; quality >= 0.45; quality -= 0.08) {
-    const result = canvas.toDataURL("image/jpeg", quality);
-    if (result.length <= MAX_FOTO_BASE64_LENGTH) {
-      return result;
-    }
-  }
-
-  throw new Error("A imagem ficou grande demais. Tente uma foto menor.");
 }
 
 export default Perfil;

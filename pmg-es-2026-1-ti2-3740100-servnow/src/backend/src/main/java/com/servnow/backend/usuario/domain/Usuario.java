@@ -58,8 +58,8 @@ public class Usuario {
     @Column(length = 2)
     private String estado;
 
-    @Column(name = "foto_perfil_base64", length = 200000)
-    private String fotoPerfilBase64;
+    @Column(name = "foto_perfil_arquivo", length = 255)
+    private String fotoPerfilArquivoRelativo;
 
     @Column(name = "foto_perfil_ajuste_x")
     private Integer fotoPerfilAjusteX;
@@ -70,8 +70,8 @@ public class Usuario {
     @Column(name = "foto_perfil_enquadramento", length = 20)
     private String fotoPerfilEnquadramento;
 
-    @Column(name = "foto_base64", length = 200000)
-    private String fotoBase64;
+    @Column(name = "foto_local_arquivo", length = 255)
+    private String fotoLocalArquivoRelativo;
 
     // ===== Campos do perfil do prestador =====
     @Column(name = "descricao_profissional", length = 500)
@@ -92,8 +92,8 @@ public class Usuario {
     @Column(name = "raio_atendimento_km")
     private Integer raioAtendimentoKm;
 
-    @Column(name = "documento_identidade_base64", columnDefinition = "TEXT")
-    private String documentoIdentidadeBase64;
+    @Column(name = "documento_identidade_arquivo", length = 255)
+    private String documentoIdentidadeArquivoRelativo;
 
     @PrePersist
     public void prePersist() {
@@ -206,12 +206,12 @@ public class Usuario {
         this.estado = estado;
     }
 
-    public String getFotoPerfilBase64() {
-        return fotoPerfilBase64;
+    public String getFotoPerfilArquivoRelativo() {
+        return fotoPerfilArquivoRelativo;
     }
 
-    public void setFotoPerfilBase64(String fotoPerfilBase64) {
-        this.fotoPerfilBase64 = fotoPerfilBase64;
+    public void setFotoPerfilArquivoRelativo(String fotoPerfilArquivoRelativo) {
+        this.fotoPerfilArquivoRelativo = fotoPerfilArquivoRelativo;
     }
 
     public Integer getFotoPerfilAjusteX() {
@@ -238,12 +238,12 @@ public class Usuario {
         this.fotoPerfilEnquadramento = fotoPerfilEnquadramento;
     }
 
-    public String getFotoBase64() {
-        return fotoBase64;
+    public String getFotoLocalArquivoRelativo() {
+        return fotoLocalArquivoRelativo;
     }
 
-    public void setFotoBase64(String fotoBase64) {
-        this.fotoBase64 = fotoBase64;
+    public void setFotoLocalArquivoRelativo(String fotoLocalArquivoRelativo) {
+        this.fotoLocalArquivoRelativo = fotoLocalArquivoRelativo;
     }
 
     public String getDescricaoProfissional() {
@@ -294,11 +294,11 @@ public class Usuario {
         this.raioAtendimentoKm = raioAtendimentoKm;
     }
 
-    public String getDocumentoIdentidadeBase64() {
-        return documentoIdentidadeBase64;
+    public String getDocumentoIdentidadeArquivoRelativo() {
+        return documentoIdentidadeArquivoRelativo;
     }
 
-    public void setDocumentoIdentidadeBase64(String documentoIdentidadeBase64) {
-        this.documentoIdentidadeBase64 = documentoIdentidadeBase64;
+    public void setDocumentoIdentidadeArquivoRelativo(String documentoIdentidadeArquivoRelativo) {
+        this.documentoIdentidadeArquivoRelativo = documentoIdentidadeArquivoRelativo;
     }
 }

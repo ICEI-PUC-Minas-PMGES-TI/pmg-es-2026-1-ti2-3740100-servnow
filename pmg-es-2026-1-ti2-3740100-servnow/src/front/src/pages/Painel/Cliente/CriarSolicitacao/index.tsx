@@ -10,10 +10,12 @@ import {
   FileText,
   Hash,
   Home,
+  ImageIcon,
   LoaderCircle,
   MapPin,
   PlusCircle,
   Tag,
+  X,
 } from "lucide-react";
 
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
@@ -25,6 +27,7 @@ import {
   type SolicitacaoServicoCreateRequest,
 } from "../../../../services/auth";
 import { TIPOS_SERVICO, TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import { otimizarImagemParaUpload } from "../../../../utils/otimizarImagemArquivo";
 
 const FAIXAS_PRECO = [
   { value: "ATE_150", label: "Ate R$ 150" },
@@ -63,6 +66,8 @@ export function CriarSolicitacao() {
   const [estado, setEstado] = useState("");
   const [data, setData] = useState("");
   const [horario, setHorario] = useState("");
+  const [imagemArquivo, setImagemArquivo] = useState<File | null>(null);
+  const [imagemPreviewUrl, setImagemPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [cepStatus, setCepStatus] = useState<"idle" | "loading" | "found" | "not-found" | "error">("idle");
   const cepDigits = onlyDigits(cep);
@@ -116,6 +121,47 @@ export function CriarSolicitacao() {
     setCep(formatCep(event.target.value));
   }
 
+  useEffect(() => {
+    return () => {
+      if (imagemPreviewUrl) {
+        URL.revokeObjectURL(imagemPreviewUrl);
+      }
+    };
+  }, [imagemPreviewUrl]);
+
+  async function handleImagemChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem (JPEG, PNG ou WebP).");
+      return;
+    }
+
+    try {
+      const otimizada = await otimizarImagemParaUpload(file);
+      if (imagemPreviewUrl) {
+        URL.revokeObjectURL(imagemPreviewUrl);
+      }
+      setImagemArquivo(otimizada);
+      setImagemPreviewUrl(URL.createObjectURL(otimizada));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Nao foi possivel processar a imagem.");
+    }
+  }
+
+  function removerImagem() {
+    if (imagemPreviewUrl) {
+      URL.revokeObjectURL(imagemPreviewUrl);
+    }
+    setImagemArquivo(null);
+    setImagemPreviewUrl(null);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const session = getValidAuthSession();
@@ -126,7 +172,7 @@ export function CriarSolicitacao() {
       return;
     }
 
-    const payload: SolicitacaoServicoCreateRequest = {
+    const dados: SolicitacaoServicoCreateRequest = {
       tipoServico,
       iconeServico: tipoServico || undefined,
       faixaPreco,
@@ -141,6 +187,15 @@ export function CriarSolicitacao() {
       data: data || undefined,
       horario: horario || undefined,
     };
+
+    const formData = new FormData();
+    formData.append(
+      "dados",
+      new Blob([JSON.stringify(dados)], { type: "application/json" }),
+    );
+    if (imagemArquivo) {
+      formData.append("imagem", imagemArquivo);
+    }
 
     setIsSaving(true);
 
@@ -165,8 +220,8 @@ export function CriarSolicitacao() {
       const response = await fetch(`${API_URL}/api/solicitacoes`, {
         method: "POST",
         cache: "no-store",
-        headers: authHeaders(session.token, "application/json"),
-        body: JSON.stringify(payload),
+        headers: authHeaders(session.token),
+        body: formData,
       });
 
       if (response.status === 401) {
@@ -369,6 +424,31 @@ export function CriarSolicitacao() {
                   required
                 />
               </div>
+            </label>
+
+            <label className="form-field form-field-full">
+              <span className="form-label">Foto do local ou do problema (opcional)</span>
+              <div className="solicitacao-foto-upload">
+                <label className="btn-secondary solicitacao-foto-btn">
+                  <ImageIcon size={16} />
+                  <span>{imagemArquivo ? "Trocar foto" : "Selecionar foto"}</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImagemChange}
+                    hidden
+                  />
+                </label>
+                {imagemPreviewUrl && (
+                  <div className="solicitacao-foto-preview">
+                    <img src={imagemPreviewUrl} alt="Pre-visualizacao da foto" />
+                    <button type="button" className="solicitacao-foto-remover" onClick={removerImagem} aria-label="Remover foto">
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <span className="form-hint">A imagem e salva como arquivo no servidor (ate 2 MB), nao no banco de dados.</span>
             </label>
 
             <label className="form-field form-field-full">

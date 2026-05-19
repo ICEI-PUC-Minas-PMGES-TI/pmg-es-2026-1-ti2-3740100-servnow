@@ -191,17 +191,24 @@ export function ClientePerfil({
 
         <label className="perfil-upload">
           <ImageIcon size={18} />
-          <span>{form.fotoBase64 ? "Trocar foto" : "Selecionar foto"}</span>
+          <span>{form.fotoLocalPreview ? "Trocar foto" : "Selecionar foto"}</span>
           <input type="file" accept="image/*" onChange={handleFotoChange} />
         </label>
 
-        {form.fotoBase64 && (
+        {form.fotoLocalPreview && (
           <div className="perfil-foto-preview">
-            <img src={form.fotoBase64} alt="Pre-visualizacao do local" />
+            <img src={form.fotoLocalPreview} alt="Pre-visualizacao do local" />
             <button
               type="button"
               className="perfil-foto-remover"
-              onClick={() => updateField("fotoBase64", "")}
+              onClick={() => {
+                if (form.fotoLocalPreview?.startsWith("blob:")) {
+                  URL.revokeObjectURL(form.fotoLocalPreview);
+                }
+                updateField("fotoLocalPreview", null);
+                updateField("fotoLocalPendente", null);
+                updateField("removerFotoLocal", true);
+              }}
             >
               Remover foto
             </button>

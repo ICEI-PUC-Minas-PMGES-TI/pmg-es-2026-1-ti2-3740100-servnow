@@ -1,4 +1,4 @@
-package com.servnow.backend.auth.web;
+package com.servnow.backend.auth.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.auth.dto.AuthRequest;
+import com.servnow.backend.perfil.service.PerfilService;
 import com.servnow.backend.auth.dto.AuthResponse;
 import com.servnow.backend.auth.dto.CurrentUserResponse;
 import com.servnow.backend.auth.dto.RegisterRequest;
@@ -61,18 +62,18 @@ public class AuthController {
             completo.getBairro(),
             completo.getCidade(),
             completo.getEstado(),
-            completo.getFotoPerfilBase64(),
+            PerfilService.urlFotoPerfil(completo),
             completo.getFotoPerfilAjusteX() == null ? 50 : completo.getFotoPerfilAjusteX(),
             completo.getFotoPerfilAjusteY() == null ? 50 : completo.getFotoPerfilAjusteY(),
             completo.getFotoPerfilEnquadramento() == null ? "cover" : completo.getFotoPerfilEnquadramento(),
-            completo.getFotoBase64(),
+            PerfilService.urlFotoLocal(completo),
             completo.getDescricaoProfissional(),
             completo.getEspecialidades(),
             completo.getDiasDisponiveis(),
             completo.getHorarioInicio(),
             completo.getHorarioFim(),
             completo.getRaioAtendimentoKm(),
-            completo.getDocumentoIdentidadeBase64()
+            PerfilService.urlDocumentoIdentidade(completo)
         );
     }
 }

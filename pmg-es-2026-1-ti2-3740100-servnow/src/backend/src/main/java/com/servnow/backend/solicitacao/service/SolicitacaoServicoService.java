@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
@@ -20,25 +22,34 @@ import com.servnow.backend.usuario.repository.UsuarioRepository;
 @Service
 public class SolicitacaoServicoService {
 
-    private static final int IMAGEM_BASE64_MAX_LENGTH = 200000;
-
     private final SolicitacaoServicoRepository solicitacaoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ArquivoStorage arquivoStorage;
 
     public SolicitacaoServicoService(
         SolicitacaoServicoRepository solicitacaoRepository,
-        UsuarioRepository usuarioRepository
+        UsuarioRepository usuarioRepository,
+        ArquivoStorage arquivoStorage
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.arquivoStorage = arquivoStorage;
     }
 
-    public SolicitacaoServicoResponse criar(UsuarioAutenticado usuarioAutenticado, SolicitacaoServicoCreateRequest request) {
+    public SolicitacaoServicoResponse criar(
+        UsuarioAutenticado usuarioAutenticado,
+        SolicitacaoServicoCreateRequest request,
+        MultipartFile imagem
+    ) {
         Usuario cliente = encontrarUsuario(usuarioAutenticado);
-        return criarParaCliente(cliente, request);
+        return criarParaCliente(cliente, request, imagem);
     }
 
-    private SolicitacaoServicoResponse criarParaCliente(Usuario cliente, SolicitacaoServicoCreateRequest request) {
+    private SolicitacaoServicoResponse criarParaCliente(
+        Usuario cliente,
+        SolicitacaoServicoCreateRequest request,
+        MultipartFile imagem
+    ) {
         validarTipo(cliente, TipoUsuario.CLIENTE);
 
         SolicitacaoServico solicitacao = new SolicitacaoServico();
@@ -57,7 +68,9 @@ public class SolicitacaoServicoService {
         solicitacao.setEndereco(montarEndereco(solicitacao));
         solicitacao.setData(request.data());
         solicitacao.setHorario(normalizarTexto(request.horario()));
-        solicitacao.setImagemBase64(validarImagem(request.imagemBase64()));
+        if (imagem != null && !imagem.isEmpty()) {
+            solicitacao.setImagemArquivoRelativo(arquivoStorage.salvar(imagem));
+        }
         solicitacao.setStatus(StatusSolicitacao.PUBLICADO);
 
         return toResponse(solicitacaoRepository.save(solicitacao));
@@ -81,6 +94,28 @@ public class SolicitacaoServicoService {
             .stream()
             .map(this::toResponse)
             .toList();
+    }
+
+    public SolicitacaoServico encontrarParaLeituraImagem(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        SolicitacaoServico solicitacao = solicitacaoRepository.findById(solicitacaoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada."));
+
+        if (usuario.getTipoUsuario() == TipoUsuario.CLIENTE) {
+            if (!solicitacao.getCliente().getId().equals(usuario.getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado a esta solicitacao.");
+            }
+            return solicitacao;
+        }
+
+        if (usuario.getTipoUsuario() == TipoUsuario.PRESTADOR) {
+            if (solicitacao.getStatus() != StatusSolicitacao.PUBLICADO) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solicitacao indisponivel.");
+            }
+            return solicitacao;
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acao nao permitida para este tipo de usuario.");
     }
 
     private Usuario encontrarUsuario(UsuarioAutenticado usuarioAutenticado) {
@@ -148,14 +183,6 @@ public class SolicitacaoServicoService {
         return trim.isEmpty() ? null : trim;
     }
 
-    private String validarImagem(String valor) {
-        String imagem = normalizarTexto(valor);
-        if (imagem != null && imagem.length() > IMAGEM_BASE64_MAX_LENGTH) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A imagem e muito grande. Escolha uma imagem menor.");
-        }
-        return imagem;
-    }
-
     private String montarEndereco(SolicitacaoServico solicitacao) {
         String complemento = solicitacao.getComplemento() == null ? "" : ", " + solicitacao.getComplemento();
         return "%s, %s%s - %s, %s - %s, CEP %s".formatted(
@@ -171,6 +198,10 @@ public class SolicitacaoServicoService {
 
     private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao) {
         Usuario prestador = solicitacao.getPrestador();
+        String imagemUrl = solicitacao.getImagemArquivoRelativo() == null
+            ? null
+            : "/api/solicitacoes/" + solicitacao.getId() + "/imagem";
+
         return new SolicitacaoServicoResponse(
             solicitacao.getId(),
             solicitacao.getCliente().getId(),
@@ -191,7 +222,7 @@ public class SolicitacaoServicoService {
             solicitacao.getDescricao(),
             solicitacao.getData(),
             solicitacao.getHorario(),
-            solicitacao.getImagemBase64(),
+            imagemUrl,
             solicitacao.getStatus().name(),
             solicitacao.getCriadoEm(),
             solicitacao.getAceitoEm()

@@ -76,8 +76,11 @@ public class SolicitacaoServico {
     @Column(name = "horario_servico", nullable = false, length = 5)
     private String horario;
 
-    @Column(name = "imagem_base64", length = 200000)
-    private String imagemBase64;
+    /**
+     * Caminho relativo ao diretorio de upload (ex.: solicitacoes/uuid.jpg). Nulo quando nao ha foto.
+     */
+    @Column(name = "imagem_arquivo_relativo", length = 255)
+    private String imagemArquivoRelativo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -231,12 +234,12 @@ public class SolicitacaoServico {
         this.horario = horario;
     }
 
-    public String getImagemBase64() {
-        return imagemBase64;
+    public String getImagemArquivoRelativo() {
+        return imagemArquivoRelativo;
     }
 
-    public void setImagemBase64(String imagemBase64) {
-        this.imagemBase64 = imagemBase64;
+    public void setImagemArquivoRelativo(String imagemArquivoRelativo) {
+        this.imagemArquivoRelativo = imagemArquivoRelativo;
     }
 
     public StatusSolicitacao getStatus() {

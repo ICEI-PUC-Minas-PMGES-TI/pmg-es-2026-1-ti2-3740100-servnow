@@ -55,8 +55,6 @@ public record SolicitacaoServicoCreateRequest(
 
     @NotBlank(message = "Informe o horario do servico.")
     @Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "Horario invalido.")
-    String horario,
-
-    String imagemBase64
+    String horario
 ) {
 }

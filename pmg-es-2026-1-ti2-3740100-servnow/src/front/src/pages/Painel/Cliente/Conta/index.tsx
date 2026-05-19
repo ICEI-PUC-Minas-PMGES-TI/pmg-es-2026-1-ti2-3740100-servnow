@@ -9,6 +9,7 @@ import {
   getValidAuthSession,
   type PerfilResponse,
 } from "../../../../services/auth";
+import { useArquivoUrl } from "../../../../hooks/useArquivoUrl";
 
 export function Conta() {
   const session = getAuthSession();
@@ -38,7 +39,8 @@ export function Conta() {
 
   const nome = perfil?.nome ?? session?.nome ?? "Cliente Servnow";
   const email = perfil?.email ?? session?.email ?? "cliente@servnow.com";
-  const fotoPerfil = perfil?.fotoPerfilBase64 ?? session?.fotoPerfilBase64;
+  const fotoPerfilUrl = perfil?.fotoPerfilUrl ?? session?.fotoPerfilUrl ?? null;
+  const { src: fotoPerfil } = useArquivoUrl(fotoPerfilUrl);
   const fotoPerfilStyle = {
     objectFit: perfil?.fotoPerfilEnquadramento ?? session?.fotoPerfilEnquadramento ?? "cover",
     objectPosition: `${perfil?.fotoPerfilAjusteX ?? session?.fotoPerfilAjusteX ?? 50}% ${perfil?.fotoPerfilAjusteY ?? session?.fotoPerfilAjusteY ?? 50}%`,

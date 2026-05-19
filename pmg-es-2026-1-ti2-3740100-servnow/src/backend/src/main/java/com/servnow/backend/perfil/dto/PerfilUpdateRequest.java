@@ -9,17 +9,17 @@ public record PerfilUpdateRequest(
     String bairro,
     String cidade,
     String estado,
-    String fotoPerfilBase64,
     Integer fotoPerfilAjusteX,
     Integer fotoPerfilAjusteY,
     String fotoPerfilEnquadramento,
-    String fotoBase64,
+    Boolean removerFotoPerfil,
+    Boolean removerFotoLocal,
+    Boolean removerDocumentoIdentidade,
     String descricaoProfissional,
     String especialidades,
     String diasDisponiveis,
     String horarioInicio,
     String horarioFim,
-    Integer raioAtendimentoKm,
-    String documentoIdentidadeBase64
+    Integer raioAtendimentoKm
 ) {
 }

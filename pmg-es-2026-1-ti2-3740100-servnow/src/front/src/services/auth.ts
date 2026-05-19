@@ -7,7 +7,7 @@ export type AuthResponse = {
   tipoUsuario: TipoUsuario;
   token: string;
   mensagem: string;
-  fotoPerfilBase64?: string | null;
+  fotoPerfilUrl?: string | null;
   fotoPerfilAjusteX?: number | null;
   fotoPerfilAjusteY?: number | null;
   fotoPerfilEnquadramento?: "cover" | "contain" | null;
@@ -25,18 +25,18 @@ export type CurrentUserResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
-  fotoPerfilBase64: string | null;
+  fotoPerfilUrl: string | null;
   fotoPerfilAjusteX: number | null;
   fotoPerfilAjusteY: number | null;
   fotoPerfilEnquadramento: "cover" | "contain" | null;
-  fotoBase64: string | null;
+  fotoLocalUrl: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
   diasDisponiveis: string | null;
   horarioInicio: string | null;
   horarioFim: string | null;
   raioAtendimentoKm: number | null;
-  documentoIdentidadeBase64: string | null;
+  documentoIdentidadeUrl: string | null;
 };
 
 export type PerfilResponse = {
@@ -51,18 +51,18 @@ export type PerfilResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
-  fotoPerfilBase64: string | null;
+  fotoPerfilUrl: string | null;
   fotoPerfilAjusteX: number | null;
   fotoPerfilAjusteY: number | null;
   fotoPerfilEnquadramento: "cover" | "contain" | null;
-  fotoBase64: string | null;
+  fotoLocalUrl: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
   diasDisponiveis: string | null;
   horarioInicio: string | null;
   horarioFim: string | null;
   raioAtendimentoKm: number | null;
-  documentoIdentidadeBase64: string | null;
+  documentoIdentidadeUrl: string | null;
 };
 
 export type PerfilUpdateRequest = {
@@ -74,18 +74,18 @@ export type PerfilUpdateRequest = {
   bairro?: string;
   cidade?: string;
   estado?: string;
-  fotoPerfilBase64?: string;
   fotoPerfilAjusteX?: number;
   fotoPerfilAjusteY?: number;
   fotoPerfilEnquadramento?: "cover" | "contain";
-  fotoBase64?: string;
+  removerFotoPerfil?: boolean;
+  removerFotoLocal?: boolean;
+  removerDocumentoIdentidade?: boolean;
   descricaoProfissional?: string;
   especialidades?: string;
   diasDisponiveis?: string;
   horarioInicio?: string;
   horarioFim?: string;
   raioAtendimentoKm?: number;
-  documentoIdentidadeBase64?: string;
 };
 
 export type SolicitacaoServicoResponse = {
@@ -108,7 +108,8 @@ export type SolicitacaoServicoResponse = {
   descricao: string;
   data: string | null;
   horario: string | null;
-  imagemBase64: string | null;
+  /** Caminho da API para baixar a foto (requer Authorization). */
+  imagemUrl: string | null;
   status: string;
   criadoEm: string;
   aceitoEm: string | null;
@@ -128,7 +129,6 @@ export type SolicitacaoServicoCreateRequest = {
   estado: string;
   data?: string;
   horario?: string;
-  imagemBase64?: string;
 };
 
 const AUTH_STORAGE_KEY = "servnow.auth";

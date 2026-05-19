@@ -28,6 +28,7 @@ type PrestadorPerfilProps = {
   toggleEspecialidade: (value: string) => void;
   toggleDiaDisponivel: (value: string) => void;
   handleDocumentoChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  removerDocumento: () => void;
 };
 
 export function PrestadorPerfil({
@@ -36,6 +37,7 @@ export function PrestadorPerfil({
   toggleEspecialidade,
   toggleDiaDisponivel,
   handleDocumentoChange,
+  removerDocumento,
 }: PrestadorPerfilProps) {
   return (
     <>
@@ -149,7 +151,7 @@ export function PrestadorPerfil({
 
         <label className="perfil-upload">
           <FileText size={18} />
-          <span>{form.documentoIdentidadeBase64 ? "Trocar documento" : "Selecionar documento"}</span>
+          <span>{form.documentoPreview ? "Trocar documento" : "Selecionar documento"}</span>
           <input
             type="file"
             accept="application/pdf,image/*"
@@ -157,16 +159,16 @@ export function PrestadorPerfil({
           />
         </label>
 
-        {form.documentoIdentidadeBase64 && (
+        {form.documentoPreview && (
           <div className="perfil-documento-preview">
-            {isPdfBase64(form.documentoIdentidadeBase64) ? (
+            {form.documentoEhPdf ? (
               <iframe
-                src={form.documentoIdentidadeBase64}
+                src={form.documentoPreview}
                 title="Pre-visualizacao do documento de identidade"
               />
             ) : (
               <img
-                src={form.documentoIdentidadeBase64}
+                src={form.documentoPreview}
                 alt="Pre-visualizacao do documento de identidade"
               />
             )}
@@ -174,7 +176,7 @@ export function PrestadorPerfil({
             <button
               type="button"
               className="perfil-foto-remover perfil-documento-remover"
-              onClick={() => updateField("documentoIdentidadeBase64", "")}
+              onClick={removerDocumento}
             >
               Remover documento
             </button>
@@ -186,7 +188,3 @@ export function PrestadorPerfil({
 }
 
 export default PrestadorPerfil;
-
-function isPdfBase64(value: string) {
-  return value.startsWith("data:application/pdf");
-}
