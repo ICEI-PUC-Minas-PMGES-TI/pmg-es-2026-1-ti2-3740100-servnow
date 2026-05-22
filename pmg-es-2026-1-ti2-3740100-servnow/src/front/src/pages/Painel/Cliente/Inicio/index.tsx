@@ -1,41 +1,65 @@
 import { ArrowRight, Calendar, Clock, FileText, PlusCircle, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
+import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
+import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import { formatarDataSolicitacao, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
 
 type InicioProps = {
   onIrParaSolicitacoes: () => void;
   onIrParaCriar: () => void;
 };
 
-const solicitacoesRecentes = [
-  {
-    id: 1,
-    titulo: "Conserto de chuveiro eletrico",
-    categoria: "Eletrica",
-    data: "12/05/2026",
-    status: "aguardando" as const,
-    statusLabel: "Aguardando propostas",
-  },
-  {
-    id: 2,
-    titulo: "Pintura da sala",
-    categoria: "Pintura",
-    data: "08/05/2026",
-    status: "agendado" as const,
-    statusLabel: "Agendado",
-  },
-  {
-    id: 3,
-    titulo: "Vazamento na pia da cozinha",
-    categoria: "Hidraulica",
-    data: "02/05/2026",
-    status: "concluido" as const,
-    statusLabel: "Concluido",
-  },
-];
-
 export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
   const navigate = useNavigate();
+  const [solicitacoes, setSolicitacoes] = useState<SolicitacaoServicoResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function carregarSolicitacoes() {
+      const session = getValidAuthSession();
+      if (!session?.token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/solicitacoes/cliente`, {
+          headers: authHeader(session.token),
+        });
+
+        if (response.status === 401) {
+          toast.error("Sessao expirada. Entre novamente.");
+          navigate("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Nao foi possivel carregar as solicitacoes.");
+        }
+
+        setSolicitacoes((await response.json()) as SolicitacaoServicoResponse[]);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    void carregarSolicitacoes();
+  }, [navigate]);
+
+  const solicitacoesRecentes = useMemo(() => solicitacoes.slice(0, 3), [solicitacoes]);
+  const solicitacoesAtivas = useMemo(
+    () => solicitacoes.filter((item) => item.status === "PUBLICADO" || item.status === "AGUARDANDO_PROPOSTAS").length,
+    [solicitacoes],
+  );
+  const solicitacoesAgendadas = useMemo(
+    () => solicitacoes.filter((item) => item.status === "AGENDADA").length,
+    [solicitacoes],
+  );
 
   return (
     <>
@@ -88,8 +112,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
             <FileText size={22} />
           </div>
           <span className="painel-stat-label">Solicitacoes ativas</span>
-          <strong className="painel-stat-valor">3</strong>
-          <span className="painel-stat-detalhe">2 com propostas recebidas</span>
+          <strong className="painel-stat-valor">{solicitacoesAtivas}</strong>
+          <span className="painel-stat-detalhe">Em aberto para novos prestadores</span>
         </div>
 
         <div className="painel-stat-card">
@@ -97,8 +121,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
             <Calendar size={22} />
           </div>
           <span className="painel-stat-label">Servicos agendados</span>
-          <strong className="painel-stat-valor">1</strong>
-          <span className="painel-stat-detalhe">Proximo em 14/05</span>
+          <strong className="painel-stat-valor">{solicitacoesAgendadas}</strong>
+          <span className="painel-stat-detalhe">Solicitacoes com prestador definido</span>
         </div>
 
         <div className="painel-stat-card">
@@ -119,25 +143,46 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
           </button>
         </div>
 
-        <div className="painel-lista">
-          {solicitacoesRecentes.map((item) => (
-            <div key={item.id} className="painel-lista-item">
-              <div className="painel-lista-item-info">
-                <p className="painel-lista-item-titulo">{item.titulo}</p>
-                <div className="painel-lista-item-meta">
-                  <span className="painel-lista-item-meta-detalhe">{item.categoria}</span>
-                  <span className="painel-lista-item-meta-detalhe">
-                    <Calendar size={13} /> {item.data}
-                  </span>
-                </div>
-              </div>
-              <div className="painel-lista-item-acoes">
-                <span className={`painel-status ${item.status}`}>{item.statusLabel}</span>
-                <button type="button" className="painel-btn-ghost">Ver detalhes</button>
-              </div>
+        {isLoading ? (
+          <div className="painel-vazio">
+            <div className="painel-vazio-icone">
+              <FileText size={32} />
             </div>
-          ))}
-        </div>
+            <p>Carregando solicitacoes...</p>
+          </div>
+        ) : solicitacoesRecentes.length === 0 ? (
+          <div className="painel-vazio">
+            <div className="painel-vazio-icone">
+              <FileText size={32} />
+            </div>
+            <p>Voce ainda nao criou solicitacoes.</p>
+          </div>
+        ) : (
+          <div className="painel-lista">
+            {solicitacoesRecentes.map((item) => {
+              const tipo = TIPOS_SERVICO_MAP[item.tipoServico]?.nome ?? item.tipoServico;
+              return (
+                <div key={item.id} className="painel-lista-item">
+                  <div className="painel-lista-item-info">
+                    <p className="painel-lista-item-titulo">{tipo}</p>
+                    <div className="painel-lista-item-meta">
+                      <span className="painel-lista-item-meta-detalhe">{item.endereco}</span>
+                      {item.data && (
+                        <span className="painel-lista-item-meta-detalhe">
+                          <Calendar size={13} /> {formatarDataSolicitacao(item.data)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="painel-lista-item-acoes">
+                    <span className={`painel-status ${getStatusClass(item.status)}`}>{getStatusLabel(item.status)}</span>
+                    <button type="button" className="painel-btn-ghost" onClick={onIrParaSolicitacoes}>Ver detalhes</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="painel-card">

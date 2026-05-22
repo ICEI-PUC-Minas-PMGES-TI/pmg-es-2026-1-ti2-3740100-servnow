@@ -11,9 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -75,6 +78,46 @@ public class SolicitacaoServicoController {
     @GetMapping({"/prestador", "/prestador/"})
     public List<SolicitacaoServicoResponse> listarParaPrestadores(@AuthenticationPrincipal UsuarioAutenticado usuario) {
         return solicitacaoService.listarParaPrestadores(usuario);
+    }
+
+    @GetMapping({"/cliente/agendadas", "/cliente/agendadas/"})
+    public List<SolicitacaoServicoResponse> listarAgendadasDoCliente(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return solicitacaoService.listarAgendadasDoCliente(usuario);
+    }
+
+    @GetMapping({"/prestador/agendadas", "/prestador/agendadas/"})
+    public List<SolicitacaoServicoResponse> listarAgendadasDoPrestador(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return solicitacaoService.listarAgendadasDoPrestador(usuario);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public SolicitacaoServicoResponse editar(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long id,
+        @Valid @RequestBody SolicitacaoServicoCreateRequest request,
+        @RequestParam(value = "removerImagem", defaultValue = "false") boolean removerImagem
+    ) {
+        return solicitacaoService.editarDoCliente(id, usuario, request, null, removerImagem);
+    }
+
+    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, "multipart/form-data;charset=UTF-8"})
+    public SolicitacaoServicoResponse editarComImagem(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long id,
+        @Valid @RequestPart("dados") SolicitacaoServicoCreateRequest request,
+        @RequestPart(value = "imagem", required = false) MultipartFile imagem,
+        @RequestPart(value = "removerImagem", required = false) String removerImagem
+    ) {
+        return solicitacaoService.editarDoCliente(id, usuario, request, imagem, Boolean.parseBoolean(removerImagem));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long id
+    ) {
+        solicitacaoService.excluirDoCliente(id, usuario);
     }
 
     @GetMapping("/{id}/imagem")

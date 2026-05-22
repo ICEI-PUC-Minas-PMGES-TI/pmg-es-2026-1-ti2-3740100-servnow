@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -51,29 +52,64 @@ public class SolicitacaoServicoService {
         MultipartFile imagem
     ) {
         validarTipo(cliente, TipoUsuario.CLIENTE);
-
         SolicitacaoServico solicitacao = new SolicitacaoServico();
         solicitacao.setCliente(cliente);
-        solicitacao.setTipoServico(normalizarTipoServico(request.tipoServico()));
-        solicitacao.setIconeServico(normalizarTexto(request.iconeServico()));
-        solicitacao.setFaixaPreco(normalizarFaixaPreco(request.faixaPreco()));
-        solicitacao.setDescricao(normalizarObrigatorio(request.descricao()));
-        solicitacao.setCep(normalizarObrigatorio(request.cep()));
-        solicitacao.setRua(normalizarObrigatorio(request.rua()));
-        solicitacao.setNumero(normalizarObrigatorio(request.numero()));
-        solicitacao.setComplemento(normalizarTexto(request.complemento()));
-        solicitacao.setBairro(normalizarObrigatorio(request.bairro()));
-        solicitacao.setCidade(normalizarObrigatorio(request.cidade()));
-        solicitacao.setEstado(normalizarObrigatorio(request.estado()).toUpperCase());
-        solicitacao.setEndereco(montarEndereco(solicitacao));
-        solicitacao.setData(request.data());
-        solicitacao.setHorario(normalizarTexto(request.horario()));
+        aplicarDadosSolicitacao(solicitacao, request);
         if (imagem != null && !imagem.isEmpty()) {
             solicitacao.setImagemArquivoRelativo(arquivoStorage.salvar(imagem));
         }
         solicitacao.setStatus(StatusSolicitacao.PUBLICADO);
 
         return toResponse(solicitacaoRepository.save(solicitacao));
+    }
+
+    @Transactional
+    public SolicitacaoServicoResponse editarDoCliente(
+        Long solicitacaoId,
+        UsuarioAutenticado usuarioAutenticado,
+        SolicitacaoServicoCreateRequest request,
+        MultipartFile imagem,
+        boolean removerImagem
+    ) {
+        Usuario cliente = encontrarUsuario(usuarioAutenticado);
+        validarTipo(cliente, TipoUsuario.CLIENTE);
+
+        SolicitacaoServico solicitacao = buscarSolicitacaoDoCliente(solicitacaoId, cliente.getId());
+        aplicarDadosSolicitacao(solicitacao, request);
+        solicitacao.setPrestador(null);
+        solicitacao.setAceitoEm(null);
+        solicitacao.setStatus(StatusSolicitacao.PUBLICADO);
+        if (imagem != null && !imagem.isEmpty()) {
+            String imagemAnterior = solicitacao.getImagemArquivoRelativo();
+            solicitacao.setImagemArquivoRelativo(arquivoStorage.salvar(imagem));
+            arquivoStorage.excluirSeExistir(imagemAnterior);
+        } else if (removerImagem) {
+            String imagemAnterior = solicitacao.getImagemArquivoRelativo();
+            solicitacao.setImagemArquivoRelativo(null);
+            arquivoStorage.excluirSeExistir(imagemAnterior);
+        }
+
+        return toResponse(solicitacaoRepository.save(solicitacao));
+    }
+
+    @Transactional
+    public void excluirDoCliente(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
+        Usuario cliente = encontrarUsuario(usuarioAutenticado);
+        validarTipo(cliente, TipoUsuario.CLIENTE);
+
+        SolicitacaoServico solicitacao = solicitacaoRepository.findById(solicitacaoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada."));
+
+        if (!solicitacao.getCliente().getId().equals(cliente.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado a esta solicitacao.");
+        }
+
+        long removidas = solicitacaoRepository.deleteByIdAndClienteId(solicitacaoId, cliente.getId());
+        if (removidas == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada.");
+        }
+
+        arquivoStorage.excluirSeExistir(solicitacao.getImagemArquivoRelativo());
     }
 
     public List<SolicitacaoServicoResponse> listarDoCliente(UsuarioAutenticado usuarioAutenticado) {
@@ -91,6 +127,26 @@ public class SolicitacaoServicoService {
         validarTipo(prestador, TipoUsuario.PRESTADOR);
 
         return solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+    }
+
+    public List<SolicitacaoServicoResponse> listarAgendadasDoCliente(UsuarioAutenticado usuarioAutenticado) {
+        Usuario cliente = encontrarUsuario(usuarioAutenticado);
+        validarTipo(cliente, TipoUsuario.CLIENTE);
+
+        return solicitacaoRepository.findByClienteIdAndStatusOrderByAceitoEmDesc(cliente.getId(), StatusSolicitacao.AGENDADA)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+    }
+
+    public List<SolicitacaoServicoResponse> listarAgendadasDoPrestador(UsuarioAutenticado usuarioAutenticado) {
+        Usuario prestador = encontrarUsuario(usuarioAutenticado);
+        validarTipo(prestador, TipoUsuario.PRESTADOR);
+
+        return solicitacaoRepository.findByPrestadorIdAndStatusOrderByAceitoEmDesc(prestador.getId(), StatusSolicitacao.AGENDADA)
             .stream()
             .map(this::toResponse)
             .toList();
@@ -116,6 +172,32 @@ public class SolicitacaoServicoService {
         }
 
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acao nao permitida para este tipo de usuario.");
+    }
+
+    private SolicitacaoServico buscarSolicitacaoDoCliente(Long solicitacaoId, Long clienteId) {
+        SolicitacaoServico solicitacao = solicitacaoRepository.findById(solicitacaoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada."));
+        if (!solicitacao.getCliente().getId().equals(clienteId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado a esta solicitacao.");
+        }
+        return solicitacao;
+    }
+
+    private void aplicarDadosSolicitacao(SolicitacaoServico solicitacao, SolicitacaoServicoCreateRequest request) {
+        solicitacao.setTipoServico(normalizarTipoServico(request.tipoServico()));
+        solicitacao.setIconeServico(normalizarTexto(request.iconeServico()));
+        solicitacao.setFaixaPreco(normalizarFaixaPreco(request.faixaPreco()));
+        solicitacao.setDescricao(normalizarObrigatorio(request.descricao()));
+        solicitacao.setCep(normalizarObrigatorio(request.cep()));
+        solicitacao.setRua(normalizarObrigatorio(request.rua()));
+        solicitacao.setNumero(normalizarObrigatorio(request.numero()));
+        solicitacao.setComplemento(normalizarTexto(request.complemento()));
+        solicitacao.setBairro(normalizarObrigatorio(request.bairro()));
+        solicitacao.setCidade(normalizarObrigatorio(request.cidade()));
+        solicitacao.setEstado(normalizarObrigatorio(request.estado()).toUpperCase());
+        solicitacao.setEndereco(montarEndereco(solicitacao));
+        solicitacao.setData(request.data());
+        solicitacao.setHorario(normalizarTexto(request.horario()));
     }
 
     private Usuario encontrarUsuario(UsuarioAutenticado usuarioAutenticado) {

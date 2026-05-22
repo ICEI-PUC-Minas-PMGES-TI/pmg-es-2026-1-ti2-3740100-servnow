@@ -14,15 +14,12 @@
 Logins para testes/desenvolvimento
 
 Perfil cliente
-Testecliente@gmail.com
-Testecliente  
+Testealeatorioe@gmail.com
+Testealeatorio@gmail.com
 
 Perfil prestador
-TestePrestador4@gmail.com
-TestePrestador4
-
-ClienteSolicitacao@gmail.com
-ClienteSolicitacao
+TestePrestador@gmail.com
+TestePrestador 
 
 
 Padroes para commit

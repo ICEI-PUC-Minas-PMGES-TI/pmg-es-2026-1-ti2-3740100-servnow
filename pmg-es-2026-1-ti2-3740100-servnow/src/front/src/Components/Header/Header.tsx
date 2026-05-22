@@ -1,6 +1,6 @@
 import { Moon, Sun, UserCircle } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo_ServNow.jpeg";
 import { getAuthSession, getDashboardRoute } from "../../services/auth";
 import { applyTheme, getNextTheme, getStoredTheme } from "../../services/theme";
@@ -40,11 +40,11 @@ export function Header({
         </Link>
 
         <nav className="header-nav">
-          <Link to="/" className="nav-link">Início</Link>
+          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Início</NavLink>
           {loggedIn && (
             <>
-              <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <Link to="/acompanhamento" className="nav-link">Acompanhamento</Link>
+              <NavLink to={dashboardRoute} className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Painel</NavLink>
+              <NavLink to="/acompanhamento" className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Acompanhamento</NavLink>
             </>
           )}
         </nav>
@@ -117,11 +117,11 @@ export function Header({
 
       {menuOpen && (
         <div className="header-mobile-menu">
-          <Link to="/" className="nav-link">Início</Link>
+          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Início</NavLink>
           {loggedIn && (
             <>
-              <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <Link to="/acompanhamento" className="nav-link">Acompanhamento</Link>
+              <NavLink to={dashboardRoute} className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Painel</NavLink>
+              <NavLink to="/acompanhamento" className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Acompanhamento</NavLink>
               <button type="button" className="nav-link mobile-logout-link" onClick={onLogout}>
                 Sair
               </button>

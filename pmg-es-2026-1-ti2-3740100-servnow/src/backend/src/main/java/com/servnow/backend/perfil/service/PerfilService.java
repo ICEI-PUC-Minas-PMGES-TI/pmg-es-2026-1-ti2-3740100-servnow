@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.perfil.dto.PerfilPublicoResponse;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -38,6 +39,29 @@ public class PerfilService {
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
         validarTipo(usuario, TipoUsuario.PRESTADOR);
         return toResponse(usuario);
+    }
+
+    public PerfilPublicoResponse buscarPublico(Long usuarioId, UsuarioAutenticado usuarioAutenticado) {
+        if (usuarioAutenticado == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nao autenticado.");
+        }
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado."));
+
+        return new PerfilPublicoResponse(
+            usuario.getId(),
+            usuario.getNome(),
+            usuario.getTipoUsuario().name(),
+            usuario.getBairro(),
+            usuario.getCidade(),
+            usuario.getEstado(),
+            urlFotoPerfilPublica(usuario),
+            usuario.getDescricaoProfissional(),
+            null,
+            0,
+            null,
+            usuario.getCriadoEm()
+        );
     }
 
     public PerfilResponse atualizar(
@@ -95,6 +119,14 @@ public class PerfilService {
 
     public String caminhoFotoPerfil(Usuario usuario) {
         return usuario.getFotoPerfilArquivoRelativo();
+    }
+
+    public Usuario encontrarParaLeituraArquivoPublico(Long usuarioId, UsuarioAutenticado autenticado) {
+        if (autenticado == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nao autenticado.");
+        }
+        return usuarioRepository.findById(usuarioId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado."));
     }
 
     public String caminhoFotoLocal(Usuario usuario) {
@@ -308,6 +340,12 @@ public class PerfilService {
 
     public static String urlFotoPerfil(Usuario usuario) {
         return temArquivo(usuario.getFotoPerfilArquivoRelativo()) ? "/api/perfil/foto-perfil" : null;
+    }
+
+    public static String urlFotoPerfilPublica(Usuario usuario) {
+        return temArquivo(usuario.getFotoPerfilArquivoRelativo())
+            ? "/api/perfil/publico/" + usuario.getId() + "/foto-perfil"
+            : null;
     }
 
     public static String urlFotoLocal(Usuario usuario) {

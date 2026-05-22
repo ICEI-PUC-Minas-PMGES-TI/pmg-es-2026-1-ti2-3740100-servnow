@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.perfil.dto.PerfilPublicoResponse;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
 import com.servnow.backend.perfil.service.PerfilService;
@@ -52,6 +53,14 @@ public class PerfilController {
     @GetMapping("/prestador")
     public PerfilResponse buscarPrestador(@AuthenticationPrincipal UsuarioAutenticado usuario) {
         return perfilService.buscarPrestador(usuario);
+    }
+
+    @GetMapping("/publico/{id}")
+    public PerfilPublicoResponse buscarPublico(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @org.springframework.web.bind.annotation.PathVariable Long id
+    ) {
+        return perfilService.buscarPublico(id, usuario);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -114,6 +123,15 @@ public class PerfilController {
     @GetMapping("/foto-perfil")
     public ResponseEntity<byte[]> obterFotoPerfil(@AuthenticationPrincipal UsuarioAutenticado usuario) {
         Usuario perfil = perfilService.encontrarParaLeituraArquivo(usuario.getId(), usuario);
+        return responderArquivo(perfilService.caminhoFotoPerfil(perfil), "Foto de perfil nao encontrada.");
+    }
+
+    @GetMapping("/publico/{id}/foto-perfil")
+    public ResponseEntity<byte[]> obterFotoPerfilPublico(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @org.springframework.web.bind.annotation.PathVariable Long id
+    ) {
+        Usuario perfil = perfilService.encontrarParaLeituraArquivoPublico(id, usuario);
         return responderArquivo(perfilService.caminhoFotoPerfil(perfil), "Foto de perfil nao encontrada.");
     }
 

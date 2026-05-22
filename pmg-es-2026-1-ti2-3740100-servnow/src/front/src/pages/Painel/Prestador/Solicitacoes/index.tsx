@@ -6,13 +6,17 @@ import { Calendar, Clock3, FileText, MapPin, X } from "lucide-react";
 import {
   API_URL,
   authHeader,
+  authHeaders,
   getValidAuthSession,
+  type PerfilPublicoResponse,
+  type PropostaCreateRequest,
   type SolicitacaoServicoResponse,
 } from "../../../../services/auth";
 import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
 import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import { useArquivoUrl } from "../../../../hooks/useArquivoUrl";
 import {
   enriquecerSolicitacao,
   filtrarOportunidades,
@@ -30,6 +34,20 @@ export function Solicitacoes() {
   const [filtroDistancia, setFiltroDistancia] = useState("");
   const [busca, setBusca] = useState("");
   const [detalheAberto, setDetalheAberto] = useState<OportunidadeSolicitacao | null>(null);
+  const [propostaAberta, setPropostaAberta] = useState<OportunidadeSolicitacao | null>(null);
+  const [valorProposta, setValorProposta] = useState("");
+  const [mensagemProposta, setMensagemProposta] = useState("");
+  const [enviandoProposta, setEnviandoProposta] = useState(false);
+  const [perfilCliente, setPerfilCliente] = useState<PerfilPublicoResponse | null>(null);
+  const [carregandoPerfilCliente, setCarregandoPerfilCliente] = useState(false);
+  const { src: fotoPerfilClienteSrc } = useArquivoUrl(perfilCliente?.fotoPerfilUrl);
+
+  function formatarMesAnoEntrada(valor: string | null | undefined) {
+    if (!valor) return "Data de entrada nao informada";
+    const data = new Date(valor);
+    if (Number.isNaN(data.getTime())) return "Data de entrada nao informada";
+    return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(data);
+  }
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -96,6 +114,88 @@ export function Solicitacoes() {
     const primeira = lista[0];
     const endereco = encodeURIComponent(primeira.endereco || `${primeira.rua}, ${primeira.cidade}`);
     window.open(`https://www.google.com/maps/search/?api=1&query=${endereco}`, "_blank", "noopener,noreferrer");
+  }
+
+  async function abrirModalProposta(item: OportunidadeSolicitacao) {
+    setPropostaAberta(item);
+    setValorProposta("");
+    setMensagemProposta("");
+    setPerfilCliente(null);
+    setCarregandoPerfilCliente(true);
+    const session = getValidAuthSession();
+    if (!session?.token) {
+      setCarregandoPerfilCliente(false);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/api/perfil/publico/${item.clienteId}`, {
+        headers: authHeader(session.token),
+      });
+      if (response.ok) {
+        setPerfilCliente((await response.json()) as PerfilPublicoResponse);
+      }
+    } catch {
+      // Perfil publico e opcional na tela de proposta.
+    } finally {
+      setCarregandoPerfilCliente(false);
+    }
+  }
+
+  async function enviarProposta() {
+    if (!propostaAberta) return;
+    const valor = Number(valorProposta.replace(",", "."));
+    if (!Number.isFinite(valor) || valor <= 0) {
+      toast.error("Informe um valor valido para a proposta.");
+      return;
+    }
+    if (!mensagemProposta.trim()) {
+      toast.error("Escreva uma mensagem para o cliente.");
+      return;
+    }
+
+    const session = getValidAuthSession();
+    if (!session?.token) {
+      toast.error("Sessao expirada. Entre novamente.");
+      navigate("/login");
+      return;
+    }
+
+    const payload: PropostaCreateRequest = {
+      solicitacaoId: propostaAberta.id,
+      valor,
+      mensagem: mensagemProposta.trim(),
+    };
+
+    setEnviandoProposta(true);
+    try {
+      const response = await fetch(`${API_URL}/api/propostas`, {
+        method: "POST",
+        headers: authHeaders(session.token, "application/json"),
+        body: JSON.stringify(payload),
+      });
+
+      if (response.status === 401) {
+        toast.error("Sessao expirada. Entre novamente.");
+        navigate("/login");
+        return;
+      }
+      if (response.status === 404) {
+        toast.error("Esta solicitacao nao esta mais disponivel para proposta. Atualize a lista.");
+        setPropostaAberta(null);
+        setSolicitacoes((atual) => atual.filter((item) => item.id !== propostaAberta.id));
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(await getResponseError(response, "Nao foi possivel enviar a proposta."));
+      }
+
+      toast.success("Proposta enviada com sucesso.");
+      setPropostaAberta(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar proposta.");
+    } finally {
+      setEnviandoProposta(false);
+    }
   }
 
   return (
@@ -239,7 +339,7 @@ export function Solicitacoes() {
                     <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
                       Ver detalhes
                     </button>
-                    <button type="button" className="painel-btn-aceitar">
+                    <button type="button" className="painel-btn-aceitar" onClick={() => void abrirModalProposta(item)}>
                       Enviar proposta
                     </button>
                   </div>
@@ -256,6 +356,91 @@ export function Solicitacoes() {
         mostrarCliente
         distanciaKm={detalheAberto?.distanciaKm}
       />
+
+      {propostaAberta && (
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setPropostaAberta(null)}>
+          <div className="solicitacao-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
+                <h3>Enviar proposta</h3>
+              </div>
+            </header>
+            <div className="solicitacao-modal-corpo">
+              <section className="painel-card" style={{ padding: 14, marginBottom: 10 }}>
+                <h4 style={{ marginTop: 0, marginBottom: 10 }}>Perfil do cliente</h4>
+                {carregandoPerfilCliente ? (
+                  <p style={{ margin: 0, color: "var(--workspace-muted)" }}>Carregando perfil...</p>
+                ) : perfilCliente ? (
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    {fotoPerfilClienteSrc ? (
+                      <img
+                        src={fotoPerfilClienteSrc}
+                        alt={`Foto de ${perfilCliente.nome}`}
+                        style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div className="painel-conta-avatar" style={{ width: 56, height: 56 }}>
+                        {perfilCliente.nome.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: 0, fontWeight: 700 }}>{perfilCliente.nome}</p>
+                      <p style={{ margin: "2px 0", color: "var(--workspace-muted)" }}>
+                        {[perfilCliente.bairro, perfilCliente.cidade, perfilCliente.estado].filter(Boolean).join(" - ") || "Localizacao nao informada"}
+                      </p>
+                      <p style={{ margin: "6px 0 0", color: "var(--workspace-muted)" }}>
+                        Avaliacao: {perfilCliente.avaliacaoMedia != null ? perfilCliente.avaliacaoMedia.toFixed(1) : "Usuario sem avaliacoes na plataforma"}
+                      </p>
+                      <p style={{ margin: "4px 0 0", color: "var(--workspace-muted)" }}>
+                        Comentario: {perfilCliente.comentarioDestaque ?? "Disponivel apos finalizacao de servicos"}
+                      </p>
+                      <p style={{ margin: "4px 0 0", color: "var(--workspace-muted)" }}>
+                        Entrou na plataforma em: {formatarMesAnoEntrada(perfilCliente.criadoEm)}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ margin: 0, color: "var(--workspace-muted)" }}>Perfil indisponivel no momento.</p>
+                )}
+              </section>
+              <div className="painel-form-grid">
+                <label className="form-field">
+                  <span className="form-label">Valor proposto (R$)</span>
+                  <div className="form-control">
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={valorProposta}
+                      onChange={(event) => setValorProposta(event.target.value)}
+                      placeholder="Ex: 150.00"
+                    />
+                  </div>
+                </label>
+                <label className="form-field form-field-full">
+                  <span className="form-label">Mensagem para o cliente</span>
+                  <div className="form-control form-control-textarea">
+                    <textarea
+                      maxLength={800}
+                      value={mensagemProposta}
+                      onChange={(event) => setMensagemProposta(event.target.value)}
+                      placeholder="Descreva o que esta incluido no atendimento e sua disponibilidade."
+                    />
+                  </div>
+                </label>
+              </div>
+            </div>
+            <footer className="solicitacao-modal-rodape">
+              <button type="button" className="btn-secondary" onClick={() => setPropostaAberta(null)} disabled={enviandoProposta}>
+                Cancelar
+              </button>
+              <button type="button" className="btn-primary" onClick={enviarProposta} disabled={enviandoProposta}>
+                {enviandoProposta ? "Enviando..." : "Enviar proposta"}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
     </>
   );
 }

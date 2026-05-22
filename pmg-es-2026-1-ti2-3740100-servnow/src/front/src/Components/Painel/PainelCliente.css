@@ -248,6 +248,14 @@
 
 .painel-card {
   padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.painel-card .btn-primary {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .painel-card + .painel-card {
@@ -393,7 +401,13 @@
 .painel-lista-item-acoes {
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14px;
+}
+
+.painel-lista-item-acoes .painel-btn-ghost,
+.painel-lista-item-acoes .painel-btn-recusar,
+.painel-lista-item-acoes .painel-btn-aceitar {
+  margin: 2px 0;
 }
 
 .painel-status {
@@ -1405,6 +1419,11 @@
 
   .painel-card {
     padding: 18px;
+  }
+
+  .painel-card .btn-primary {
+    width: 100%;
+    justify-content: center;
   }
 
   .painel-secao-cabecalho h1 {

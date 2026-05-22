@@ -1,41 +1,48 @@
 import { Calendar, Clock, MapPin, User } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
-
-type AgendamentoPrestador = {
-  id: number;
-  titulo: string;
-  categoria: string;
-  cliente: string;
-  endereco: string;
-  data: string;
-  horario: string;
-  valor: number;
-};
-
-const AGENDAMENTOS: AgendamentoPrestador[] = [
-  {
-    id: 1,
-    titulo: "Instalacao de ventilador de teto",
-    categoria: "Eletrica",
-    cliente: "Ricardo A.",
-    endereco: "Rua da Bahia, 512 - Savassi, BH",
-    data: "20/05/2026",
-    horario: "14:30",
-    valor: 250,
-  },
-  {
-    id: 2,
-    titulo: "Troca de disjuntor",
-    categoria: "Eletrica",
-    cliente: "Ana Paula",
-    endereco: "Av. Afonso Pena, 1200 - Centro, BH",
-    data: "22/05/2026",
-    horario: "09:00",
-    valor: 220,
-  },
-];
+import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
+import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
+import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 export function Agendamentos() {
+  const navigate = useNavigate();
+  const [agendamentos, setAgendamentos] = useState<SolicitacaoServicoResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function carregar() {
+      const session = getValidAuthSession();
+      if (!session?.token) {
+        navigate("/login");
+        return;
+      }
+      try {
+        const response = await fetch(`${API_URL}/api/solicitacoes/prestador/agendadas`, {
+          headers: authHeader(session.token),
+        });
+        if (response.status === 401) {
+          toast.error("Sessao expirada. Entre novamente.");
+          navigate("/login");
+          return;
+        }
+        if (!response.ok) {
+          throw new Error("Nao foi possivel carregar os agendamentos.");
+        }
+        setAgendamentos((await response.json()) as SolicitacaoServicoResponse[]);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar agendamentos.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    void carregar();
+  }, [navigate]);
+
+  const lista = useMemo(() => agendamentos, [agendamentos]);
+
   return (
     <>
       <PainelSectionHeader
@@ -49,7 +56,14 @@ export function Agendamentos() {
           <h2>Proximos atendimentos</h2>
         </div>
 
-        {AGENDAMENTOS.length === 0 ? (
+        {isLoading ? (
+          <div className="painel-vazio">
+            <div className="painel-vazio-icone">
+              <Calendar size={32} />
+            </div>
+            <p>Carregando agendamentos...</p>
+          </div>
+        ) : lista.length === 0 ? (
           <div className="painel-vazio">
             <div className="painel-vazio-icone">
               <Calendar size={32} />
@@ -58,27 +72,28 @@ export function Agendamentos() {
           </div>
         ) : (
           <div className="painel-lista">
-            {AGENDAMENTOS.map((item) => (
+            {lista.map((item) => (
               <div key={item.id} className="painel-lista-item">
                 <div className="painel-lista-item-info">
-                  <p className="painel-lista-item-titulo">{item.titulo}</p>
+                  <p className="painel-lista-item-titulo">{TIPOS_SERVICO_MAP[item.tipoServico]?.nome ?? item.tipoServico}</p>
                   <div className="painel-lista-item-meta">
-                    <span className="painel-lista-item-meta-detalhe">{item.categoria}</span>
                     <span className="painel-lista-item-meta-detalhe">
-                      <User size={13} /> {item.cliente}
+                      <User size={13} /> {item.clienteNome}
                     </span>
                     <span className="painel-lista-item-meta-detalhe">
                       <MapPin size={13} /> {item.endereco}
                     </span>
-                    <span className="painel-lista-item-meta-detalhe">
-                      <Calendar size={13} /> {item.data}
-                    </span>
-                    <span className="painel-lista-item-meta-detalhe">
-                      <Clock size={13} /> {item.horario}
-                    </span>
-                    <span className="painel-lista-item-meta-detalhe">
-                      {item.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                    </span>
+                    {item.data && (
+                      <span className="painel-lista-item-meta-detalhe">
+                        <Calendar size={13} /> {formatarDataSolicitacao(item.data)}
+                      </span>
+                    )}
+                    {item.horario && (
+                      <span className="painel-lista-item-meta-detalhe">
+                        <Clock size={13} /> {item.horario}
+                      </span>
+                    )}
+                    <span className="painel-lista-item-meta-detalhe">{item.faixaPreco}</span>
                   </div>
                 </div>
                 <div className="painel-lista-item-acoes">

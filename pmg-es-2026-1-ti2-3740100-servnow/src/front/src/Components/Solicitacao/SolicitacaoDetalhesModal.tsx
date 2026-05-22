@@ -14,8 +14,8 @@ import { TIPOS_SERVICO_MAP } from "../../utils/tiposServico";
 type Props = {
   solicitacao: SolicitacaoServicoResponse | null;
   onFechar: () => void;
-  /** Exibe nome do cliente (painel do prestador). */
   mostrarCliente?: boolean;
+  mostrarPrestador?: boolean;
   distanciaKm?: number;
 };
 
@@ -23,6 +23,7 @@ export function SolicitacaoDetalhesModal({
   solicitacao,
   onFechar,
   mostrarCliente = false,
+  mostrarPrestador = false,
   distanciaKm,
 }: Props) {
   const imagemUrl = solicitacao?.imagemUrl ?? null;
@@ -111,6 +112,12 @@ export function SolicitacaoDetalhesModal({
               <div className="solicitacao-modal-linha">
                 <dt><User size={14} /> Cliente</dt>
                 <dd>{solicitacao.clienteNome}</dd>
+              </div>
+            )}
+            {mostrarPrestador && (
+              <div className="solicitacao-modal-linha">
+                <dt><User size={14} /> Prestador</dt>
+                <dd>{solicitacao.prestadorNome ?? "Ainda sem prestador atribuido"}</dd>
               </div>
             )}
             <div className="solicitacao-modal-linha">

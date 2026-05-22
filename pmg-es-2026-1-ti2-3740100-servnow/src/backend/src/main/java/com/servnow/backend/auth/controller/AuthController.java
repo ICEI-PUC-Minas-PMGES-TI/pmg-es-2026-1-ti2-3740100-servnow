@@ -22,7 +22,7 @@ import com.servnow.backend.usuario.repository.UsuarioRepository;
 
 import jakarta.validation.Valid;
 
-@RestController
+@RestController("authControllerApi")
 @RequestMapping("/api/auth")
 public class AuthController {
 

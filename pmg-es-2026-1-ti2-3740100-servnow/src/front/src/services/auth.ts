@@ -131,6 +131,45 @@ export type SolicitacaoServicoCreateRequest = {
   horario?: string;
 };
 
+export type PropostaCreateRequest = {
+  solicitacaoId: number;
+  valor: number;
+  mensagem: string;
+};
+
+export type PropostaServicoResponse = {
+  id: number;
+  solicitacaoId: number;
+  solicitacaoTipoServico: string;
+  solicitacaoEndereco: string;
+  solicitacaoData: string | null;
+  solicitacaoHorario: string | null;
+  clienteId: number;
+  clienteNome: string;
+  prestadorId: number;
+  prestadorNome: string;
+  valor: number;
+  mensagem: string;
+  status: "PENDENTE" | "ACEITA" | "RECUSADA";
+  criadoEm: string;
+  respondidoEm: string | null;
+};
+
+export type PerfilPublicoResponse = {
+  id: number;
+  nome: string;
+  tipoUsuario: TipoUsuario;
+  bairro: string | null;
+  cidade: string | null;
+  estado: string | null;
+  fotoPerfilUrl: string | null;
+  descricao: string | null;
+  avaliacaoMedia: number | null;
+  totalAvaliacoes: number;
+  comentarioDestaque: string | null;
+  criadoEm: string | null;
+};
+
 const AUTH_STORAGE_KEY = "servnow.auth";
 export const API_URL = "http://localhost:8080";
 
@@ -210,4 +249,28 @@ export function getValidAuthSession() {
   }
 
   return { ...session, token };
+}
+
+export async function getResponseError(response: Response, fallback: string) {
+  try {
+    const data = (await response.json()) as { detail?: string; message?: string };
+    return data.detail || data.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function formatarDataIso(valor: string | null | undefined) {
+  if (!valor) {
+    return "Data nao informada";
+  }
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) {
+    return "Data nao informada";
+  }
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(data);
 }

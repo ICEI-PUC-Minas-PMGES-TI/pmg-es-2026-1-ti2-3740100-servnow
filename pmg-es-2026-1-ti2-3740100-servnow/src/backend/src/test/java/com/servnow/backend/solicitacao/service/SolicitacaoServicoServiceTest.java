@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
@@ -114,6 +117,81 @@ class SolicitacaoServicoServiceTest {
             );
 
         verify(solicitacaoRepository, never()).save(any(SolicitacaoServico.class));
+    }
+
+    @Test
+    void editarDoClienteAtualizaSolicitacaoERepublicaComoPublicada() {
+        Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
+        Usuario prestador = usuario(2L, "Prestador", "prestador@email.com", TipoUsuario.PRESTADOR);
+        SolicitacaoServico existente = solicitacao(cliente, "Hidraulica", "Arrumar pia");
+        existente.setPrestador(prestador);
+        existente.setStatus(StatusSolicitacao.AGENDADA);
+        existente.setAceitoEm(OffsetDateTime.now().minusDays(1));
+
+        SolicitacaoServicoCreateRequest request = request("Pintura", "Pintar quarto");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(10L)).thenReturn(Optional.of(existente));
+        when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        SolicitacaoServicoResponse response = solicitacaoService.editarDoCliente(10L, usuarioAutenticadoCliente(), request, null, false);
+
+        assertThat(existente.getTipoServico()).isEqualTo("PINTURA");
+        assertThat(existente.getDescricao()).isEqualTo("Pintar quarto");
+        assertThat(existente.getStatus()).isEqualTo(StatusSolicitacao.PUBLICADO);
+        assertThat(existente.getPrestador()).isNull();
+        assertThat(existente.getAceitoEm()).isNull();
+        assertThat(response.status()).isEqualTo("PUBLICADO");
+        verify(solicitacaoRepository).save(existente);
+    }
+
+    @Test
+    void excluirDoClienteRemoveSolicitacaoDoProprioCliente() {
+        Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
+        SolicitacaoServico existente = solicitacao(cliente, "Hidraulica", "Arrumar pia");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(10L)).thenReturn(Optional.of(existente));
+        when(solicitacaoRepository.deleteByIdAndClienteId(10L, 1L)).thenReturn(1L);
+
+        solicitacaoService.excluirDoCliente(10L, usuarioAutenticadoCliente());
+
+        verify(solicitacaoRepository, times(1)).deleteByIdAndClienteId(10L, 1L);
+    }
+
+    @Test
+    void excluirDoClienteRetornaNotFoundQuandoSolicitacaoNaoExiste() {
+        Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(404L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> solicitacaoService.excluirDoCliente(404L, usuarioAutenticadoCliente()))
+            .isInstanceOfSatisfying(ResponseStatusException.class, exception ->
+                assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
+            );
+
+        verify(solicitacaoRepository, never()).deleteByIdAndClienteId(any(Long.class), any(Long.class));
+    }
+
+    @Test
+    void editarDoClientePermiteTrocarImagem() {
+        Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
+        SolicitacaoServico existente = solicitacao(cliente, "Hidraulica", "Arrumar pia");
+        existente.setImagemArquivoRelativo("solicitacoes/antiga.jpg");
+
+        SolicitacaoServicoCreateRequest request = request("Pintura", "Pintar quarto");
+        MockMultipartFile imagemNova = new MockMultipartFile("imagem", "nova.jpg", "image/jpeg", "123".getBytes());
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(11L)).thenReturn(Optional.of(existente));
+        when(arquivoStorage.salvar(imagemNova)).thenReturn("solicitacoes/nova.jpg");
+        when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        SolicitacaoServicoResponse response = solicitacaoService.editarDoCliente(11L, usuarioAutenticadoCliente(), request, imagemNova, false);
+
+        assertThat(existente.getImagemArquivoRelativo()).isEqualTo("solicitacoes/nova.jpg");
+        assertThat(response.imagemUrl()).endsWith("/imagem");
+        verify(arquivoStorage).excluirSeExistir("solicitacoes/antiga.jpg");
     }
 
     private SolicitacaoServicoCreateRequest request(String tipoServico, String descricao) {
