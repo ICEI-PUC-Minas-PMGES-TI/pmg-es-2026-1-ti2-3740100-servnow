@@ -74,5 +74,5 @@ Os tipos de dados utilizados nas atividades são:
 
 | Comandos        | Destino                                 | Tipo    |
 |-----------------|-----------------------------------------|---------|
-| Salvar perfil   | Aguardar solicitações (fila do sistema) | default |
+| Salvar perfil   |  Painel do prestador                    | default |
 | Editar depois   | Painel do prestador                     | cancel  |
