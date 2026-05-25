@@ -53,11 +53,11 @@ Os tipos de dados utilizados nas atividades são:
 | **Campo** | **Tipo**       | **Restrições**           |
 | ---       | ---            | ---                      | 
 | E-mail    | Caixa de texto |formato de e-mail válido  |
-|   Senha   | Caixa de texto |mínimo de 8 caracteres    |                
+|  Senha   | Caixa de texto |mínimo de 8 caracteres    |                
 
 | **Comandos**     | **Destino**                  | **Tipo**  |
 | ---              | ---                          | ---       |
-| Entrar           | Autenticar (sistema)         | default   |
+| Entrar           | Painel                       | default   |
 | Esqueci a senha  | Processo de recuperação      | cancel    |
 
 ---
@@ -73,8 +73,8 @@ Os tipos de dados utilizados nas atividades são:
 
 | Comandos         | Destino                       | Tipo    |
 |------------------|-------------------------------|---------|
-| Salvar perfil    | Página inicial do cliente     | default |
-| Editar depois    | Painel do cliente             | cancel  |
+| Salvar perfil    | Painel do cliente              | default |
+|Cancelar          | Painel do cliente             | cancel  |
 
 
 
