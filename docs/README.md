@@ -6,8 +6,6 @@
 
 **Lucas Silva Borges, 1598846@sga.pucminas.br**
 
-**Marco Túlio Sales de Deus, 891847@sga.pcuminas.br**
-
 ---
 Professores:
 

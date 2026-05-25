@@ -1,15 +1,7 @@
 ### 3.3.1 Processo 1 – Gestão de Clientes
 
-Atualmente, não há uma plataforma centralizada que facilite essa interação, fazendo com que o cliente dependa de indicações informais ou contatos diretos, muitas vezes sem informações suficientes sobre o prestador. Isso gera insegurança, dificuldade na comunicação e falta de visibilidade sobre o andamento do serviço após a contratação.
-
-A oportunidade de melhoria está na implementação de uma jornada digital completa por meio da plataforma. Nela, o cliente poderá criar sua conta, autenticar-se com segurança e ter acesso a uma lista de prestadores disponíveis, com informações relevantes e avaliações.
-
-
 O processo de gestão de clientes envolve o cadastro e a autenticação do usuário na plataforma, etapas essenciais para garantir o acesso seguro às funcionalidades disponíveis. Por meio desse processo, o cliente consegue acessar seu painel, onde pode visualizar todos os serviços solicitados, acompanhar o status de cada atendimento e gerenciar suas interações dentro da plataforma.
 
-
-
-=======
 ![Processo 1](images/BPMN/Gestaoclientes.svg)
 
 
@@ -61,11 +53,11 @@ Os tipos de dados utilizados nas atividades são:
 | **Campo** | **Tipo**       | **Restrições**           |
 | ---       | ---            | ---                      | 
 | E-mail    | Caixa de texto |formato de e-mail válido  |
-|   Senha   | Caixa de texto |mínimo de 8 caracteres    |                
+|  Senha   | Caixa de texto |mínimo de 8 caracteres    |                
 
 | **Comandos**     | **Destino**                  | **Tipo**  |
 | ---              | ---                          | ---       |
-| Entrar           | Autenticar (sistema)         | default   |
+| Entrar           | Painel                       | default   |
 | Esqueci a senha  | Processo de recuperação      | cancel    |
 
 ---
@@ -81,8 +73,8 @@ Os tipos de dados utilizados nas atividades são:
 
 | Comandos         | Destino                       | Tipo    |
 |------------------|-------------------------------|---------|
-| Salvar perfil    | Página inicial do cliente     | default |
-| Editar depois    | Painel do cliente             | cancel  |
+| Salvar perfil    | Painel do cliente              | default |
+|Cancelar          | Painel do cliente             | cancel  |
 
 
 
