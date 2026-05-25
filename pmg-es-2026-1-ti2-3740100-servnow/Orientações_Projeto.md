@@ -14,8 +14,8 @@
 Logins para testes/desenvolvimento
 
 Perfil cliente
-Testecliente@gmail.com
-Testecliente  
+Testealeatorioe@gmail.com
+Testealeatorio@gmail.com
 
 Perfil prestador
 TestePrestador@gmail.com

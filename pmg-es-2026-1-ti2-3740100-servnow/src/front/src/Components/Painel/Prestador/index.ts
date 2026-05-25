@@ -1,0 +1,1 @@
+export { PainelPrestador } from "./PainelPrestador";

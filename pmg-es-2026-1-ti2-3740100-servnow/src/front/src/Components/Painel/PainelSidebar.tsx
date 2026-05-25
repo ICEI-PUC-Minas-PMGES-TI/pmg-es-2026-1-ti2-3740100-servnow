@@ -1,0 +1,56 @@
+import { Pencil } from "lucide-react";
+import type { ReactNode } from "react";
+
+type PainelSidebarProps = {
+  nomeUsuario: string;
+  papelLabel: string;
+  children: ReactNode;
+  onEditarConta: () => void;
+};
+
+function obterInicial(nome: string) {
+  const texto = nome.trim();
+  if (!texto) {
+    return "U";
+  }
+  return texto.charAt(0).toUpperCase();
+}
+
+export function PainelSidebar({
+  nomeUsuario,
+  papelLabel,
+  children,
+  onEditarConta,
+}: PainelSidebarProps) {
+  const nomeExibicao = nomeUsuario.trim() || "Usuario";
+
+  return (
+    <aside className="painel-sidebar">
+      <div className="painel-sidebar-welcome">
+        <div className="painel-sidebar-avatar" aria-hidden="true">
+          {obterInicial(nomeExibicao)}
+        </div>
+        <div className="painel-sidebar-welcome-text">
+          <span>Bem-vindo</span>
+          <strong title={nomeExibicao}>{nomeExibicao}</strong>
+          <small>{papelLabel}</small>
+        </div>
+      </div>
+
+      <div className="painel-sidebar-corpo">
+        <span className="painel-sidebar-titulo">Menu</span>
+        <nav className="painel-nav">{children}</nav>
+      </div>
+
+      <div className="painel-sidebar-rodape">
+        <button type="button" className="painel-nav-item" onClick={onEditarConta}>
+          <Pencil size={18} />
+          <span>Editar conta</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+export default PainelSidebar;
+

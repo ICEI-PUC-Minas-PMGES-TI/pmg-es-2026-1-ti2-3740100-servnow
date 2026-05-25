@@ -7,6 +7,10 @@ export type AuthResponse = {
   tipoUsuario: TipoUsuario;
   token: string;
   mensagem: string;
+  fotoPerfilUrl?: string | null;
+  fotoPerfilAjusteX?: number | null;
+  fotoPerfilAjusteY?: number | null;
+  fotoPerfilEnquadramento?: "cover" | "contain" | null;
 };
 
 export type CurrentUserResponse = {
@@ -21,15 +25,18 @@ export type CurrentUserResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
-  fotoPerfilBase64: string | null;
-  fotoBase64: string | null;
+  fotoPerfilUrl: string | null;
+  fotoPerfilAjusteX: number | null;
+  fotoPerfilAjusteY: number | null;
+  fotoPerfilEnquadramento: "cover" | "contain" | null;
+  fotoLocalUrl: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
   diasDisponiveis: string | null;
   horarioInicio: string | null;
   horarioFim: string | null;
   raioAtendimentoKm: number | null;
-  documentoIdentidadeBase64: string | null;
+  documentoIdentidadeUrl: string | null;
 };
 
 export type PerfilResponse = {
@@ -44,15 +51,18 @@ export type PerfilResponse = {
   bairro: string | null;
   cidade: string | null;
   estado: string | null;
-  fotoPerfilBase64: string | null;
-  fotoBase64: string | null;
+  fotoPerfilUrl: string | null;
+  fotoPerfilAjusteX: number | null;
+  fotoPerfilAjusteY: number | null;
+  fotoPerfilEnquadramento: "cover" | "contain" | null;
+  fotoLocalUrl: string | null;
   descricaoProfissional: string | null;
   especialidades: string | null;
   diasDisponiveis: string | null;
   horarioInicio: string | null;
   horarioFim: string | null;
   raioAtendimentoKm: number | null;
-  documentoIdentidadeBase64: string | null;
+  documentoIdentidadeUrl: string | null;
 };
 
 export type PerfilUpdateRequest = {
@@ -64,15 +74,18 @@ export type PerfilUpdateRequest = {
   bairro?: string;
   cidade?: string;
   estado?: string;
-  fotoPerfilBase64?: string;
-  fotoBase64?: string;
+  fotoPerfilAjusteX?: number;
+  fotoPerfilAjusteY?: number;
+  fotoPerfilEnquadramento?: "cover" | "contain";
+  removerFotoPerfil?: boolean;
+  removerFotoLocal?: boolean;
+  removerDocumentoIdentidade?: boolean;
   descricaoProfissional?: string;
   especialidades?: string;
   diasDisponiveis?: string;
   horarioInicio?: string;
   horarioFim?: string;
   raioAtendimentoKm?: number;
-  documentoIdentidadeBase64?: string;
 };
 
 export type SolicitacaoServicoResponse = {
@@ -82,27 +95,79 @@ export type SolicitacaoServicoResponse = {
   prestadorId: number | null;
   prestadorNome: string | null;
   endereco: string;
+  cep: string;
+  rua: string;
+  numero: string;
+  complemento: string | null;
+  bairro: string;
+  cidade: string;
+  estado: string;
   tipoServico: string;
+  iconeServico: string | null;
   faixaPreco: string;
   descricao: string;
-  data: string;
-  horario: string;
-  imagemBase64: string | null;
+  data: string | null;
+  horario: string | null;
+  /** Caminho da API para baixar a foto (requer Authorization). */
+  imagemUrl: string | null;
   status: string;
   criadoEm: string;
   aceitoEm: string | null;
 };
 
-export type NotificacaoResponse = {
-  id: number;
-  titulo: string;
-  mensagem: string;
-  lida: boolean;
-  criadoEm: string;
+export type SolicitacaoServicoCreateRequest = {
+  tipoServico: string;
+  iconeServico?: string;
+  faixaPreco: string;
+  descricao: string;
+  cep: string;
+  rua: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  data?: string;
+  horario?: string;
 };
 
-export type NotificacaoResumoResponse = {
-  quantidadeNaoLidas: number;
+export type PropostaCreateRequest = {
+  solicitacaoId: number;
+  valor: number;
+  mensagem: string;
+};
+
+export type PropostaServicoResponse = {
+  id: number;
+  solicitacaoId: number;
+  solicitacaoTipoServico: string;
+  solicitacaoEndereco: string;
+  solicitacaoData: string | null;
+  solicitacaoHorario: string | null;
+  clienteId: number;
+  clienteNome: string;
+  prestadorId: number;
+  prestadorNome: string;
+  valor: number;
+  mensagem: string;
+  status: "PENDENTE" | "ACEITA" | "RECUSADA";
+  criadoEm: string;
+  respondidoEm: string | null;
+};
+
+export type PerfilPublicoResponse = {
+  id: number;
+  nome: string;
+  tipoUsuario: TipoUsuario;
+  bairro: string | null;
+  cidade: string | null;
+  estado: string | null;
+  fotoPerfilUrl: string | null;
+  descricao: string | null;
+  avaliacaoMedia: number | null;
+  totalAvaliacoes: number;
+  comentarioDestaque: string | null;
+  criadoEm: string | null;
 };
 
 const AUTH_STORAGE_KEY = "servnow.auth";
@@ -126,10 +191,86 @@ export function getAuthSession(): AuthResponse | null {
   }
 }
 
+export function updateAuthSessionName(novoNome: string) {
+  const session = getAuthSession();
+  if (session) {
+    session.nome = novoNome;
+    saveAuthSession(session);
+  }
+}
+
 export function clearAuthSession() {
   localStorage.removeItem(AUTH_STORAGE_KEY);
 }
 
 export function getDashboardRoute(tipoUsuario: TipoUsuario) {
   return tipoUsuario === "CLIENTE" ? "/painel/cliente" : "/painel/prestador";
+}
+
+export function authHeader(token: string) {
+  const bearer = `Bearer ${token.trim()}`;
+  return { Authorization: bearer, "X-Authorization": bearer };
+}
+
+export function authHeaders(token: string, contentType?: string) {
+  const bearer = `Bearer ${token.trim()}`;
+  const headers = new Headers();
+
+  headers.set("Authorization", bearer);
+  headers.set("X-Authorization", bearer);
+
+  if (contentType) {
+    headers.set("Content-Type", contentType);
+  }
+
+  return headers;
+}
+
+export function tokenExpirado(token: string) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1] ?? "")) as { exp?: number };
+    if (!payload.exp) {
+      return false;
+    }
+
+    return payload.exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+}
+
+export function getValidAuthSession() {
+  const session = getAuthSession();
+  const token = session?.token?.trim();
+
+  if (!session || !token || tokenExpirado(token)) {
+    clearAuthSession();
+    return null;
+  }
+
+  return { ...session, token };
+}
+
+export async function getResponseError(response: Response, fallback: string) {
+  try {
+    const data = (await response.json()) as { detail?: string; message?: string };
+    return data.detail || data.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function formatarDataIso(valor: string | null | undefined) {
+  if (!valor) {
+    return "Data nao informada";
+  }
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) {
+    return "Data nao informada";
+  }
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(data);
 }

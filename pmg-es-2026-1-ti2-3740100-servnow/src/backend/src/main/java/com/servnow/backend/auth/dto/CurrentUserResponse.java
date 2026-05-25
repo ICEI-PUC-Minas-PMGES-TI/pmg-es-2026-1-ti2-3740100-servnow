@@ -12,14 +12,17 @@ public record CurrentUserResponse(
     String bairro,
     String cidade,
     String estado,
-    String fotoPerfilBase64,
-    String fotoBase64,
+    String fotoPerfilUrl,
+    Integer fotoPerfilAjusteX,
+    Integer fotoPerfilAjusteY,
+    String fotoPerfilEnquadramento,
+    String fotoLocalUrl,
     String descricaoProfissional,
     String especialidades,
     String diasDisponiveis,
     String horarioInicio,
     String horarioFim,
     Integer raioAtendimentoKm,
-    String documentoIdentidadeBase64
+    String documentoIdentidadeUrl
 ) {
 }

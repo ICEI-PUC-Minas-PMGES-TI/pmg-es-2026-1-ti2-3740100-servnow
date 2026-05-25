@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { Moon, Sun, UserCircle } from "lucide-react";
-import "./Header.css";
-import logo from "../../assets/logo2.png";
-import { Notificacoes } from "../Notificacoes/Notificacoes";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import logo from "../../assets/logo_ServNow.jpeg";
 import { getAuthSession, getDashboardRoute } from "../../services/auth";
 import { applyTheme, getNextTheme, getStoredTheme } from "../../services/theme";
+import "./Header.css";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -24,6 +23,7 @@ export function Header({
   const session = getAuthSession();
   const loggedIn = isLoggedIn || Boolean(session);
   const dashboardRoute = session ? getDashboardRoute(session.tipoUsuario) : "/login";
+  const profileRoute = session?.tipoUsuario === "CLIENTE" ? "/painel/cliente?secao=perfil" : "/perfil";
 
   function handleToggleTheme() {
     const nextTheme = getNextTheme(theme);
@@ -40,11 +40,11 @@ export function Header({
         </Link>
 
         <nav className="header-nav">
-          <Link to="/" className="nav-link">Inicio</Link>
+          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Início</NavLink>
           {loggedIn && (
             <>
-              <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <a href="#" className="nav-link">Acompanhamento</a>
+              <NavLink to={dashboardRoute} className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Painel</NavLink>
+              <NavLink to="/acompanhamento" className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Acompanhamento</NavLink>
             </>
           )}
         </nav>
@@ -65,13 +65,12 @@ export function Header({
               <button
                 type="button"
                 className="header-profile-icon"
-                aria-label="Configurar perfil"
-                title="Configurar perfil"
-                onClick={() => navigate("/perfil")}
+                aria-label="Meu perfil"
+                title="Meu perfil"
+                onClick={() => navigate(profileRoute)}
               >
                 <UserCircle size={24} />
               </button>
-              <Notificacoes />
               <button type="button" className="btn-logout" onClick={onLogout}>
                 Sair
               </button>
@@ -95,13 +94,12 @@ export function Header({
               <button
                 type="button"
                 className="header-profile-icon mobile-header-action"
-                aria-label="Configurar perfil"
-                title="Configurar perfil"
-                onClick={() => navigate("/perfil")}
+                aria-label="Meu perfil"
+                title="Meu perfil"
+                onClick={() => navigate(profileRoute)}
               >
                 <UserCircle size={21} />
               </button>
-              <Notificacoes />
             </>
           )}
         </div>
@@ -119,15 +117,27 @@ export function Header({
 
       {menuOpen && (
         <div className="header-mobile-menu">
-          <Link to="/" className="nav-link">Inicio</Link>
+          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Início</NavLink>
           {loggedIn && (
             <>
-              <Link to={dashboardRoute} className="nav-link">Painel</Link>
-              <a href="#" className="nav-link">Acompanhamento</a>
+              <NavLink to={dashboardRoute} className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Painel</NavLink>
+              <NavLink to="/acompanhamento" className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}>Acompanhamento</NavLink>
               <button type="button" className="nav-link mobile-logout-link" onClick={onLogout}>
                 Sair
               </button>
             </>
+          )}
+          {!loggedIn && (
+            <button
+              type="button"
+              className="nav-link mobile-login-link"
+              onClick={() => {
+                onLogin?.();
+                navigate("/login");
+              }}
+            >
+              Login
+            </button>
           )}
         </div>
       )}

@@ -1,307 +1,443 @@
 import {
-  Wrench, Zap, Paintbrush, Hammer, Droplet, Wind,
-  Search, CheckCircle, Star, Shield, Clock, TrendingUp,
-  ArrowRight, Users, Briefcase, ThumbsUp, MapPin,
+  ArrowRight,
+  BadgeCheck,
+  BriefcaseBusiness,
+  CheckCircle2,
+  Clock3,
+  Droplets,
+  Hammer,
+  MapPin,
+  Paintbrush,
+  PlugZap,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  TrendingUp,
+  UsersRound,
+  Wrench,
+  Wind,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
 
-import prestadorImg from "../../assets/prestador.svg";
-import fechandoAcordoImg from "../../assets/fechandoacordo.svg";
-import grafico from "../../assets/grafico.svg";
-import completo from "../../assets/completo.svg";
+import completoImg from "../../assets/completo.svg";
+import eletricistaImg from "../../assets/eletricista.svg";
+import clientesGlobaisImg from "../../assets/globalclientes.svg";
+import prestadorImg from "../../assets/prestador.jpg";
 import { getAuthSession } from "../../services/auth";
+
+type IconItem = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+};
+
+const categories: Array<IconItem & { signal: string }> = [
+  { icon: PlugZap, title: "Elétrica", description: "Instalações, reparos e vistorias residenciais.", signal: "8k+" },
+  { icon: Droplets, title: "Hidráulica", description: "Vazamentos, encanamentos e emergências.", signal: "4k+" },
+  { icon: Hammer, title: "Montagem", description: "Móveis planejados, ajustes e acabamentos.", signal: "+1k" },
+  { icon: Wrench, title: "Manutenção", description: "Pequenos reparos com orçamento transparente.", signal: "+3k" },
+  { icon: Paintbrush, title: "Pintura", description: "Paredes, textura, restauração e acabamento fino.", signal: "10k+" },
+  { icon: Wind, title: "Eletrodomésticos", description: "Instalação, diagnóstico e conserto técnico.", signal: "7k+" },
+];
+
+const stats = [
+  { icon: UsersRound, value: "12k+", label: "clientes atendidos" },
+  { icon: BriefcaseBusiness, value: "3.5k", label: "prestadores verificados" },
+  { icon: Star, value: "4.9/5", label: "média de avaliação" },
+  { icon: MapPin, value: "200+", label: "cidades cobertas" },
+];
+
+const steps: IconItem[] = [
+  {
+    icon: Search,
+    title: "Descreva a demanda",
+    description: "Escolha a categoria, detalhe o problema, informe seu endereço e publique o serviço.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "Compare profissionais",
+    description: "Veja disponibilidade, avaliações, experiência e proposta antes de confirmar.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Acompanhe até o fim",
+    description: "Receba atualizações do atendimento e avalie o serviço quando tudo estiver pronto.",
+  },
+];
+
+const platformBenefits: IconItem[] = [
+  {
+    icon: ShieldCheck,
+    title: "Confiança operacional",
+    description: "Perfis verificados, histórico de atendimentos e avaliações reais reduzem risco na contratação.",
+  },
+  {
+    icon: Clock3,
+    title: "Resposta rápida",
+    description: "Pedidos chegam para profissionais ativos na região, diminuindo o tempo entre busca e orçamento.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Crescimento previsível",
+    description: "Prestadores organizam agenda, recebem novas oportunidades e constroem reputação em um só lugar.",
+  },
+];
+
+const reviews = [
+  {
+    name: "Patrícia Oliveira",
+    role: "Cliente",
+    initials: "PO",
+    quote: "Encontrei um encanador para um vazamento urgente e consegui resolver no mesmo dia, sem ficar ligando para várias pessoas.",
+  },
+  {
+    name: "Rommel Silva",
+    role: "Eletricista",
+    initials: "RS",
+    quote: "A plataforma deixou meus pedidos mais organizados. Consigo responder clientes, combinar horários e acompanhar tudo com clareza.",
+  },
+  {
+    name: "Lucas Martins",
+    role: "Prestador",
+    initials: "LM",
+    quote: "O perfil com avaliações ajudou muito a passar confiança. Hoje fecho serviços maiores e tenho uma rotina mais previsível.",
+  },
+];
+
+function PrimaryCta({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link to={to} className="home-button home-button-primary">
+      {children}
+      <ArrowRight size={18} />
+    </Link>
+  );
+}
+
+function SectionIntro({
+  eyebrow,
+  title,
+  description,
+  align = "center",
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  align?: "center" | "left";
+}) {
+  return (
+    <div className={`home-section-intro home-section-intro-${align}`}>
+      <span className="home-eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+      {description && <p>{description}</p>}
+    </div>
+  );
+}
+
 export function Home() {
-  const isLoggedIn = Boolean(getAuthSession());
-  const categorias = [
-    { icon: Zap,        titulo: "Elétrica",           descricao: "Instalação e reparo elétrico" },
-    { icon: Droplet,    titulo: "Hidráulica",          descricao: "Encanamento e vazamentos" },
-    { icon: Hammer,     titulo: "Montagem de Móveis",  descricao: "Montadores profissionais" },
-    { icon: Wrench,     titulo: "Manutenção Geral",    descricao: "Reparos diversos" },
-    { icon: Paintbrush, titulo: "Pintura",             descricao: "Pintores especializados" },
-    { icon: Wind,       titulo: "Eletrodomésticos",    descricao: "Conserto e instalação" },
-  ];
-
-  const avaliacoes = [
-    {
-      nome: "Maria Silva",
-      comentario: "Atendimento incrível! O profissional chegou no horário e resolveu tudo em menos de uma hora.",
-      servico: "Elétrica",
-      estrelas: 5,
-      avatar: "https://st.depositphotos.com/1771835/2035/i/450/depositphotos_20355973-stock-photo-portrait-real-high-definition-grey.jpg"
-    },
-    {
-      nome: "João Santos",
-      comentario: "Muito prático e rápido. Encontrei um encanador excelente em minutos. Recomendo demais!",
-      servico: "Hidráulica",
-      estrelas: 5,
-      avatar: "https://img.freepik.com/fotos-premium/bracos-cruzados-moda-e-sorriso-com-retrato-de-homem-em-estudio-em-fundo-cinza-para-estilo-de-roupa-descontraido-casual-denim-e-feliz-com-pessoa-natural-em-roupas-roupa-para-modelo-jaqueta-ou-guarda-roupa_590464-382569.jpg"
-    },
-    {
-      nome: "Ana Costa",
-      comentario: "Profissionais qualificados e educados. Minha cadeira saiu como o esperado. Otimo serviço!",
-      servico: "Marcenaria",
-      estrelas: 5,
-      avatar: "https://s2-oglobo.glbimg.com/6Jszzah_XGYop6I173dS4OE4lGQ=/0x107:2362x1557/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2023/B/7/BTZjbdREKYomgDBUVfIQ/jenn-granneman-5.jpg"
-    },
-    {
-      nome: "Carlos Melo",
-      comentario: "Serviço de pintura impecável. Preço justo e resultado profissional.",
-      servico: "Pintura",
-      estrelas: 4,
-      avatar: "https://img.freepik.com/fotos-gratis/cara-alegre-aproveitando-a-pausa-para-o-cafe-ao-ar-livre_1262-20005.jpg"
-    },
-  ];
-
-
-  const stats = [
-    { icon: Users,     valor: "12.000+", label: "Clientes atendidos" },
-    { icon: Briefcase, valor: "3.500+",  label: "Prestadores cadastrados" },
-    { icon: ThumbsUp,  valor: "98%",     label: "Satisfação geral" },
-    { icon: MapPin,    valor: "200+",    label: "Cidades atendidas" },
-  ];
+  const session = getAuthSession();
+  const ctaRoute = session
+    ? session.tipoUsuario === "CLIENTE"
+      ? "/painel/cliente"
+      : "/painel/prestador"
+    : "/cadastro";
 
   return (
-    <div className="home">
+    <div className="home-shell">
+      <section className="home-hero" aria-labelledby="home-hero-title">
+        <div className="home-hero-bg" />
 
-      {/* HERO */}
-      <section className="hero">
-        <div className="hero-content">
-          <span className="hero-badge">Plataforma de serviços #1 do Brasil</span>
-          <h1>Serviços profissionais<br />na palma da sua mão</h1>
-          <p>Conectamos você aos melhores profissionais da sua região de forma rápida, segura e sem complicação.</p>
-          <div className="hero-buttons">
-            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-              <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
-            </Link>
-            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-              <button className="btn-outline">Sou prestador</button>
-            </Link>
-          </div>
-        </div>
+        <div className="home-container home-hero-grid">
+          <div className="home-hero-copy">
+            <span className="home-hero-kicker">
+              <Sparkles size={16} />
+             Saas para serviços locais
+            </span>
 
-        <div className="hero-image">
-          <img src={prestadorImg} alt="Prestador de serviço" />
-          <div className="hero-card-float card-1">
-            <CheckCircle size={18} className="icon-sky" />
-            <span>Profissional verificado</span>
-          </div>
-          <div className="hero-card-float card-2">
-            <Star size={18} className="icon-sky" />
-            <span>4.9 — Elétrica</span>
-          </div>
-          <div className="hero-card-float card-3">
-            <Clock size={18} className="icon-sky" />
-            <span>Resposta em minutos</span>
-          </div>
-        </div>
-      </section>
+            <h1 id="home-hero-title">
+          Tudo o que você precisa para contratar profissionais.
+            </h1>
 
-      {/* STATS */}
-      <section className="stats-bar">
-        {stats.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <div key={i} className="stat-item">
-              <Icon size={22} className="icon-sky" />
-              <strong>{s.valor}</strong>
-              <span>{s.label}</span>
+            <p>
+              A Servnow conecta clientes e prestadores em uma experiência simples,
+              segura e elegante, do orçamento ao atendimento concluído.
+            </p>
+
+            <div className="home-hero-actions">
+              <PrimaryCta to={ctaRoute}>Solicitar serviço</PrimaryCta>
+              <Link to={ctaRoute} className="home-button home-button-secondary">
+                Sou prestador
+              </Link>
             </div>
-          );
-        })}
-      </section>
 
-      {/* COMO FUNCIONA */}
-      <section className="section">
-        <div className="section-inner">
-          <p className="section-label">Simples e rápido</p>
-          <h2>Como funciona</h2>
-          <p className="section-sub">Em apenas 3 passos você tem o profissional ideal na sua porta</p>
-          <div className="steps">
-            <div className="step">
-              <div className="step-number">01</div>
-              <Search size={28} className="icon-sky" />
-              <h3>Busque o serviço</h3>
-              <p>Escolha a categoria do serviço que você precisa e sua localização.</p>
-            </div>
-            <div className="step-arrow"><ArrowRight size={20} /></div>
-            <div className="step">
-              <div className="step-number">02</div>
-              <CheckCircle size={28} className="icon-sky" />
-              <h3>Escolha o profissional</h3>
-              <p>Veja perfis, avaliações e preços. Escolha o que mais combina com você.</p>
-            </div>
-            <div className="step-arrow"><ArrowRight size={20} /></div>
-            <div className="step">
-              <div className="step-number">03</div>
-              <Star size={28} className="icon-sky" />
-              <h3>Avalie o serviço</h3>
-              <p>Após o atendimento, avalie o profissional e ajude a comunidade.</p>
+            <div className="home-hero-proof" aria-label="Indicadores da plataforma">
+              <div>
+                <strong>98%</strong>
+                <span>satisfação geral</span>
+              </div>
+              <div>
+                <strong>18 min</strong>
+                <span>tempo médio de resposta</span>
+              </div>
+              <div>
+                <strong>R$ 0</strong>
+                <span>para começar</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* CATEGORIAS */}
-      <section className="section section-alt">
-        <div className="section-inner">
-          <p className="section-label">O que você precisa?</p>
-          <h2>Categorias de serviço</h2>
-          <p className="section-sub">Profissionais especializados para cada tipo de necessidade</p>
-          <div className="categorias-grid">
-            {categorias.map((cat, i) => {
-              const Icon = cat.icon;
-              return (
-                <div key={i} className="categoria-card">
-                  <div className="categoria-icon">
-                    <Icon size={26} />
-                  </div>
-                  <h3>{cat.titulo}</h3>
-                  <p>{cat.descricao}</p>
-                  <span className="categoria-link">Ver profissionais <ArrowRight size={13} /></span>
+          <div className="home-product-stage" aria-label="Prévia do produto Servnow">
+            <div className="home-product-panel">
+              <div className="home-panel-topbar">
+                <span />
+                <span />
+                <span />
+              </div>
+
+              <div className="home-panel-header">
+                <div>
+                  <span>Solicitação ativa</span>
+                  <strong>Reparo elétrico</strong>
                 </div>
+                <span className="home-live-pill">ao vivo</span>
+              </div>
+
+              <div className="home-provider-card">
+                <img src={prestadorImg} alt="Prestador de serviço" />
+                <div>
+                  <strong>Marcos A.</strong>
+                  <span>Eletricista verificado</span>
+                  <div className="home-rating-row">
+                    <Star size={15} fill="currentColor" />
+                    4.9 · 327 serviços
+                  </div>
+                </div>
+              </div>
+
+              <div className="home-progress">
+                <div className="home-progress-line">
+                  <span />
+                </div>
+                <div className="home-progress-labels">
+                  <span>Pedido</span>
+                  <span>Orçamento</span>
+                  <span>Agendado</span>
+                </div>
+              </div>
+
+              <div className="home-panel-metrics">
+                <div>
+                  <span>Chegada</span>
+                  <strong>14:30</strong>
+                </div>
+                <div>
+                  <span>Faixa</span>
+                  <strong>R$ 120-180</strong>
+                </div>
+              </div>
+            </div>
+
+        
+          </div>
+        </div>
+      </section>
+
+      <section className="home-stats-band">
+        <div className="home-container home-stats-grid">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div className="home-stat" key={stat.label}>
+                <Icon size={21} />
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="home-section home-section-light">
+        <div className="home-container">
+          <SectionIntro
+            eyebrow="Como funciona"
+            title="Uma jornada clara e tracejada sem improviso."
+            description="A experiência foi estruturada para dar confiança antes, durante e depois do atendimento."
+          />
+
+          <div className="home-steps">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <article className="home-step" key={step.title}>
+                  <span className="home-step-index">{String(index + 1).padStart(2, "0")}</span>
+                  <div className="home-step-icon">
+                    <Icon size={24} />
+                  </div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </article>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* PARA CLIENTES */}
-      <section className="section split-section">
-        <div className="section-inner split-inner">
-          <div className="split-text">
-            <p className="section-label">Para clientes</p>
-            <h2>Resolva tudo sem sair de casa</h2>
-            <p>Nossa plataforma foi pensada para tornar sua vida mais fácil. Chega de ligar para vários profissionais, negociar preços às cegas ou contratar sem referências.</p>
-            <ul className="benefit-list">
-              <li><CheckCircle size={17} className="icon-sky" /> Profissionais verificados e avaliados</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Orçamentos transparentes e sem surpresas</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Agendamento online em minutos</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Suporte durante todo o atendimento</li>
-            </ul>
-            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-              <button className="btn-primary">Quero contratar <ArrowRight size={15} /></button>
-            </Link>
-          </div>
-          <div className="split-image">
-            <img src={fechandoAcordoImg} alt="Cliente fechando acordo com prestador" />
-          </div>
-        </div>
-      </section>
+      <section className="home-section home-section-muted">
+        <div className="home-container home-categories-layout">
+          <SectionIntro
+            eyebrow="Categorias"
+            title=" Categorias de serviços oferecidos."
+            description="Priorizamos profissionais ativos com disponibilidade real e sinais claros de confiança."
+            align="left"
+          />
 
-      {/* PARA PRESTADORES */}
-      <section className="section section-alt split-section">
-        <div className="section-inner split-inner reverse">
-          <div className="split-image">
-            <img src={grafico} alt="Grafico de ganhos" />
-          </div>
-          <div className="split-text">
-            <p className="section-label">Para prestadores</p>
-            <h2>Expanda seu negócio com a Servnow</h2>
-            <p>Cadastre-se gratuitamente e comece a receber solicitações de clientes na sua região. Sem mensalidade, sem complicação.</p>
-            <ul className="benefit-list">
-              <li><CheckCircle size={17} className="icon-sky" /> Cadastro gratuito e rápido</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Receba pedidos direto no celular</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Gerencie sua agenda com facilidade</li>
-              <li><CheckCircle size={17} className="icon-sky" /> Pagamento garantido pela plataforma</li>
-            </ul>
-            <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-              <button className="btn-primary">Quero me cadastrar <ArrowRight size={15} /></button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* BENEFÍCIOS */}
-      <section className="section">
-        <div className="section-inner">
-          <p className="section-label">Por que escolher a Servnow?</p>
-          <h2>Vantagens da plataforma</h2>
-          <div className="beneficios-grid">
-            <div className="beneficio-card">
-              <Shield size={30} className="icon-sky" />
-              <h3>Profissionais verificados</h3>
-              <p>Todos os prestadores passam por verificação de identidade e histórico antes de serem aceitos.</p>
-            </div>
-            <div className="beneficio-card">
-              <Clock size={30} className="icon-sky" />
-              <h3>Atendimento rápido</h3>
-              <p>Receba respostas em minutos. Nossa rede de profissionais está sempre disponível para você.</p>
-            </div>
-            <div className="beneficio-card">
-              <Star size={30} className="icon-sky" />
-              <h3>Avaliações reais</h3>
-              <p>Todas as avaliações são feitas por clientes reais após a conclusão do serviço.</p>
-            </div>
-            <div className="beneficio-card">
-              <TrendingUp size={30} className="icon-sky" />
-              <h3>Mais oportunidades</h3>
-              <p>Prestadores ampliam sua carteira de clientes sem custo adicional de marketing.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-     {/* AVALIAÇÕES */}
-      <section className="section section-alt">
-        <div className="section-inner">
-          <p className="section-label">Avaliações</p>
-          <h2>O que dizem nossos clientes</h2>
-
-          <div className="avaliacoes-grid">
-            {avaliacoes.map((a, i) => (
-              <div key={i} className="avaliacao-card">
-
-                <div className="avaliacao-estrelas">
-                  {Array.from({ length: a.estrelas }).map((_, j) => (
-                    <Star key={j} size={14} fill="#38bdf8" color="#38bdf8" />
-                  ))}
-                </div>
-
-                <p>"{a.comentario}"</p>
-
-                <div className="avaliacao-autor">
-
-                  {/* AVATAR COM IMAGEM */}
-                  <img
-                    src={a.avatar}
-                    alt={a.nome}
-                    className="avaliacao-avatar-img"
-                  />
-
-                  <div>
-                    <strong>{a.nome}</strong>
-                    <span>{a.servico}</span>
+          <div className="home-categories-list">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <Link to={ctaRoute} className="home-category-row" key={category.title}>
+                  <div className="home-category-icon">
+                    <Icon size={22} />
                   </div>
+                  <div>
+                    <h3>{category.title}</h3>
+                    <p>{category.description}</p>
+                  </div>
+                  <span>{category.signal}</span>
+                  <ArrowRight size={18} />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
+      <section className="home-section home-split-section">
+        <div className="home-container home-split-grid">
+          <div className="home-split-copy">
+            <SectionIntro
+              eyebrow="Para clientes"
+              title="Resolva serviços domésticos com facilidade."
+              align="left"
+            />
+            <p>
+              Compare profissionais sem pressa, acompanhe o andamento e mantenha
+              todos os detalhes importantes em um fluxo simples de entender.
+            </p>
+            <ul className="home-check-list">
+              <li><CheckCircle2 size={18} /> Profissionais verificados e avaliados</li>
+              <li><CheckCircle2 size={18} /> Orçamentos claros antes da contratação</li>
+              <li><CheckCircle2 size={18} /> Agendamento online e histórico do atendimento</li>
+            </ul>
+            <br />
+            <PrimaryCta to={ctaRoute}>Encontrar profissional</PrimaryCta>
+          </div>
+
+          <div className="home-visual-frame home-visual-frame-client">
+            <img src={clientesGlobaisImg} alt="Cliente fechando acordo com prestador" />
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section home-section-dark home-split-section">
+        <div className="home-container home-split-grid home-split-grid-reverse">
+          <div className="home-split-copy">
+            <SectionIntro
+              eyebrow="Para prestadores"
+              title="Transforme reputação em agenda cheia."
+              align="left"
+            />
+            <p>
+              Receba solicitações qualificadas, organize o contato com clientes
+              e construa uma vitrine profissional sem depender de indicação informal.
+            </p>
+            <ul className="home-check-list">
+              <li><CheckCircle2 size={18} /> Perfil com avaliações e especialidades</li>
+              <li><CheckCircle2 size={18} /> Pedidos por região e tipo de serviço</li>
+              <li><CheckCircle2 size={18} /> Rotina comercial mais previsível</li>
+            </ul>
+            <br/>
+
+            <PrimaryCta to={ctaRoute}>Criar perfil profissional</PrimaryCta>
+          </div>
+
+          <div className="home-visual-frame home-visual-frame-provider">
+            <img src={eletricistaImg} alt="Gráfico de crescimento de atendimentos" />
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section home-section-light">
+        <div className="home-container">
+          <SectionIntro
+            eyebrow="Vantagens"
+            title="A base de confiança que  Sass de serviços precisa."
+          />
+
+          <div className="home-benefits-grid">
+            {platformBenefits.map((benefit) => {
+              const Icon = benefit.icon;
+              return (
+                <article className="home-benefit" key={benefit.title}>
+                  <Icon size={26} />
+                  <h3>{benefit.title}</h3>
+                  <p>{benefit.description}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section home-reviews-section">
+        <div className="home-container">
+          <SectionIntro
+            eyebrow="Relatos"
+            title="Pessoas reais, rotinas mais simples."
+            description="A Servnow foi pensada para quem precisa resolver rápido e para quem quer trabalhar melhor."
+          />
+
+          <div className="home-reviews-grid">
+            {reviews.map((review) => (
+              <article className="home-review" key={review.name}>
+                <div className="home-review-header">
+                  <span>{review.initials}</span>
+                  <div>
+                    <h3>{review.name}</h3>
+                    <p>{review.role}</p>
+                  </div>
                 </div>
-              </div>
+                <p>{review.quote}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      
-
-      {/* CTA FINAL */}
-      <section className="cta-section">
-        <div className="cta-inner">
-          <img src={completo} alt="Sucesso" className="cta-image" />
-          <div className="cta-text">
-            <h2>Pronto para começar?</h2>
-            <p>Cadastre-se gratuitamente e encontre o profissional ideal hoje mesmo.</p>
-            <div className="hero-buttons">
-              <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-                <button className="btn-primary">Solicitar serviço <ArrowRight size={16} /></button>
-              </Link>
-              <Link to={isLoggedIn ? "#" : "/cadastro"} onClick={(event) => isLoggedIn && event.preventDefault()}>
-                <button className="btn-outline">Sou prestador</button>
+      <section className="home-final-cta">
+        <div className="home-container home-final-cta-inner">
+          <div>
+            <span className="home-eyebrow">Comece hoje</span>
+        <h2>A plataforma que conecta profissionais a clientes prontos para contratar.</h2>
+            <p>
+              Cadastre-se gratuitamente e encontre o profissional ideal ou comece
+              a receber novas oportunidades na sua região.
+            </p>
+            <div className="home-hero-actions">
+              <PrimaryCta to={ctaRoute}>Entrar na Servnow</PrimaryCta>
+              <Link to={ctaRoute} className="home-button home-button-secondary">
+                Ver oportunidades
               </Link>
             </div>
           </div>
+
+          <img src={completoImg} alt="Atendimento concluído com sucesso" />
         </div>
       </section>
-
     </div>
   );
 }

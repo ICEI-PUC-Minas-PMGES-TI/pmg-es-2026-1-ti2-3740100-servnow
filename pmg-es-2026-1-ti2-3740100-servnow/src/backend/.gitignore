@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Uploads ###
+data/servnow-uploads/
+
 ### Environment & Secrets ###
 .env
 .env.local

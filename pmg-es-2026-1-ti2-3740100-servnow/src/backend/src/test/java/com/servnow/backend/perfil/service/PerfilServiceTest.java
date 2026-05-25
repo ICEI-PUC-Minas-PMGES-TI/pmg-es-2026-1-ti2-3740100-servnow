@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -26,6 +27,9 @@ class PerfilServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private ArquivoStorage arquivoStorage;
 
     @InjectMocks
     private PerfilService perfilService;
@@ -76,13 +80,16 @@ class PerfilServiceTest {
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
         );
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(usuarioRepository.save(usuario)).thenReturn(usuario);
 
-        PerfilResponse response = perfilService.atualizarCliente(usuarioAutenticado(), request);
+        PerfilResponse response = perfilService.atualizarCliente(usuarioAutenticado(), request, null, null, null);
 
         assertThat(response.nome()).isEqualTo("Maria Silva");
         assertThat(response.rua()).isEqualTo("Rua A");
@@ -92,9 +99,8 @@ class PerfilServiceTest {
     }
 
     @Test
-    void atualizarPrestadorRecusaFotoMuitoGrande() {
+    void atualizarPrestadorExigeDocumentoQuandoNaoHaArquivoSalvo() {
         Usuario usuario = usuario(TipoUsuario.PRESTADOR);
-        String fotoMuitoGrande = "a".repeat(200001);
         PerfilUpdateRequest request = new PerfilUpdateRequest(
             null,
             null,
@@ -104,20 +110,23 @@ class PerfilServiceTest {
             null,
             null,
             null,
-            fotoMuitoGrande,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
             "SEGUNDA",
             "08:00",
             "17:00",
-            10,
-            "data:application/pdf;base64,abc"
+            10
         );
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        assertThatThrownBy(() -> perfilService.atualizarPrestador(usuarioAutenticado(), request))
+        assertThatThrownBy(() -> perfilService.atualizarPrestador(usuarioAutenticado(), request, null, null, null))
             .isInstanceOfSatisfying(ResponseStatusException.class, exception ->
                 assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST)
             );
