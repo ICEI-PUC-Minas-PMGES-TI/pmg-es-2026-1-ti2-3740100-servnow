@@ -1,7 +1,7 @@
 import type { SolicitacaoServicoResponse } from "../../../../services/auth";
 
 export type OportunidadeSolicitacao = SolicitacaoServicoResponse & {
-  distanciaKm: number;
+  distanciaKm: number | null;
   tipoFiltro: string;
   valorEstimado: number;
 };
@@ -23,14 +23,10 @@ const FAIXA_PARA_VALOR: Record<string, number> = {
   ACIMA_1000: 1200,
 };
 
-export function enriquecerSolicitacao(
-  item: SolicitacaoServicoResponse,
-  index: number,
-): OportunidadeSolicitacao {
-  const distancias = [1.8, 2.3, 3.0, 4.1, 5.5, 7.2, 9.0];
+export function enriquecerSolicitacao(item: SolicitacaoServicoResponse): OportunidadeSolicitacao {
   return {
     ...item,
-    distanciaKm: distancias[index % distancias.length],
+    distanciaKm: item.distanciaKm ?? null,
     tipoFiltro: TIPO_PARA_FILTRO[item.tipoServico] ?? "manutencao",
     valorEstimado: FAIXA_PARA_VALOR[item.faixaPreco] ?? 200,
   };
@@ -67,6 +63,7 @@ export function filtrarOportunidades(
     }
 
     if (opcoes.distancia) {
+      if (item.distanciaKm == null) return false;
       const dist = item.distanciaKm;
       if (opcoes.distancia === "0-2" && dist > 2) return false;
       if (opcoes.distancia === "2-5" && (dist < 2 || dist > 5)) return false;
@@ -76,6 +73,13 @@ export function filtrarOportunidades(
 
     return true;
   });
+}
+
+export function formatarDistancia(distanciaKm: number | null | undefined) {
+  if (distanciaKm == null || !Number.isFinite(distanciaKm)) {
+    return "Distancia indisponivel";
+  }
+  return `${distanciaKm.toFixed(1)} km`;
 }
 
 export function getFaixaPrecoLabel(faixaPreco: string) {

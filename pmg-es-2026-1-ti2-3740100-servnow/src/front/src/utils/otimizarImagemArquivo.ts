@@ -41,9 +41,7 @@ function nomeArquivoJpeg(nomeOriginal: string) {
   return `${base}.jpg`;
 }
 
-/**
- * Redimensiona e comprime a foto antes do envio (arquivo binario, sem base64 no JSON).
- */
+
 export async function otimizarImagemParaUpload(file: File) {
   const image = await carregarImagem(file);
   const scale = Math.min(1, LADO_MAXIMO_PX / Math.max(image.width, image.height));

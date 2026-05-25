@@ -24,6 +24,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.localizacao.DistanceService;
+import com.servnow.backend.localizacao.GeoCoordinates;
+import com.servnow.backend.localizacao.GeocodingService;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
@@ -46,6 +49,12 @@ class SolicitacaoServicoServiceTest {
     @Mock
     private ArquivoStorage arquivoStorage;
 
+    @Mock
+    private GeocodingService geocodingService;
+
+    @Mock
+    private DistanceService distanceService;
+
     @InjectMocks
     private SolicitacaoServicoService solicitacaoService;
 
@@ -55,6 +64,8 @@ class SolicitacaoServicoServiceTest {
         SolicitacaoServicoCreateRequest request = request("Eletrica", "Trocar tomada");
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(geocodingService.geocode(any(SolicitacaoServico.class)))
+            .thenReturn(Optional.of(new GeoCoordinates(-19.9167, -43.9345)));
         when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         SolicitacaoServicoResponse response = solicitacaoService.criar(usuarioAutenticadoCliente(), request, null);
@@ -69,7 +80,11 @@ class SolicitacaoServicoServiceTest {
         assertThat(solicitacaoSalva.getDescricao()).isEqualTo("Trocar tomada");
         assertThat(solicitacaoSalva.getStatus()).isEqualTo(StatusSolicitacao.PUBLICADO);
         assertThat(solicitacaoSalva.getEndereco()).isEqualTo("Rua A, 123, Apto 2 - Centro, Belo Horizonte - MG, CEP 30100-000");
+        assertThat(solicitacaoSalva.getLatitude()).isEqualTo(-19.9167);
+        assertThat(solicitacaoSalva.getLongitude()).isEqualTo(-43.9345);
         assertThat(response.clienteId()).isEqualTo(1L);
+        assertThat(response.latitude()).isEqualTo(-19.9167);
+        assertThat(response.longitude()).isEqualTo(-43.9345);
         assertThat(response.clienteNome()).isEqualTo("Cliente Solicitacao");
         assertThat(response.status()).isEqualTo("PUBLICADO");
     }
@@ -122,11 +137,8 @@ class SolicitacaoServicoServiceTest {
     @Test
     void editarDoClienteAtualizaSolicitacaoERepublicaComoPublicada() {
         Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
-        Usuario prestador = usuario(2L, "Prestador", "prestador@email.com", TipoUsuario.PRESTADOR);
         SolicitacaoServico existente = solicitacao(cliente, "Hidraulica", "Arrumar pia");
-        existente.setPrestador(prestador);
-        existente.setStatus(StatusSolicitacao.AGENDADA);
-        existente.setAceitoEm(OffsetDateTime.now().minusDays(1));
+        existente.setStatus(StatusSolicitacao.AGUARDANDO_PROPOSTAS);
 
         SolicitacaoServicoCreateRequest request = request("Pintura", "Pintar quarto");
 
@@ -143,6 +155,24 @@ class SolicitacaoServicoServiceTest {
         assertThat(existente.getAceitoEm()).isNull();
         assertThat(response.status()).isEqualTo("PUBLICADO");
         verify(solicitacaoRepository).save(existente);
+    }
+
+    @Test
+    void editarDoClienteRecusaSolicitacaoAgendada() {
+        Usuario cliente = usuario(1L, "Cliente Solicitacao", "cliente@email.com", TipoUsuario.CLIENTE);
+        SolicitacaoServico existente = solicitacao(cliente, "Hidraulica", "Arrumar pia");
+        existente.setStatus(StatusSolicitacao.AGENDADA);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(10L)).thenReturn(Optional.of(existente));
+
+        assertThatThrownBy(() -> solicitacaoService.editarDoCliente(10L, usuarioAutenticadoCliente(), request("Pintura", "Pintar quarto"), null, false))
+            .isInstanceOfSatisfying(ResponseStatusException.class, exception -> {
+                assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+                assertThat(exception.getReason()).isEqualTo("Nao e possivel editar uma solicitacao agendada.");
+            });
+
+        verify(solicitacaoRepository, never()).save(any(SolicitacaoServico.class));
     }
 
     @Test

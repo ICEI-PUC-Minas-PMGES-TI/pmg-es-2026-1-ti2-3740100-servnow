@@ -16,7 +16,7 @@ type Props = {
   onFechar: () => void;
   mostrarCliente?: boolean;
   mostrarPrestador?: boolean;
-  distanciaKm?: number;
+  distanciaKm?: number | null;
 };
 
 export function SolicitacaoDetalhesModal({
@@ -136,10 +136,14 @@ export function SolicitacaoDetalhesModal({
                 <dd>{solicitacao.horario}</dd>
               </div>
             )}
-            {distanciaKm != null && (
+            {distanciaKm !== undefined && (
               <div className="solicitacao-modal-linha">
                 <dt><MapPin size={14} /> Distancia</dt>
-                <dd>{distanciaKm.toFixed(1)} km</dd>
+                <dd>
+                  {distanciaKm != null && Number.isFinite(distanciaKm)
+                    ? `${distanciaKm.toFixed(1)} km`
+                    : "Indisponivel — confira seu endereco no perfil"}
+                </dd>
               </div>
             )}
             <div className="solicitacao-modal-linha solicitacao-modal-linha-full">

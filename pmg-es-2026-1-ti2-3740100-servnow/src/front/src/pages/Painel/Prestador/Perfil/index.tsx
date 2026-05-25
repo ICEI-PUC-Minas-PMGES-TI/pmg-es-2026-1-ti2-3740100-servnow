@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, MessageSquare, Star, User } from "lucide-react";
+import { CalendarDays, MapPin, MessageSquare, Star, User } from "lucide-react";
 
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
@@ -80,6 +80,10 @@ export function PerfilPrestador() {
     objectPosition: `${perfil?.fotoPerfilAjusteX ?? session?.fotoPerfilAjusteX ?? 50}% ${perfil?.fotoPerfilAjusteY ?? session?.fotoPerfilAjusteY ?? 50}%`,
   };
 
+  const enderecoResumo = perfil
+    ? [perfil.rua, perfil.numero, perfil.bairro, perfil.cidade, perfil.estado].filter(Boolean).join(", ")
+    : "";
+
   return (
     <>
       <PainelSectionHeader
@@ -89,19 +93,30 @@ export function PerfilPrestador() {
       />
 
       <section className="painel-perfil-grid">
-        <div className="painel-card painel-perfil-card">
-          <div className="painel-perfil-avatar">
-            {fotoPerfil ? (
-              <img src={fotoPerfil} alt={`Foto de perfil de ${nome}`} style={fotoPerfilStyle} />
-            ) : (
-              <User size={34} />
-            )}
+        <div className="painel-card painel-perfil-card painel-perfil-card-foto">
+          <div className="painel-perfil-avatar-wrap">
+            <div className="painel-perfil-avatar">
+              {fotoPerfil ? (
+                <img src={fotoPerfil} alt={`Foto de perfil de ${nome}`} style={fotoPerfilStyle} />
+              ) : (
+                <User size={48} strokeWidth={1.5} />
+              )}
+            </div>
           </div>
 
           <div className="painel-perfil-info">
-            <span>Prestador</span>
+            <span className="painel-perfil-papel">Prestador</span>
             <h2>{nome}</h2>
             <p>{email}</p>
+            {enderecoResumo ? (
+              <p className="painel-perfil-endereco">
+                <MapPin size={14} /> {enderecoResumo}
+              </p>
+            ) : (
+              <p className="painel-perfil-endereco painel-perfil-endereco--vazio">
+                Cadastre seu endereco em Configurar perfil para ver distancias nas solicitacoes.
+              </p>
+            )}
           </div>
         </div>
 

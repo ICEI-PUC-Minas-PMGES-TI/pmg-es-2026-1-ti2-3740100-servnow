@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.localizacao.DistanceService;
+import com.servnow.backend.localizacao.GeocodingService;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
@@ -26,15 +28,21 @@ public class SolicitacaoServicoService {
     private final SolicitacaoServicoRepository solicitacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
+    private final GeocodingService geocodingService;
+    private final DistanceService distanceService;
 
     public SolicitacaoServicoService(
         SolicitacaoServicoRepository solicitacaoRepository,
         UsuarioRepository usuarioRepository,
-        ArquivoStorage arquivoStorage
+        ArquivoStorage arquivoStorage,
+        GeocodingService geocodingService,
+        DistanceService distanceService
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
+        this.geocodingService = geocodingService;
+        this.distanceService = distanceService;
     }
 
     public SolicitacaoServicoResponse criar(
@@ -75,6 +83,12 @@ public class SolicitacaoServicoService {
         validarTipo(cliente, TipoUsuario.CLIENTE);
 
         SolicitacaoServico solicitacao = buscarSolicitacaoDoCliente(solicitacaoId, cliente.getId());
+        if (solicitacao.getStatus() == StatusSolicitacao.AGENDADA) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Nao e possivel editar uma solicitacao agendada."
+            );
+        }
         aplicarDadosSolicitacao(solicitacao, request);
         solicitacao.setPrestador(null);
         solicitacao.setAceitoEm(null);
@@ -122,14 +136,71 @@ public class SolicitacaoServicoService {
             .toList();
     }
 
+    @Transactional
     public List<SolicitacaoServicoResponse> listarParaPrestadores(UsuarioAutenticado usuarioAutenticado) {
         Usuario prestador = encontrarUsuario(usuarioAutenticado);
         validarTipo(prestador, TipoUsuario.PRESTADOR);
 
-        return solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO)
-            .stream()
-            .map(this::toResponse)
+        List<SolicitacaoServico> publicadas = solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO);
+        garantirCoordenadasPrestador(prestador);
+        preencherCoordenadasPendentes(publicadas);
+
+        return publicadas.stream()
+            .map(solicitacao -> toResponse(solicitacao, prestador))
             .toList();
+    }
+
+    private void garantirCoordenadasPrestador(Usuario prestador) {
+        if (prestador.getLatitude() != null && prestador.getLongitude() != null) {
+            return;
+        }
+        if (!temEnderecoCompleto(prestador)) {
+            return;
+        }
+        aplicarGeocodificacao(prestador);
+        if (prestador.getLatitude() != null && prestador.getLongitude() != null) {
+            usuarioRepository.save(prestador);
+        }
+    }
+
+    private boolean temEnderecoCompleto(Usuario usuario) {
+        return usuario.getRua() != null
+            && usuario.getNumero() != null
+            && usuario.getBairro() != null
+            && usuario.getCidade() != null
+            && usuario.getEstado() != null
+            && usuario.getCep() != null;
+    }
+
+    private void aplicarGeocodificacao(Usuario usuario) {
+        geocodingService.geocode(usuario).ifPresentOrElse(
+            coords -> {
+                usuario.setLatitude(coords.latitude());
+                usuario.setLongitude(coords.longitude());
+            },
+            () -> {
+                usuario.setLatitude(null);
+                usuario.setLongitude(null);
+            }
+        );
+    }
+
+    private void preencherCoordenadasPendentes(List<SolicitacaoServico> solicitacoes) {
+        int preenchidas = 0;
+        final int limitePorRequisicao = 5;
+        for (SolicitacaoServico solicitacao : solicitacoes) {
+            if (preenchidas >= limitePorRequisicao) {
+                break;
+            }
+            if (solicitacao.getLatitude() != null && solicitacao.getLongitude() != null) {
+                continue;
+            }
+            aplicarGeocodificacao(solicitacao);
+            if (solicitacao.getLatitude() != null && solicitacao.getLongitude() != null) {
+                solicitacaoRepository.save(solicitacao);
+                preenchidas++;
+            }
+        }
     }
 
     public List<SolicitacaoServicoResponse> listarAgendadasDoCliente(UsuarioAutenticado usuarioAutenticado) {
@@ -198,6 +269,20 @@ public class SolicitacaoServicoService {
         solicitacao.setEndereco(montarEndereco(solicitacao));
         solicitacao.setData(request.data());
         solicitacao.setHorario(normalizarTexto(request.horario()));
+        aplicarGeocodificacao(solicitacao);
+    }
+
+    private void aplicarGeocodificacao(SolicitacaoServico solicitacao) {
+        geocodingService.geocode(solicitacao).ifPresentOrElse(
+            coords -> {
+                solicitacao.setLatitude(coords.latitude());
+                solicitacao.setLongitude(coords.longitude());
+            },
+            () -> {
+                solicitacao.setLatitude(null);
+                solicitacao.setLongitude(null);
+            }
+        );
     }
 
     private Usuario encontrarUsuario(UsuarioAutenticado usuarioAutenticado) {
@@ -279,10 +364,24 @@ public class SolicitacaoServicoService {
     }
 
     private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao) {
+        return toResponse(solicitacao, null);
+    }
+
+    private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao, Usuario prestadorReferencia) {
         Usuario prestador = solicitacao.getPrestador();
         String imagemUrl = solicitacao.getImagemArquivoRelativo() == null
             ? null
             : "/api/solicitacoes/" + solicitacao.getId() + "/imagem";
+
+        Double distanciaKm = null;
+        if (prestadorReferencia != null) {
+            distanciaKm = distanceService.distanciaKm(
+                prestadorReferencia.getLatitude(),
+                prestadorReferencia.getLongitude(),
+                solicitacao.getLatitude(),
+                solicitacao.getLongitude()
+            );
+        }
 
         return new SolicitacaoServicoResponse(
             solicitacao.getId(),
@@ -307,7 +406,10 @@ public class SolicitacaoServicoService {
             imagemUrl,
             solicitacao.getStatus().name(),
             solicitacao.getCriadoEm(),
-            solicitacao.getAceitoEm()
+            solicitacao.getAceitoEm(),
+            solicitacao.getLatitude(),
+            solicitacao.getLongitude(),
+            distanciaKm
         );
     }
 }

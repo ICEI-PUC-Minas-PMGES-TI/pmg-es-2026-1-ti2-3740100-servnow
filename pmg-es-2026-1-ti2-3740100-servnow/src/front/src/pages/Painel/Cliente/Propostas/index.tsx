@@ -13,6 +13,7 @@ import {
   type PerfilPublicoResponse,
   type PropostaServicoResponse,
 } from "../../../../services/auth";
+import { dispararAtualizacaoNotificacoes } from "../../../../services/notificacoes";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 function tituloSolicitacao(proposta: PropostaServicoResponse) {
@@ -110,8 +111,13 @@ export function Propostas() {
         );
       }
 
-      toast.success(acao === "aceitar" ? "Proposta aceita. Servico agendado." : "Proposta recusada.");
+      toast.success(
+        acao === "aceitar"
+          ? "Proposta aceita. As demais propostas desta solicitacao foram canceladas."
+          : "Proposta recusada.",
+      );
       await carregar();
+      dispararAtualizacaoNotificacoes();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao responder proposta.");
     } finally {
@@ -154,7 +160,10 @@ export function Propostas() {
               const processando = acaoId === proposta.id;
 
               return (
-                <article className="painel-proposta-card" key={proposta.id}>
+                <article
+                  className={`painel-proposta-card ${proposta.status === "ACEITA" ? "painel-proposta-card-aceita" : ""}`}
+                  key={proposta.id}
+                >
                   <div className="painel-proposta-cabecalho">
                     <div>
                       <span className="painel-proposta-solicitacao">{tituloSolicitacao(proposta)}</span>
@@ -178,7 +187,14 @@ export function Propostas() {
                     <span className="painel-proposta-prestador">
                       <User size={14} />
                       Enviada em {formatarDataIso(proposta.criadoEm)}
-                      {!pendente && ` · ${proposta.status === "ACEITA" ? "Aceita" : "Recusada"}`}
+                      {!pendente &&
+                        ` · ${
+                          proposta.status === "ACEITA"
+                            ? "Aceita"
+                            : proposta.status === "CANCELADA"
+                              ? "Cancelada"
+                              : "Recusada"
+                        }`}
                     </span>
 
                     <strong className="painel-proposta-valor">

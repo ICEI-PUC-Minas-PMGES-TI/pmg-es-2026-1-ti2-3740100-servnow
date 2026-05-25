@@ -59,6 +59,10 @@ const ESTADOS_BR = [
   "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ];
 
+function podeEditarSolicitacao(status: string) {
+  return status !== "AGENDADA";
+}
+
 export function Solicitacoes() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState<FiltroSolicitacao>("todas");
@@ -123,6 +127,10 @@ export function Solicitacoes() {
   }, [editImagemPreviewUrl]);
 
   function abrirEdicao(item: SolicitacaoServicoResponse) {
+    if (!podeEditarSolicitacao(item.status)) {
+      toast.error("Nao e possivel editar uma solicitacao agendada.");
+      return;
+    }
     if (editImagemPreviewUrl) {
       URL.revokeObjectURL(editImagemPreviewUrl);
     }
@@ -192,6 +200,10 @@ export function Solicitacoes() {
 
   async function salvarEdicao() {
     if (!editando || !editForm) return;
+    if (!podeEditarSolicitacao(editando.status)) {
+      toast.error("Nao e possivel editar uma solicitacao agendada.");
+      return;
+    }
     const session = getValidAuthSession();
 
     if (!session?.token) {
@@ -366,9 +378,11 @@ export function Solicitacoes() {
                     <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
                       Ver detalhes
                     </button>
-                    <button type="button" className="painel-btn-ghost" onClick={() => abrirEdicao(item)}>
-                      Editar
-                    </button>
+                    {podeEditarSolicitacao(item.status) && (
+                      <button type="button" className="painel-btn-ghost" onClick={() => abrirEdicao(item)}>
+                        Editar
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="painel-btn-recusar"

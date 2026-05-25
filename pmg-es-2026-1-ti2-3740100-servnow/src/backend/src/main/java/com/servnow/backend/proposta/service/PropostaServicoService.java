@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.servnow.backend.notificacao.domain.TipoNotificacao;
+import com.servnow.backend.notificacao.service.NotificacaoService;
 import com.servnow.backend.proposta.domain.PropostaServico;
 import com.servnow.backend.proposta.domain.StatusProposta;
 import com.servnow.backend.proposta.dto.PropostaCreateRequest;
@@ -27,15 +29,18 @@ public class PropostaServicoService {
     private final PropostaServicoRepository propostaRepository;
     private final SolicitacaoServicoRepository solicitacaoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final NotificacaoService notificacaoService;
 
     public PropostaServicoService(
         PropostaServicoRepository propostaRepository,
         SolicitacaoServicoRepository solicitacaoRepository,
-        UsuarioRepository usuarioRepository
+        UsuarioRepository usuarioRepository,
+        NotificacaoService notificacaoService
     ) {
         this.propostaRepository = propostaRepository;
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     @Transactional
@@ -66,6 +71,16 @@ public class PropostaServicoService {
             solicitacao.setStatus(StatusSolicitacao.AGUARDANDO_PROPOSTAS);
             solicitacaoRepository.save(solicitacao);
         }
+
+        notificacaoService.criar(
+            solicitacao.getCliente(),
+            TipoNotificacao.NOVA_PROPOSTA,
+            "Nova proposta recebida",
+            prestador.getNome() + " enviou uma proposta para sua solicitacao de " + rotuloServico(solicitacao.getTipoServico()) + ".",
+            salva.getId(),
+            solicitacao.getId()
+        );
+
         return toResponse(salva);
     }
 
@@ -106,26 +121,55 @@ public class PropostaServicoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Solicitacao ja concluida.");
         }
 
-        List<PropostaServico> pendentesDaSolicitacao = propostaRepository
-            .findBySolicitacaoIdAndStatus(solicitacao.getId(), StatusProposta.PENDENTE);
         OffsetDateTime agora = OffsetDateTime.now();
-        for (PropostaServico item : pendentesDaSolicitacao) {
-            if (item.getId().equals(proposta.getId())) {
-                continue;
-            }
-            item.setStatus(StatusProposta.RECUSADA);
+        List<PropostaServico> outrasPendentes = propostaRepository
+            .findBySolicitacaoIdAndStatus(solicitacao.getId(), StatusProposta.PENDENTE)
+            .stream()
+            .filter(item -> !item.getId().equals(proposta.getId()))
+            .toList();
+
+        for (PropostaServico item : outrasPendentes) {
+            item.setStatus(StatusProposta.CANCELADA);
             item.setRespondidoEm(agora);
         }
 
         proposta.setStatus(StatusProposta.ACEITA);
         proposta.setRespondidoEm(agora);
-        propostaRepository.saveAll(pendentesDaSolicitacao);
+        propostaRepository.saveAll(outrasPendentes);
         propostaRepository.save(proposta);
 
         solicitacao.setPrestador(proposta.getPrestador());
         solicitacao.setStatus(StatusSolicitacao.AGENDADA);
         solicitacao.setAceitoEm(agora);
         solicitacaoRepository.save(solicitacao);
+
+        String servico = rotuloServico(solicitacao.getTipoServico());
+        notificacaoService.criar(
+            proposta.getPrestador(),
+            TipoNotificacao.SERVICO_AGENDADO,
+            "Servico agendado",
+            cliente.getNome() + " aceitou sua proposta. O servico de " + servico + " foi agendado.",
+            proposta.getId(),
+            solicitacao.getId()
+        );
+        notificacaoService.criar(
+            cliente,
+            TipoNotificacao.SERVICO_AGENDADO,
+            "Servico agendado",
+            "Voce aceitou a proposta de " + proposta.getPrestador().getNome() + ". O servico de " + servico + " esta agendado.",
+            proposta.getId(),
+            solicitacao.getId()
+        );
+        for (PropostaServico item : outrasPendentes) {
+            notificacaoService.criar(
+                item.getPrestador(),
+                TipoNotificacao.PROPOSTA_CANCELADA,
+                "Proposta cancelada",
+                "Outra proposta foi aceita para a solicitacao de " + servico + ". Sua proposta foi cancelada automaticamente.",
+                item.getId(),
+                solicitacao.getId()
+            );
+        }
 
         return toResponse(proposta);
     }
@@ -145,6 +189,17 @@ public class PropostaServicoService {
         proposta.setStatus(StatusProposta.RECUSADA);
         proposta.setRespondidoEm(OffsetDateTime.now());
         PropostaServico salva = propostaRepository.save(proposta);
+
+        SolicitacaoServico solicitacao = proposta.getSolicitacao();
+        notificacaoService.criar(
+            proposta.getPrestador(),
+            TipoNotificacao.PROPOSTA_RECUSADA,
+            "Proposta recusada",
+            cliente.getNome() + " recusou sua proposta para a solicitacao de " + rotuloServico(solicitacao.getTipoServico()) + ".",
+            salva.getId(),
+            solicitacao.getId()
+        );
+
         return toResponse(salva);
     }
 
@@ -160,6 +215,13 @@ public class PropostaServicoService {
         if (usuario.getTipoUsuario() != tipoEsperado) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acao nao permitida para este tipo de usuario.");
         }
+    }
+
+    private String rotuloServico(String tipoServico) {
+        if (tipoServico == null || tipoServico.isBlank()) {
+            return "servico";
+        }
+        return tipoServico.toLowerCase().replace('_', ' ');
     }
 
     private PropostaServicoResponse toResponse(PropostaServico proposta) {

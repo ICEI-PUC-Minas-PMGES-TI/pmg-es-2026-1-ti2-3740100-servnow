@@ -337,6 +337,10 @@ export function Perfil() {
       return;
     }
 
+    if (!validarEndereco(form)) {
+      return;
+    }
+
     if (session.tipoUsuario === "PRESTADOR" && !validarPerfilPrestador(form)) {
       return;
     }
@@ -361,6 +365,13 @@ export function Perfil() {
         }
       : {
           nome: form.nome.trim(),
+          rua: form.rua,
+          numero: form.numero,
+          cep: form.cep,
+          complemento: form.complemento,
+          bairro: form.bairro,
+          cidade: form.cidade,
+          estado: form.estado,
           fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
           fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
           fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
@@ -445,7 +456,7 @@ export function Perfil() {
             <p className="workspace-description">
               {isCliente
                 ? "Atualize seus dados e o endereco onde voce costuma solicitar servicos."
-                : "Mantenha seu perfil profissional atualizado para que mais clientes encontrem voce."}
+                : "Atualize seu perfil profissional e o endereco da sua base para calcular distancias ate as solicitacoes."}
             </p>
           </header>
 
@@ -595,6 +606,19 @@ async function getResponseError(response: Response, fallback: string) {
   } catch {
     return fallback;
   }
+}
+
+function validarEndereco(form: FormState) {
+  const cep = form.cep.replace(/\D/g, "");
+  if (cep.length !== 8) {
+    toast.error("Informe um CEP valido com 8 digitos.");
+    return false;
+  }
+  if (!form.rua.trim() || !form.numero.trim() || !form.bairro.trim() || !form.cidade.trim() || !form.estado.trim()) {
+    toast.error("Preencha rua, numero, bairro, cidade e estado.");
+    return false;
+  }
+  return true;
 }
 
 function validarPerfilPrestador(form: FormState) {

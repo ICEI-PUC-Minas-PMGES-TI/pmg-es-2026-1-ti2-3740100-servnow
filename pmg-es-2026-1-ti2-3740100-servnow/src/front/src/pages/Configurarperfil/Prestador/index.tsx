@@ -2,6 +2,7 @@ import type { ChangeEvent } from "react";
 import { Clock, FileText, MapPin } from "lucide-react";
 
 import type { FormState } from "../../../Components/Perfil";
+import { EnderecoPerfilSection } from "../../../Components/Perfil/EnderecoPerfilSection";
 
 const TIPOS_SERVICO = [
   { value: "ELETRICO", label: "Eletrico" },
@@ -41,6 +42,12 @@ export function PrestadorPerfil({
 }: PrestadorPerfilProps) {
   return (
     <>
+      <EnderecoPerfilSection
+        form={form}
+        updateField={updateField}
+        hint="Endereco da sua residencia ou base de atendimento, usado para calcular a distancia ate cada solicitacao."
+      />
+
       <section className="workspace-card workspace-section">
         <h2>Descricao profissional</h2>
         <p className="workspace-hint">Conte sobre sua experiencia e o que voce faz de melhor (ate 500 caracteres).</p>

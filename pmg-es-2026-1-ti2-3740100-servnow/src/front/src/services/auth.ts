@@ -108,11 +108,14 @@ export type SolicitacaoServicoResponse = {
   descricao: string;
   data: string | null;
   horario: string | null;
-  /** Caminho da API para baixar a foto (requer Authorization). */
+
   imagemUrl: string | null;
   status: string;
   criadoEm: string;
   aceitoEm: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  distanciaKm: number | null;
 };
 
 export type SolicitacaoServicoCreateRequest = {
@@ -150,7 +153,7 @@ export type PropostaServicoResponse = {
   prestadorNome: string;
   valor: number;
   mensagem: string;
-  status: "PENDENTE" | "ACEITA" | "RECUSADA";
+  status: "PENDENTE" | "ACEITA" | "RECUSADA" | "CANCELADA";
   criadoEm: string;
   respondidoEm: string | null;
 };

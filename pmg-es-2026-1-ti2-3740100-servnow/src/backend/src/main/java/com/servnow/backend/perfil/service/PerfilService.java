@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.localizacao.GeocodingService;
 import com.servnow.backend.perfil.dto.PerfilPublicoResponse;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
@@ -19,10 +20,16 @@ public class PerfilService {
 
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
+    private final GeocodingService geocodingService;
 
-    public PerfilService(UsuarioRepository usuarioRepository, ArquivoStorage arquivoStorage) {
+    public PerfilService(
+        UsuarioRepository usuarioRepository,
+        ArquivoStorage arquivoStorage,
+        GeocodingService geocodingService
+    ) {
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
+        this.geocodingService = geocodingService;
     }
 
     public PerfilResponse buscar(UsuarioAutenticado usuarioAutenticado) {
@@ -102,6 +109,8 @@ public class PerfilService {
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
         validarTipo(usuario, TipoUsuario.PRESTADOR);
         atualizarNome(usuario, request);
+        aplicarEndereco(usuario, request);
+        aplicarGeocodificacao(usuario);
         aplicarFotoPerfil(usuario, request, fotoPerfil);
         atualizarEnquadramentoFotoPerfil(usuario, request);
         usuario.setDescricaoProfissional(normalizarTextoLongo(request.descricaoProfissional()));
@@ -137,13 +146,7 @@ public class PerfilService {
         return usuario.getDocumentoIdentidadeArquivoRelativo();
     }
 
-    private void aplicarAtualizacaoComum(
-        Usuario usuario,
-        PerfilUpdateRequest request,
-        MultipartFile fotoPerfil,
-        MultipartFile fotoLocal
-    ) {
-        atualizarNome(usuario, request);
+    private void aplicarEndereco(Usuario usuario, PerfilUpdateRequest request) {
         usuario.setRua(normalizarTexto(request.rua()));
         usuario.setNumero(normalizarTexto(request.numero()));
         usuario.setCep(normalizarTexto(request.cep()));
@@ -151,6 +154,30 @@ public class PerfilService {
         usuario.setBairro(normalizarTexto(request.bairro()));
         usuario.setCidade(normalizarTexto(request.cidade()));
         usuario.setEstado(normalizarEstado(request.estado()));
+    }
+
+    private void aplicarGeocodificacao(Usuario usuario) {
+        geocodingService.geocode(usuario).ifPresentOrElse(
+            coords -> {
+                usuario.setLatitude(coords.latitude());
+                usuario.setLongitude(coords.longitude());
+            },
+            () -> {
+                usuario.setLatitude(null);
+                usuario.setLongitude(null);
+            }
+        );
+    }
+
+    private void aplicarAtualizacaoComum(
+        Usuario usuario,
+        PerfilUpdateRequest request,
+        MultipartFile fotoPerfil,
+        MultipartFile fotoLocal
+    ) {
+        atualizarNome(usuario, request);
+        aplicarEndereco(usuario, request);
+        aplicarGeocodificacao(usuario);
         aplicarFotoPerfil(usuario, request, fotoPerfil);
         atualizarEnquadramentoFotoPerfil(usuario, request);
         aplicarFotoLocal(usuario, request, fotoLocal);

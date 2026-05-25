@@ -14,17 +14,18 @@ import {
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 type StatusProposta = PropostaServicoResponse["status"];
+type FiltroProposta = StatusProposta | "todas" | "encerradas";
 
-const FILTROS: Array<{ id: StatusProposta | "todas"; label: string }> = [
+const FILTROS: Array<{ id: FiltroProposta; label: string }> = [
   { id: "todas", label: "Todas" },
   { id: "PENDENTE", label: "Pendentes" },
   { id: "ACEITA", label: "Aceitas" },
-  { id: "RECUSADA", label: "Recusadas" },
+  { id: "encerradas", label: "Encerradas" },
 ];
 
 function getStatusClass(status: StatusProposta) {
-  if (status === "ACEITA") return "agendado";
-  if (status === "RECUSADA") return "concluido";
+  if (status === "ACEITA") return "aceita";
+  if (status === "RECUSADA" || status === "CANCELADA") return "concluido";
   return "aguardando";
 }
 
@@ -33,6 +34,7 @@ function getStatusLabel(status: StatusProposta) {
     PENDENTE: "Pendente",
     ACEITA: "Aceita",
     RECUSADA: "Recusada",
+    CANCELADA: "Cancelada",
   };
   return labels[status];
 }
@@ -45,7 +47,7 @@ export function Propostas() {
   const navigate = useNavigate();
   const [propostas, setPropostas] = useState<PropostaServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filtro, setFiltro] = useState<StatusProposta | "todas">("todas");
+  const [filtro, setFiltro] = useState<FiltroProposta>("todas");
 
   const carregar = useCallback(async () => {
     const session = getValidAuthSession();
@@ -82,6 +84,9 @@ export function Propostas() {
 
   const lista = useMemo(() => {
     if (filtro === "todas") return propostas;
+    if (filtro === "encerradas") {
+      return propostas.filter((item) => item.status === "RECUSADA" || item.status === "CANCELADA");
+    }
     return propostas.filter((item) => item.status === filtro);
   }, [filtro, propostas]);
 
@@ -131,7 +136,10 @@ export function Propostas() {
         ) : (
           <div className="painel-lista">
             {lista.map((proposta) => (
-              <article key={proposta.id} className="painel-lista-item">
+              <article
+                key={proposta.id}
+                className={`painel-lista-item ${proposta.status === "ACEITA" ? "painel-lista-item-aceita" : ""}`}
+              >
                 <div className="painel-lista-item-info">
                   <p className="painel-lista-item-titulo">
                     <FileText size={18} style={{ marginRight: 8, verticalAlign: "text-bottom" }} />

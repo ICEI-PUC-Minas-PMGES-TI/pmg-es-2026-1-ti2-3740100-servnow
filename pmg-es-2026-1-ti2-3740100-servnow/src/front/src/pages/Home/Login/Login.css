@@ -213,7 +213,7 @@
   transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.toggle-btn.active {
+.login-page .toggle-btn.active {
   color: #ffffff;
   background: linear-gradient(135deg, #0d1117 0%, #1f2937 48%, #0f766e 100%);
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
@@ -347,7 +347,7 @@
   background: rgba(20, 184, 166, 0.1);
 }
 
-.btn-login {
+.login-page .btn-login {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -368,17 +368,17 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.btn-login:hover {
+.login-page .btn-login:hover {
   transform: translateY(-2px);
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.24);
   filter: brightness(1.04);
 }
 
-.btn-login:active {
+.login-page .btn-login:active {
   transform: translateY(0);
 }
 
-.btn-login:disabled {
+.login-page .btn-login:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
@@ -444,7 +444,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .login-img-placeholder img,
-  .btn-login,
+  .login-page .btn-login,
   .toggle-btn,
   .toggle-password {
     transition: none;

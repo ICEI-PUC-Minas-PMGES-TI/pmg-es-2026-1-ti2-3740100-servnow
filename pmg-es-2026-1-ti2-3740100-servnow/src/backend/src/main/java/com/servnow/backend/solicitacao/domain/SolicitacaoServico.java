@@ -92,6 +92,12 @@ public class SolicitacaoServico {
     @Column(name = "aceito_em")
     private OffsetDateTime aceitoEm;
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @PrePersist
     public void prePersist() {
         if (status == null) {
@@ -260,5 +266,21 @@ public class SolicitacaoServico {
 
     public void setAceitoEm(OffsetDateTime aceitoEm) {
         this.aceitoEm = aceitoEm;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

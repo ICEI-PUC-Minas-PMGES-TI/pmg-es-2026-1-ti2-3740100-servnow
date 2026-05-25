@@ -26,6 +26,9 @@ public record SolicitacaoServicoResponse(
     String imagemUrl,
     String status,
     OffsetDateTime criadoEm,
-    OffsetDateTime aceitoEm
+    OffsetDateTime aceitoEm,
+    Double latitude,
+    Double longitude,
+    Double distanciaKm
 ) {
 }

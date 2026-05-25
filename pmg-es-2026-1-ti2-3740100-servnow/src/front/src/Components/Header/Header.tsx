@@ -2,6 +2,7 @@ import { Moon, Sun, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo_ServNow.jpeg";
+import { NotificacoesMenu } from "../Notificacoes/NotificacoesMenu";
 import { getAuthSession, getDashboardRoute } from "../../services/auth";
 import { applyTheme, getNextTheme, getStoredTheme } from "../../services/theme";
 import "./Header.css";
@@ -62,6 +63,7 @@ export function Header({
 
           {loggedIn ? (
             <>
+              <NotificacoesMenu />
               <button
                 type="button"
                 className="header-profile-icon"
@@ -91,6 +93,7 @@ export function Header({
         <div className="mobile-header-actions">
           {loggedIn && (
             <>
+              <NotificacoesMenu />
               <button
                 type="button"
                 className="header-profile-icon mobile-header-action"

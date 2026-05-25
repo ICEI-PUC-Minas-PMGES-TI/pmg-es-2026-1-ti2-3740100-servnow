@@ -89,17 +89,19 @@ export function PerfilCliente() {
       />
 
       <section className="painel-perfil-grid">
-        <div className="painel-card painel-perfil-card">
-          <div className="painel-perfil-avatar">
-            {fotoPerfil ? (
-              <img src={fotoPerfil} alt={`Foto de perfil de ${nome}`} style={fotoPerfilStyle} />
-            ) : (
-              <User size={34} />
-            )}
+        <div className="painel-card painel-perfil-card painel-perfil-card-foto">
+          <div className="painel-perfil-avatar-wrap">
+            <div className="painel-perfil-avatar">
+              {fotoPerfil ? (
+                <img src={fotoPerfil} alt={`Foto de perfil de ${nome}`} style={fotoPerfilStyle} />
+              ) : (
+                <User size={48} strokeWidth={1.5} />
+              )}
+            </div>
           </div>
 
           <div className="painel-perfil-info">
-            <span>Cliente</span>
+            <span className="painel-perfil-papel">Cliente</span>
             <h2>{nome}</h2>
             <p>{email}</p>
           </div>

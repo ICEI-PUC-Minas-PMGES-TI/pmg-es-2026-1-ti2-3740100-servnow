@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Calendar, Clock3, FileText, MapPin, X } from "lucide-react";
+import { Calendar, Clock3, FileText, List, MapPin, X } from "lucide-react";
 
 import {
   API_URL,
@@ -14,13 +14,16 @@ import {
 } from "../../../../services/auth";
 import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
 import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
+import { MapaOportunidades } from "../../../../Components/Mapa/MapaOportunidades";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
+import { dispararAtualizacaoNotificacoes } from "../../../../services/notificacoes";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { useArquivoUrl } from "../../../../hooks/useArquivoUrl";
 import {
   enriquecerSolicitacao,
   filtrarOportunidades,
   formatarData,
+  formatarDistancia,
   getFaixaPrecoLabel,
   type OportunidadeSolicitacao,
 } from "../utils/filtrosSolicitacao";
@@ -40,6 +43,7 @@ export function Solicitacoes() {
   const [enviandoProposta, setEnviandoProposta] = useState(false);
   const [perfilCliente, setPerfilCliente] = useState<PerfilPublicoResponse | null>(null);
   const [carregandoPerfilCliente, setCarregandoPerfilCliente] = useState(false);
+  const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
   const { src: fotoPerfilClienteSrc } = useArquivoUrl(perfilCliente?.fotoPerfilUrl);
 
   function formatarMesAnoEntrada(valor: string | null | undefined) {
@@ -98,6 +102,18 @@ export function Solicitacoes() {
 
   const temFiltrosAtivos = Boolean(filtroTipo || filtroPreco || filtroDistancia || busca);
 
+  const semLocalizacaoNoMapa = useMemo(
+    () =>
+      lista.filter(
+        (item) =>
+          item.latitude == null ||
+          item.longitude == null ||
+          !Number.isFinite(item.latitude) ||
+          !Number.isFinite(item.longitude),
+      ).length,
+    [lista],
+  );
+
   function limparFiltros() {
     setFiltroTipo("");
     setFiltroPreco("");
@@ -105,15 +121,12 @@ export function Solicitacoes() {
     setBusca("");
   }
 
-  function verNoMapa() {
+  function abrirVisualizacaoMapa() {
     if (lista.length === 0) {
       toast.info("Nenhuma solicitacao para exibir no mapa.");
       return;
     }
-
-    const primeira = lista[0];
-    const endereco = encodeURIComponent(primeira.endereco || `${primeira.rua}, ${primeira.cidade}`);
-    window.open(`https://www.google.com/maps/search/?api=1&query=${endereco}`, "_blank", "noopener,noreferrer");
+    setVisualizacao("mapa");
   }
 
   async function abrirModalProposta(item: OportunidadeSolicitacao) {
@@ -189,8 +202,14 @@ export function Solicitacoes() {
         throw new Error(await getResponseError(response, "Nao foi possivel enviar a proposta."));
       }
 
+      const solicitacaoId = propostaAberta.id;
       toast.success("Proposta enviada com sucesso.");
       setPropostaAberta(null);
+      setSolicitacoes((atual) => atual.filter((item) => item.id !== solicitacaoId));
+      if (detalheAberto?.id === solicitacaoId) {
+        setDetalheAberto(null);
+      }
+      dispararAtualizacaoNotificacoes();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao enviar proposta.");
     } finally {
@@ -260,10 +279,24 @@ export function Solicitacoes() {
                 <option value="10+">Acima de 10 km</option>
               </select>
             </div>
-            <button type="button" className="painel-btn-mapa" onClick={verNoMapa}>
-              <MapPin size={16} />
-              Ver no mapa
-            </button>
+            <div className="painel-visualizacao-toggle" role="group" aria-label="Visualizacao">
+              <button
+                type="button"
+                className={visualizacao === "lista" ? "is-active" : ""}
+                onClick={() => setVisualizacao("lista")}
+              >
+                <List size={14} style={{ marginRight: 6, verticalAlign: "text-bottom" }} />
+                Lista
+              </button>
+              <button
+                type="button"
+                className={visualizacao === "mapa" ? "is-active" : ""}
+                onClick={abrirVisualizacaoMapa}
+              >
+                <MapPin size={14} style={{ marginRight: 6, verticalAlign: "text-bottom" }} />
+                Mapa
+              </button>
+            </div>
             {temFiltrosAtivos && (
               <button type="button" className="painel-btn-limpar" onClick={limparFiltros}>
                 <X size={16} />
@@ -276,6 +309,14 @@ export function Solicitacoes() {
           )}
         </div>
 
+        {visualizacao === "mapa" && !isLoading && lista.length > 0 && (
+          <MapaOportunidades
+            oportunidades={lista}
+            semLocalizacao={semLocalizacaoNoMapa}
+            onSelecionar={(item: OportunidadeSolicitacao) => setDetalheAberto(item)}
+          />
+        )}
+
         {isLoading ? (
           <div className="painel-vazio">
             <div className="painel-vazio-icone">
@@ -283,7 +324,14 @@ export function Solicitacoes() {
             </div>
             <p>Carregando solicitacoes...</p>
           </div>
-        ) : lista.length === 0 ? (
+        ) : visualizacao === "mapa" && lista.length === 0 ? (
+          <div className="painel-vazio">
+            <div className="painel-vazio-icone">
+              <MapPin size={32} />
+            </div>
+            <p>Nenhuma solicitacao encontrada para o mapa.</p>
+          </div>
+        ) : visualizacao === "mapa" ? null : lista.length === 0 ? (
           <div className="painel-vazio">
             <div className="painel-vazio-icone">
               <MapPin size={32} />
@@ -321,7 +369,7 @@ export function Solicitacoes() {
                       <span className="painel-lista-item-meta-detalhe">
                         <MapPin size={13} /> {item.endereco}
                       </span>
-                      <span className="painel-lista-item-meta-detalhe">{item.distanciaKm.toFixed(1)} km</span>
+                      <span className="painel-lista-item-meta-detalhe">{formatarDistancia(item.distanciaKm)}</span>
                       {item.data && (
                         <span className="painel-lista-item-meta-detalhe">
                           <Calendar size={13} /> {formatarData(item.data)}

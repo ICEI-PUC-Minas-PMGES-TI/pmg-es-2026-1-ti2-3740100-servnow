@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.localizacao.GeocodingService;
 import com.servnow.backend.perfil.dto.PerfilResponse;
 import com.servnow.backend.perfil.dto.PerfilUpdateRequest;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -30,6 +31,9 @@ class PerfilServiceTest {
 
     @Mock
     private ArquivoStorage arquivoStorage;
+
+    @Mock
+    private GeocodingService geocodingService;
 
     @InjectMocks
     private PerfilService perfilService;
