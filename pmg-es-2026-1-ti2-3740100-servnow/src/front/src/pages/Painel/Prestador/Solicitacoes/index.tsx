@@ -7,18 +7,19 @@ import {
   API_URL,
   authHeader,
   authHeaders,
+  buscarPerfilPublico,
   getValidAuthSession,
   type PerfilPublicoResponse,
   type PropostaCreateRequest,
   type SolicitacaoServicoResponse,
 } from "../../../../services/auth";
+import { PerfilPublicoConteudo } from "../../../../Components/Perfil/PerfilPublicoModal";
 import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
 import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
 import { MapaOportunidades } from "../../../../Components/Mapa/MapaOportunidades";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { dispararAtualizacaoNotificacoes } from "../../../../services/notificacoes";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
-import { useArquivoUrl } from "../../../../hooks/useArquivoUrl";
 import {
   enriquecerSolicitacao,
   filtrarOportunidades,
@@ -44,15 +45,6 @@ export function Solicitacoes() {
   const [perfilCliente, setPerfilCliente] = useState<PerfilPublicoResponse | null>(null);
   const [carregandoPerfilCliente, setCarregandoPerfilCliente] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
-  const { src: fotoPerfilClienteSrc } = useArquivoUrl(perfilCliente?.fotoPerfilUrl);
-
-  function formatarMesAnoEntrada(valor: string | null | undefined) {
-    if (!valor) return "Data de entrada nao informada";
-    const data = new Date(valor);
-    if (Number.isNaN(data.getTime())) return "Data de entrada nao informada";
-    return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(data);
-  }
-
   useEffect(() => {
     async function carregarSolicitacoes() {
       const session = getValidAuthSession();
@@ -141,11 +133,9 @@ export function Solicitacoes() {
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/api/perfil/publico/${item.clienteId}`, {
-        headers: authHeader(session.token),
-      });
-      if (response.ok) {
-        setPerfilCliente((await response.json()) as PerfilPublicoResponse);
+      const perfil = await buscarPerfilPublico(item.clienteId, session.token);
+      if (perfil) {
+        setPerfilCliente(perfil);
       }
     } catch {
       // Perfil publico e opcional na tela de proposta.
@@ -416,40 +406,7 @@ export function Solicitacoes() {
             <div className="solicitacao-modal-corpo">
               <section className="painel-card" style={{ padding: 14, marginBottom: 10 }}>
                 <h4 style={{ marginTop: 0, marginBottom: 10 }}>Perfil do cliente</h4>
-                {carregandoPerfilCliente ? (
-                  <p style={{ margin: 0, color: "var(--workspace-muted)" }}>Carregando perfil...</p>
-                ) : perfilCliente ? (
-                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                    {fotoPerfilClienteSrc ? (
-                      <img
-                        src={fotoPerfilClienteSrc}
-                        alt={`Foto de ${perfilCliente.nome}`}
-                        style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <div className="painel-conta-avatar" style={{ width: 56, height: 56 }}>
-                        {perfilCliente.nome.slice(0, 1).toUpperCase()}
-                      </div>
-                    )}
-                    <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: 0, fontWeight: 700 }}>{perfilCliente.nome}</p>
-                      <p style={{ margin: "2px 0", color: "var(--workspace-muted)" }}>
-                        {[perfilCliente.bairro, perfilCliente.cidade, perfilCliente.estado].filter(Boolean).join(" - ") || "Localizacao nao informada"}
-                      </p>
-                      <p style={{ margin: "6px 0 0", color: "var(--workspace-muted)" }}>
-                        Avaliacao: {perfilCliente.avaliacaoMedia != null ? perfilCliente.avaliacaoMedia.toFixed(1) : "Usuario sem avaliacoes na plataforma"}
-                      </p>
-                      <p style={{ margin: "4px 0 0", color: "var(--workspace-muted)" }}>
-                        Comentario: {perfilCliente.comentarioDestaque ?? "Disponivel apos finalizacao de servicos"}
-                      </p>
-                      <p style={{ margin: "4px 0 0", color: "var(--workspace-muted)" }}>
-                        Entrou na plataforma em: {formatarMesAnoEntrada(perfilCliente.criadoEm)}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <p style={{ margin: 0, color: "var(--workspace-muted)" }}>Perfil indisponivel no momento.</p>
-                )}
+                <PerfilPublicoConteudo perfil={perfilCliente} carregando={carregandoPerfilCliente} />
               </section>
               <div className="painel-form-grid">
                 <label className="form-field">

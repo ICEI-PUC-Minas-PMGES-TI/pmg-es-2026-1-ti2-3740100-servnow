@@ -141,6 +141,7 @@ public class PropostaServicoService {
         solicitacao.setPrestador(proposta.getPrestador());
         solicitacao.setStatus(StatusSolicitacao.AGENDADA);
         solicitacao.setAceitoEm(agora);
+        solicitacao.setValorAceito(proposta.getValorProposto());
         solicitacaoRepository.save(solicitacao);
 
         String servico = rotuloServico(solicitacao.getTipoServico());

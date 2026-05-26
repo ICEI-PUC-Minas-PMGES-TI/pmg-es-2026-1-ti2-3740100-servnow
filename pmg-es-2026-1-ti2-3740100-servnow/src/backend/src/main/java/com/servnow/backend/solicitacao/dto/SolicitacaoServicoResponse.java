@@ -1,5 +1,6 @@
 package com.servnow.backend.solicitacao.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -29,6 +30,7 @@ public record SolicitacaoServicoResponse(
     OffsetDateTime aceitoEm,
     Double latitude,
     Double longitude,
-    Double distanciaKm
+    Double distanciaKm,
+    BigDecimal valorAceito
 ) {
 }

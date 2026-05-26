@@ -412,8 +412,11 @@
 
 .painel-status {
   gap: 6px;
-  padding: 5px 12px;
-  font-weight: 600;
+  padding: 6px 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .painel-status.aguardando,
@@ -421,6 +424,25 @@
 .painel-proposta-avaliacao {
   background: rgba(250, 204, 21, 0.16);
   color: #b45309;
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+.painel-status.aceita {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.12));
+  color: #15803d;
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.painel-status.recusada {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.1));
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.painel-status.cancelada {
+  background: rgba(148, 163, 184, 0.16);
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 .painel-status.concluido,
@@ -432,6 +454,7 @@
 .painel-status.agendado {
   background: rgba(56, 189, 248, 0.16);
   color: var(--brand-strong);
+  border-color: rgba(56, 189, 248, 0.35);
 }
 
 .painel-btn-ghost {
@@ -585,9 +608,48 @@
   border-radius: 16px;
 }
 
+.painel-proposta-card-aceita {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), var(--workspace-item-bg));
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.12);
+}
+
+.painel-proposta-card-recusada {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.06), var(--workspace-item-bg));
+}
+
+.painel-proposta-card-cancelada {
+  border-color: rgba(148, 163, 184, 0.4);
+  opacity: 0.92;
+}
+
+.painel-lista-item-aceita {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), var(--workspace-item-bg));
+}
+
+.painel-lista-item-recusada {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.06), var(--workspace-item-bg));
+}
+
+.painel-lista-item-cancelada {
+  border-color: rgba(148, 163, 184, 0.4);
+  opacity: 0.92;
+}
+
 .painel-proposta-cabecalho {
   align-items: flex-start;
   justify-content: space-between;
+}
+
+.painel-proposta-cabecalho-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .painel-proposta-solicitacao {
@@ -691,9 +753,18 @@
   color: #fde68a;
 }
 
+:root[data-theme="dark"] .painel-status.aceita,
 :root[data-theme="dark"] .painel-status.concluido,
 :root[data-theme="dark"] .painel-btn-aceitar {
-  color: #bbf7d0;
+  color: #86efac;
+}
+
+:root[data-theme="dark"] .painel-status.recusada {
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .painel-status.cancelada {
+  color: #cbd5e1;
 }
 
 :root[data-theme="dark"] .painel-btn-recusar {
@@ -1491,7 +1562,6 @@
   cursor: pointer;
 }
 
-.painel-btn-mapa,
 .painel-btn-limpar {
   display: inline-flex;
   align-items: center;
@@ -1499,27 +1569,14 @@
   height: 40px;
   padding: 0 14px;
   border-radius: 12px;
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface-soft);
+  color: var(--workspace-muted);
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.18s, color 0.18s, border-color 0.18s;
-}
-
-.painel-btn-mapa {
-  border: 1px solid rgba(56, 189, 248, 0.45);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(20, 184, 166, 0.08));
-  color: var(--brand-strong);
-}
-
-.painel-btn-mapa:hover {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(20, 184, 166, 0.14));
-}
-
-.painel-btn-limpar {
-  border: 1px solid var(--workspace-border);
-  background: var(--workspace-surface-soft);
-  color: var(--workspace-muted);
 }
 
 .painel-btn-limpar:hover {

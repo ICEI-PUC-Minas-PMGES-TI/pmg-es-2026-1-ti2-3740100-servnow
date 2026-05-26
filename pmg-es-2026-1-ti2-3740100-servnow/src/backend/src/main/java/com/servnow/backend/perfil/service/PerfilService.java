@@ -45,7 +45,7 @@ public class PerfilService {
     public PerfilResponse buscarPrestador(UsuarioAutenticado usuarioAutenticado) {
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
         validarTipo(usuario, TipoUsuario.PRESTADOR);
-        return toResponse(usuario);
+        return toResponse(garantirCoordenadasSePossivel(usuario));
     }
 
     public PerfilPublicoResponse buscarPublico(Long usuarioId, UsuarioAutenticado usuarioAutenticado) {
@@ -55,6 +55,7 @@ public class PerfilService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado."));
 
+        boolean prestador = usuario.getTipoUsuario() == TipoUsuario.PRESTADOR;
         return new PerfilPublicoResponse(
             usuario.getId(),
             usuario.getNome(),
@@ -64,6 +65,11 @@ public class PerfilService {
             usuario.getEstado(),
             urlFotoPerfilPublica(usuario),
             usuario.getDescricaoProfissional(),
+            prestador ? usuario.getEspecialidades() : null,
+            prestador ? usuario.getDiasDisponiveis() : null,
+            prestador ? usuario.getHorarioInicio() : null,
+            prestador ? usuario.getHorarioFim() : null,
+            prestador ? usuario.getRaioAtendimentoKm() : null,
             null,
             0,
             null,
@@ -157,16 +163,33 @@ public class PerfilService {
     }
 
     private void aplicarGeocodificacao(Usuario usuario) {
-        geocodingService.geocode(usuario).ifPresentOrElse(
-            coords -> {
-                usuario.setLatitude(coords.latitude());
-                usuario.setLongitude(coords.longitude());
-            },
-            () -> {
-                usuario.setLatitude(null);
-                usuario.setLongitude(null);
-            }
-        );
+        geocodingService.geocode(usuario).ifPresent(coords -> {
+            usuario.setLatitude(coords.latitude());
+            usuario.setLongitude(coords.longitude());
+        });
+    }
+
+    private Usuario garantirCoordenadasSePossivel(Usuario usuario) {
+        if (usuario.getLatitude() != null && usuario.getLongitude() != null) {
+            return usuario;
+        }
+        if (!temEnderecoCompleto(usuario)) {
+            return usuario;
+        }
+        aplicarGeocodificacao(usuario);
+        if (usuario.getLatitude() != null && usuario.getLongitude() != null) {
+            return usuarioRepository.save(usuario);
+        }
+        return usuario;
+    }
+
+    private boolean temEnderecoCompleto(Usuario usuario) {
+        return usuario.getRua() != null
+            && usuario.getNumero() != null
+            && usuario.getBairro() != null
+            && usuario.getCidade() != null
+            && usuario.getEstado() != null
+            && usuario.getCep() != null;
     }
 
     private void aplicarAtualizacaoComum(

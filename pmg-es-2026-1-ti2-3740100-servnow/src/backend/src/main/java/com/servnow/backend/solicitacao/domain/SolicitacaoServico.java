@@ -1,5 +1,6 @@
 package com.servnow.backend.solicitacao.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -97,6 +98,9 @@ public class SolicitacaoServico {
 
     @Column
     private Double longitude;
+
+    @Column(name = "valor_aceito", precision = 10, scale = 2)
+    private BigDecimal valorAceito;
 
     @PrePersist
     public void prePersist() {
@@ -282,5 +286,13 @@ public class SolicitacaoServico {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public BigDecimal getValorAceito() {
+        return valorAceito;
+    }
+
+    public void setValorAceito(BigDecimal valorAceito) {
+        this.valorAceito = valorAceito;
     }
 }

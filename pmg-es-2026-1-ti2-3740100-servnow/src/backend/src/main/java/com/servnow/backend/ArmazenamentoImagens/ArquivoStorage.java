@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ArquivoStorage {
 
     public static final String PASTA_SOLICITACOES = "solicitacoes";
+    public static final String PASTA_ACOMPANHAMENTO = "acompanhamento";
     public static final String PASTA_PERFIL = "usuarios/perfil";
     public static final String PASTA_FOTO_LOCAL = "usuarios/fotos";
     public static final String PASTA_DOCUMENTOS = "usuarios/documentos";

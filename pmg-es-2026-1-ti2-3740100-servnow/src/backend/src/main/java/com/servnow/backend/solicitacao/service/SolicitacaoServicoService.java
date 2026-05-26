@@ -92,6 +92,7 @@ public class SolicitacaoServicoService {
         aplicarDadosSolicitacao(solicitacao, request);
         solicitacao.setPrestador(null);
         solicitacao.setAceitoEm(null);
+        solicitacao.setValorAceito(null);
         solicitacao.setStatus(StatusSolicitacao.PUBLICADO);
         if (imagem != null && !imagem.isEmpty()) {
             String imagemAnterior = solicitacao.getImagemArquivoRelativo();
@@ -141,9 +142,10 @@ public class SolicitacaoServicoService {
         Usuario prestador = encontrarUsuario(usuarioAutenticado);
         validarTipo(prestador, TipoUsuario.PRESTADOR);
 
-        List<SolicitacaoServico> publicadas = solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO);
+        List<SolicitacaoServico> publicadas =
+            solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO);
         garantirCoordenadasPrestador(prestador);
-        preencherCoordenadasPendentes(publicadas);
+        preencherCoordenadasPendentes(publicadas, 2);
 
         return publicadas.stream()
             .map(solicitacao -> toResponse(solicitacao, prestador))
@@ -173,26 +175,22 @@ public class SolicitacaoServicoService {
     }
 
     private void aplicarGeocodificacao(Usuario usuario) {
-        geocodingService.geocode(usuario).ifPresentOrElse(
-            coords -> {
-                usuario.setLatitude(coords.latitude());
-                usuario.setLongitude(coords.longitude());
-            },
-            () -> {
-                usuario.setLatitude(null);
-                usuario.setLongitude(null);
-            }
-        );
+        geocodingService.geocode(usuario).ifPresent(coords -> {
+            usuario.setLatitude(coords.latitude());
+            usuario.setLongitude(coords.longitude());
+        });
     }
 
-    private void preencherCoordenadasPendentes(List<SolicitacaoServico> solicitacoes) {
+    private void preencherCoordenadasPendentes(List<SolicitacaoServico> solicitacoes, int limitePorRequisicao) {
         int preenchidas = 0;
-        final int limitePorRequisicao = 5;
         for (SolicitacaoServico solicitacao : solicitacoes) {
             if (preenchidas >= limitePorRequisicao) {
                 break;
             }
             if (solicitacao.getLatitude() != null && solicitacao.getLongitude() != null) {
+                continue;
+            }
+            if (!temEnderecoCompleto(solicitacao)) {
                 continue;
             }
             aplicarGeocodificacao(solicitacao);
@@ -201,6 +199,15 @@ public class SolicitacaoServicoService {
                 preenchidas++;
             }
         }
+    }
+
+    private boolean temEnderecoCompleto(SolicitacaoServico solicitacao) {
+        return solicitacao.getRua() != null
+            && solicitacao.getNumero() != null
+            && solicitacao.getBairro() != null
+            && solicitacao.getCidade() != null
+            && solicitacao.getEstado() != null
+            && solicitacao.getCep() != null;
     }
 
     public List<SolicitacaoServicoResponse> listarAgendadasDoCliente(UsuarioAutenticado usuarioAutenticado) {
@@ -219,7 +226,7 @@ public class SolicitacaoServicoService {
 
         return solicitacaoRepository.findByPrestadorIdAndStatusOrderByAceitoEmDesc(prestador.getId(), StatusSolicitacao.AGENDADA)
             .stream()
-            .map(this::toResponse)
+            .map(solicitacao -> toResponse(solicitacao, prestador))
             .toList();
     }
 
@@ -273,16 +280,10 @@ public class SolicitacaoServicoService {
     }
 
     private void aplicarGeocodificacao(SolicitacaoServico solicitacao) {
-        geocodingService.geocode(solicitacao).ifPresentOrElse(
-            coords -> {
-                solicitacao.setLatitude(coords.latitude());
-                solicitacao.setLongitude(coords.longitude());
-            },
-            () -> {
-                solicitacao.setLatitude(null);
-                solicitacao.setLongitude(null);
-            }
-        );
+        geocodingService.geocode(solicitacao).ifPresent(coords -> {
+            solicitacao.setLatitude(coords.latitude());
+            solicitacao.setLongitude(coords.longitude());
+        });
     }
 
     private Usuario encontrarUsuario(UsuarioAutenticado usuarioAutenticado) {
@@ -409,7 +410,8 @@ public class SolicitacaoServicoService {
             solicitacao.getAceitoEm(),
             solicitacao.getLatitude(),
             solicitacao.getLongitude(),
-            distanciaKm
+            distanciaKm,
+            solicitacao.getValorAceito()
         );
     }
 }

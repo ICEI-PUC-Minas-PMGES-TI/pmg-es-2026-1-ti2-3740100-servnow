@@ -13,6 +13,7 @@ import {
 import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
 import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
+import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { otimizarImagemParaUpload } from "../../../../utils/otimizarImagemArquivo";
 import {
@@ -355,7 +356,11 @@ export function Solicitacoes() {
                       {tipoServico?.nome || item.tipoServico}
                     </p>
                     <div className="painel-lista-item-meta">
-                      <span className="painel-lista-item-meta-detalhe">{getFaixaPrecoLabel(item.faixaPreco)}</span>
+                      <span className="painel-lista-item-meta-detalhe">
+                        {item.status === "AGENDADA" && item.valorAceito != null
+                          ? formatarMoedaBrl(item.valorAceito)
+                          : getFaixaPrecoLabel(item.faixaPreco)}
+                      </span>
                       <span className="painel-lista-item-meta-detalhe">
                         <MapPin size={13} /> {item.endereco}
                       </span>
@@ -567,7 +572,7 @@ export function Solicitacoes() {
             <header className="solicitacao-modal-cabecalho">
               <div className="solicitacao-modal-titulo-grupo">
                 <Trash2 size={20} />
-                <h3>Confirmar exclusao</h3>
+                <h3>Excluir solicitacao</h3>
               </div>
               <button
                 type="button"
@@ -579,11 +584,11 @@ export function Solicitacoes() {
               </button>
             </header>
             <div className="solicitacao-modal-corpo">
-              <p style={{ marginTop: 0 }}>
-                Tem certeza que deseja excluir esta solicitacao?
+              <p style={{ marginTop: 0, fontWeight: 600, color: "var(--workspace-text)" }}>
+                Deseja excluir esta solicitacao?
               </p>
               <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
-                Essa acao nao pode ser desfeita.
+                As propostas vinculadas tambem serao removidas. Essa acao nao pode ser desfeita.
               </p>
             </div>
             <footer className="solicitacao-modal-rodape">

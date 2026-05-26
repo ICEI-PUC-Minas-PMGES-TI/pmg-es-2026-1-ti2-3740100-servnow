@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, DollarSign, FileText, HandCoins } from "lucide-react";
+import { Calendar, DollarSign, Eye, FileText, HandCoins } from "lucide-react";
+import { PerfilPublicoModal } from "../../../../Components/Perfil/PerfilPublicoModal";
 import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
@@ -12,31 +13,26 @@ import {
   type PropostaServicoResponse,
 } from "../../../../services/auth";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import {
+  getPropostaStatusClass,
+  getPropostaStatusLabel,
+  type StatusProposta,
+} from "../../../../utils/propostaLabels";
 
-type StatusProposta = PropostaServicoResponse["status"];
 type FiltroProposta = StatusProposta | "todas" | "encerradas";
 
 const FILTROS: Array<{ id: FiltroProposta; label: string }> = [
   { id: "todas", label: "Todas" },
   { id: "PENDENTE", label: "Pendentes" },
   { id: "ACEITA", label: "Aceitas" },
-  { id: "encerradas", label: "Encerradas" },
+  { id: "encerradas", label: "Recusadas" },
 ];
 
-function getStatusClass(status: StatusProposta) {
-  if (status === "ACEITA") return "aceita";
-  if (status === "RECUSADA" || status === "CANCELADA") return "concluido";
-  return "aguardando";
-}
-
-function getStatusLabel(status: StatusProposta) {
-  const labels: Record<StatusProposta, string> = {
-    PENDENTE: "Pendente",
-    ACEITA: "Aceita",
-    RECUSADA: "Recusada",
-    CANCELADA: "Cancelada",
-  };
-  return labels[status];
+function getListaItemClass(status: StatusProposta) {
+  if (status === "ACEITA") return "painel-lista-item-aceita";
+  if (status === "RECUSADA") return "painel-lista-item-recusada";
+  if (status === "CANCELADA") return "painel-lista-item-cancelada";
+  return "";
 }
 
 function tituloSolicitacao(proposta: PropostaServicoResponse) {
@@ -48,6 +44,7 @@ export function Propostas() {
   const [propostas, setPropostas] = useState<PropostaServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filtro, setFiltro] = useState<FiltroProposta>("todas");
+  const [perfilUsuarioId, setPerfilUsuarioId] = useState<number | null>(null);
 
   const carregar = useCallback(async () => {
     const session = getValidAuthSession();
@@ -138,7 +135,7 @@ export function Propostas() {
             {lista.map((proposta) => (
               <article
                 key={proposta.id}
-                className={`painel-lista-item ${proposta.status === "ACEITA" ? "painel-lista-item-aceita" : ""}`}
+                className={`painel-lista-item ${getListaItemClass(proposta.status)}`}
               >
                 <div className="painel-lista-item-info">
                   <p className="painel-lista-item-titulo">
@@ -163,8 +160,16 @@ export function Propostas() {
                   )}
                 </div>
                 <div className="painel-lista-item-acoes">
-                  <span className={`painel-status ${getStatusClass(proposta.status)}`}>
-                    {getStatusLabel(proposta.status)}
+                  <button
+                    type="button"
+                    className="painel-btn-ghost"
+                    onClick={() => setPerfilUsuarioId(proposta.clienteId)}
+                  >
+                    <Eye size={14} />
+                    Ver perfil do cliente
+                  </button>
+                  <span className={`painel-status ${getPropostaStatusClass(proposta.status)}`}>
+                    {getPropostaStatusLabel(proposta.status)}
                   </span>
                 </div>
               </article>
@@ -172,6 +177,14 @@ export function Propostas() {
           </div>
         )}
       </section>
+
+      {perfilUsuarioId != null ? (
+        <PerfilPublicoModal
+          usuarioId={perfilUsuarioId}
+          titulo="Perfil do cliente"
+          onFechar={() => setPerfilUsuarioId(null)}
+        />
+      ) : null}
     </>
   );
 }

@@ -1,20 +1,36 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, DollarSign, FileText, MessageSquare, Star, User, X } from "lucide-react";
+import { Check, DollarSign, Eye, FileText, MessageSquare, Star, User, X } from "lucide-react";
+import { PerfilPublicoModal } from "../../../../Components/Perfil/PerfilPublicoModal";
 import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   API_URL,
   authHeader,
   authHeaders,
+  buscarPerfilPublico,
   formatarDataIso,
   getResponseError,
   getValidAuthSession,
-  type PerfilPublicoResponse,
   type PropostaServicoResponse,
 } from "../../../../services/auth";
 import { dispararAtualizacaoNotificacoes } from "../../../../services/notificacoes";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import {
+  getPropostaCardClass,
+  getPropostaStatusClass,
+  getPropostaStatusLabel,
+  type StatusProposta,
+} from "../../../../utils/propostaLabels";
+
+type FiltroProposta = StatusProposta | "todas" | "encerradas";
+
+const FILTROS: Array<{ id: FiltroProposta; label: string }> = [
+  { id: "todas", label: "Todas" },
+  { id: "PENDENTE", label: "Pendentes" },
+  { id: "ACEITA", label: "Aceitas" },
+  { id: "encerradas", label: "Recusadas" },
+];
 
 function tituloSolicitacao(proposta: PropostaServicoResponse) {
   return TIPOS_SERVICO_MAP[proposta.solicitacaoTipoServico]?.nome ?? proposta.solicitacaoTipoServico;
@@ -26,54 +42,57 @@ export function Propostas() {
   const [isLoading, setIsLoading] = useState(true);
   const [acaoId, setAcaoId] = useState<number | null>(null);
   const [avaliacoes, setAvaliacoes] = useState<Record<number, number | null>>({});
+  const [perfilUsuarioId, setPerfilUsuarioId] = useState<number | null>(null);
+  const [filtro, setFiltro] = useState<FiltroProposta>("todas");
+  const [confirmarRecusa, setConfirmarRecusa] = useState<PropostaServicoResponse | null>(null);
 
-  const carregar = useCallback(async () => {
-    const session = getValidAuthSession();
-    if (!session?.token) {
-      navigate("/login");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/api/propostas/cliente`, {
-        headers: authHeader(session.token),
-      });
-      if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+  const carregar = useCallback(
+    async (opcoes?: { silencioso?: boolean }) => {
+      const session = getValidAuthSession();
+      if (!session?.token) {
         navigate("/login");
         return;
       }
-      if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel carregar as propostas."));
+
+      if (!opcoes?.silencioso) {
+        setIsLoading(true);
       }
-      const lista = (await response.json()) as PropostaServicoResponse[];
-      setPropostas(lista);
-      void carregarAvaliacoes(lista, session.token);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao carregar propostas.");
-      setPropostas([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [navigate]);
+
+      try {
+        const response = await fetch(`${API_URL}/api/propostas/cliente`, {
+          headers: authHeader(session.token),
+        });
+        if (response.status === 401) {
+          toast.error("Sessao expirada. Entre novamente.");
+          navigate("/login");
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(await getResponseError(response, "Nao foi possivel carregar as propostas."));
+        }
+        const lista = (await response.json()) as PropostaServicoResponse[];
+        setPropostas(lista);
+        void carregarAvaliacoes(lista, session.token);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar propostas.");
+        if (!opcoes?.silencioso) {
+          setPropostas([]);
+        }
+      } finally {
+        if (!opcoes?.silencioso) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [navigate],
+  );
 
   async function carregarAvaliacoes(lista: PropostaServicoResponse[], token: string) {
     const prestadoresUnicos = [...new Set(lista.map((item) => item.prestadorId))];
     const entradas = await Promise.all(
       prestadoresUnicos.map(async (prestadorId) => {
-        try {
-          const response = await fetch(`${API_URL}/api/perfil/publico/${prestadorId}`, {
-            headers: authHeader(token),
-          });
-          if (!response.ok) {
-            return [prestadorId, null] as const;
-          }
-          const perfil = (await response.json()) as PerfilPublicoResponse;
-          return [prestadorId, perfil.avaliacaoMedia] as const;
-        } catch {
-          return [prestadorId, null] as const;
-        }
+        const perfil = await buscarPerfilPublico(prestadorId, token);
+        return [prestadorId, perfil?.avaliacaoMedia ?? null] as const;
       }),
     );
     setAvaliacoes(Object.fromEntries(entradas));
@@ -82,6 +101,14 @@ export function Propostas() {
   useEffect(() => {
     void carregar();
   }, [carregar]);
+
+  const lista = useMemo(() => {
+    if (filtro === "todas") return propostas;
+    if (filtro === "encerradas") {
+      return propostas.filter((item) => item.status === "RECUSADA" || item.status === "CANCELADA");
+    }
+    return propostas.filter((item) => item.status === filtro);
+  }, [filtro, propostas]);
 
   async function responderProposta(propostaId: number, acao: "aceitar" | "recusar") {
     const session = getValidAuthSession();
@@ -111,17 +138,33 @@ export function Propostas() {
         );
       }
 
-      toast.success(
-        acao === "aceitar"
-          ? "Proposta aceita. As demais propostas desta solicitacao foram canceladas."
-          : "Proposta recusada.",
-      );
-      await carregar();
+      const atualizada = (await response.json()) as PropostaServicoResponse;
+
+      if (acao === "aceitar") {
+        setPropostas((atual) =>
+          atual.map((item) => {
+            if (item.id === atualizada.id) {
+              return atualizada;
+            }
+            if (item.solicitacaoId === atualizada.solicitacaoId && item.status === "PENDENTE") {
+              return { ...item, status: "CANCELADA" };
+            }
+            return item;
+          }),
+        );
+        toast.success("Proposta aceita. As demais propostas desta solicitacao foram canceladas.");
+      } else {
+        setPropostas((atual) => atual.map((item) => (item.id === atualizada.id ? atualizada : item)));
+        toast.success("Proposta recusada. Ela permanece no historico em Recusadas.");
+      }
+
       dispararAtualizacaoNotificacoes();
+      void carregar({ silencioso: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao responder proposta.");
     } finally {
       setAcaoId(null);
+      setConfirmarRecusa(null);
     }
   }
 
@@ -136,6 +179,18 @@ export function Propostas() {
       <section className="painel-card">
         <div className="painel-card-cabecalho">
           <h2>Propostas de prestadores</h2>
+          <div className="painel-filtros">
+            {FILTROS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`painel-filtro ${filtro === item.id ? "ativo" : ""}`}
+                onClick={() => setFiltro(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {isLoading ? (
@@ -145,23 +200,27 @@ export function Propostas() {
             </div>
             <p>Carregando propostas...</p>
           </div>
-        ) : propostas.length === 0 ? (
+        ) : lista.length === 0 ? (
           <div className="painel-vazio">
             <div className="painel-vazio-icone">
               <FileText size={32} />
             </div>
-            <p>Nenhuma proposta recebida no momento.</p>
+            <p>
+              {propostas.length === 0
+                ? "Nenhuma proposta recebida no momento."
+                : "Nenhuma proposta encontrada para esse filtro."}
+            </p>
           </div>
         ) : (
           <div className="painel-propostas-lista">
-            {propostas.map((proposta) => {
+            {lista.map((proposta) => {
               const avaliacao = avaliacoes[proposta.prestadorId];
               const pendente = proposta.status === "PENDENTE";
               const processando = acaoId === proposta.id;
 
               return (
                 <article
-                  className={`painel-proposta-card ${proposta.status === "ACEITA" ? "painel-proposta-card-aceita" : ""}`}
+                  className={`painel-proposta-card ${getPropostaCardClass(proposta.status)}`}
                   key={proposta.id}
                 >
                   <div className="painel-proposta-cabecalho">
@@ -170,12 +229,17 @@ export function Propostas() {
                       <h3>{proposta.prestadorNome}</h3>
                     </div>
 
-                    {avaliacao != null ? (
-                      <div className="painel-proposta-avaliacao" aria-label={`${avaliacao} estrelas`}>
-                        <Star size={15} fill="currentColor" />
-                        {avaliacao.toFixed(1)}
-                      </div>
-                    ) : null}
+                    <div className="painel-proposta-cabecalho-status">
+                      {avaliacao != null ? (
+                        <div className="painel-proposta-avaliacao" aria-label={`${avaliacao} estrelas`}>
+                          <Star size={15} fill="currentColor" />
+                          {avaliacao.toFixed(1)}
+                        </div>
+                      ) : null}
+                      <span className={`painel-status ${getPropostaStatusClass(proposta.status)}`}>
+                        {getPropostaStatusLabel(proposta.status)}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="painel-proposta-comentario">
@@ -187,14 +251,7 @@ export function Propostas() {
                     <span className="painel-proposta-prestador">
                       <User size={14} />
                       Enviada em {formatarDataIso(proposta.criadoEm)}
-                      {!pendente &&
-                        ` · ${
-                          proposta.status === "ACEITA"
-                            ? "Aceita"
-                            : proposta.status === "CANCELADA"
-                              ? "Cancelada"
-                              : "Recusada"
-                        }`}
+                      {proposta.respondidoEm ? ` · Respondida em ${formatarDataIso(proposta.respondidoEm)}` : ""}
                     </span>
 
                     <strong className="painel-proposta-valor">
@@ -206,25 +263,100 @@ export function Propostas() {
                     </strong>
                   </div>
 
-                  {pendente ? (
-                    <div className="painel-proposta-acoes">
-                      <button type="button" className="painel-btn-recusar" disabled={processando} onClick={() => void responderProposta(proposta.id, "recusar")}>
-                        <X size={15} />
-                        Recusar
-                      </button>
+                  <div className="painel-proposta-acoes">
+                    <button
+                      type="button"
+                      className="painel-btn-ghost"
+                      onClick={() => setPerfilUsuarioId(proposta.prestadorId)}
+                    >
+                      <Eye size={15} />
+                      Ver perfil do prestador
+                    </button>
 
-                      <button type="button" className="painel-btn-aceitar" disabled={processando} onClick={() => void responderProposta(proposta.id, "aceitar")}>
-                        <Check size={15} />
-                        Aceitar
-                      </button>
-                    </div>
-                  ) : null}
+                    {pendente ? (
+                      <>
+                        <button
+                          type="button"
+                          className="painel-btn-recusar"
+                          disabled={processando}
+                          onClick={() => setConfirmarRecusa(proposta)}
+                        >
+                          <X size={15} />
+                          Recusar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="painel-btn-aceitar"
+                          disabled={processando}
+                          onClick={() => void responderProposta(proposta.id, "aceitar")}
+                        >
+                          <Check size={15} />
+                          Aceitar
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
                 </article>
               );
             })}
           </div>
         )}
       </section>
+
+      {perfilUsuarioId != null ? (
+        <PerfilPublicoModal
+          usuarioId={perfilUsuarioId}
+          titulo="Perfil do prestador"
+          onFechar={() => setPerfilUsuarioId(null)}
+        />
+      ) : null}
+
+      {confirmarRecusa && (
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarRecusa(null)}>
+          <div
+            className="solicitacao-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) => event.stopPropagation()}
+            style={{ maxWidth: 460 }}
+          >
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
+                <X size={20} />
+                <h3>Recusar proposta</h3>
+              </div>
+              <button
+                type="button"
+                className="solicitacao-modal-fechar"
+                onClick={() => setConfirmarRecusa(null)}
+                aria-label="Fechar"
+              >
+                <X size={18} />
+              </button>
+            </header>
+            <div className="solicitacao-modal-corpo">
+              <p style={{ marginTop: 0 }}>Deseja recusar a proposta de {confirmarRecusa.prestadorNome}?</p>
+              <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
+                A proposta continuara visivel no filtro Recusadas.
+              </p>
+            </div>
+            <footer className="solicitacao-modal-rodape">
+              <button type="button" className="btn-secondary" onClick={() => setConfirmarRecusa(null)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="painel-btn-recusar"
+                disabled={acaoId === confirmarRecusa.id}
+                onClick={() => void responderProposta(confirmarRecusa.id, "recusar")}
+              >
+                {acaoId === confirmarRecusa.id ? "Recusando..." : "Sim, recusar"}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -73,6 +73,7 @@ class PropostaServicoServiceTest {
         assertThat(outra.getRespondidoEm()).isNotNull();
         assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.AGENDADA);
         assertThat(solicitacao.getPrestador()).isSameAs(prestadorAceito);
+        assertThat(solicitacao.getValorAceito()).isEqualByComparingTo(new BigDecimal("150.00"));
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<PropostaServico>> captor = ArgumentCaptor.forClass(List.class);

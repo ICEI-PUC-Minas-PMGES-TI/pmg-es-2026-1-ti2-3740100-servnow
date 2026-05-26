@@ -1,10 +1,11 @@
-import { Calendar, Clock, MapPin, User } from "lucide-react";
+import { Calendar, Clock, DollarSign, MapPin, User } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
 import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
+import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 export function Agendamentos() {
@@ -93,11 +94,21 @@ export function Agendamentos() {
                         <Clock size={13} /> {item.horario}
                       </span>
                     )}
+                    <span className="painel-lista-item-meta-detalhe painel-proposta-valor">
+                      <DollarSign size={13} />
+                      {formatarMoedaBrl(item.valorAceito)}
+                    </span>
                   </div>
                 </div>
                 <div className="painel-lista-item-acoes">
                   <span className="painel-status agendado">Agendado</span>
-                  <button type="button" className="painel-btn-ghost">Ver detalhes</button>
+                  <button
+                    type="button"
+                    className="painel-btn-ghost"
+                    onClick={() => navigate(`/acompanhamento/${item.id}`)}
+                  >
+                    Acompanhar
+                  </button>
                 </div>
               </div>
             ))}

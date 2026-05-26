@@ -19,6 +19,7 @@ Este projeto utiliza um conjunto de tecnologias modernas para desenvolvimento fu
 | Bibliotecas (front) | lucide-react, react-router-dom, react-toastify, maplibre-gl (componentes mapcn), clsx, tailwind-merge |
 | APIs e serviços externos | ViaCEP (consulta de CEP no front), Nominatim/OpenStreetMap , tiles CARTO/MapLibre (mapa) |
 | Deploy / Hosting | Vercel (front-end), Render (back-end) |
+| Banco em nuvem | PostgreSQL no Supabase |
 | Ferramentas | Git, GitHub |
 | IDE | VS Code  |
 
