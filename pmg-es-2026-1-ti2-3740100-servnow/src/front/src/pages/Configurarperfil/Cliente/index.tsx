@@ -27,7 +27,7 @@ export function ClientePerfil({
         <h2>Foto do local</h2>
         <p className="workspace-hint">Adicione uma foto do imovel para que o prestador encontre o local com facilidade.</p>
 
-        <label className="perfil-upload">
+        <label className="home-button home-button-primary perfil-upload">
           <ImageIcon size={18} />
           <span>{form.fotoLocalPreview ? "Trocar foto" : "Selecionar foto"}</span>
           <input type="file" accept="image/*" onChange={handleFotoChange} />

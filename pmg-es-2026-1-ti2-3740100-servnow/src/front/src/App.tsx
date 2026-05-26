@@ -104,6 +104,14 @@ function App() {
             </ProtectedRoute>
           )}
         />
+        <Route
+          path="/acompanhamento/:solicitacaoId"
+          element={(
+            <ProtectedRoute>
+              <AcompanhamentoPage />
+            </ProtectedRoute>
+          )}
+        />
       </Routes>
 
       <ToastContainer

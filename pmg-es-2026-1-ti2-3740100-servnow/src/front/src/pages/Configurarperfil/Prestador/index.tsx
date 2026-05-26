@@ -50,10 +50,12 @@ export function PrestadorPerfil({
 
       <section className="workspace-card workspace-section">
         <h2>Descricao profissional</h2>
-        <p className="workspace-hint">Conte sobre sua experiencia e o que voce faz de melhor (ate 500 caracteres).</p>
+        <p className="workspace-hint">
+          Conte sobre sua experiencia e o que voce faz de melhor (ate 500 caracteres). Obrigatorio para salvar o perfil.
+        </p>
 
         <label className="form-field form-field-full">
-          <span className="form-label">Sobre voce</span>
+          <span className="form-label">Sobre voce *</span>
           <div className="form-control form-control-textarea">
             <textarea
               rows={6}
@@ -156,7 +158,7 @@ export function PrestadorPerfil({
         <h2>Documento de identidade</h2>
         <p className="workspace-hint">Envie um PDF ou imagem com tamanho maximo de 5 MB.</p>
 
-        <label className="perfil-upload">
+        <label className="home-button home-button-primary perfil-upload">
           <FileText size={18} />
           <span>{form.documentoPreview ? "Trocar documento" : "Selecionar documento"}</span>
           <input

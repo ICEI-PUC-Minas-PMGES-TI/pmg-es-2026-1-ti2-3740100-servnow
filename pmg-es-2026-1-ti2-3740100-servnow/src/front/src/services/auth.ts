@@ -116,6 +116,7 @@ export type SolicitacaoServicoResponse = {
   latitude: number | null;
   longitude: number | null;
   distanciaKm: number | null;
+  valorAceito: number | null;
 };
 
 export type SolicitacaoServicoCreateRequest = {
@@ -167,11 +168,33 @@ export type PerfilPublicoResponse = {
   estado: string | null;
   fotoPerfilUrl: string | null;
   descricao: string | null;
+  especialidades: string | null;
+  diasDisponiveis: string | null;
+  horarioInicio: string | null;
+  horarioFim: string | null;
+  raioAtendimentoKm: number | null;
   avaliacaoMedia: number | null;
   totalAvaliacoes: number;
   comentarioDestaque: string | null;
   criadoEm: string | null;
 };
+
+export async function buscarPerfilPublico(
+  usuarioId: number,
+  token: string,
+): Promise<PerfilPublicoResponse | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/perfil/publico/${usuarioId}`, {
+      headers: authHeader(token),
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as PerfilPublicoResponse;
+  } catch {
+    return null;
+  }
+}
 
 const AUTH_STORAGE_KEY = "servnow.auth";
 export const API_URL = "http://localhost:8080";

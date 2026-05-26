@@ -1,59 +1,105 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import {
+  ArrowLeft,
   Camera,
   CheckCircle2,
   Clock,
-  CreditCard,
   MapPin,
   QrCode,
   Send,
   Smartphone,
   Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
+import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
+import {
+  confirmarChegada,
+  concluirExecucao,
+  iniciarAcompanhamento,
+  registrarAtualizacao,
+  type AcompanhamentoDetalhe,
+} from "../../../../services/acompanhamento";
+import {
+  formatarDataHoraAcompanhamento,
+  formatarHorarioAcompanhamento,
+} from "../../../../utils/acompanhamentoLabels";
+import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
+import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
-type Etapa = "confirmar-chegada" | "em-execucao" | "aguardando-pagamento" | "aguardando-avaliacao" | "concluido";
+type PrestadorEtapa = "confirmar-chegada" | "em-execucao" | "aguardando-pagamento" | "aguardando-avaliacao" | "concluido";
 
-type Atualizacao = {
-  id: number;
-  horario: string;
-  descricao: string;
-  fotos: string[];
-};
-
-const ATUALIZACOES_INICIAIS: Atualizacao[] = [
-  {
-    id: 1,
-    horario: "14:45 - Hoje",
-    descricao: "Removendo o chuveiro antigo e preparando a instalacao.",
-    fotos: [],
-  },
-];
-
-const SERVICO_MOCK = {
-  titulo: "Troca de chuveiro eletrico",
-  cliente: "Maria Silva",
-  clienteEndereco: "Rua das Flores, 123 - Sao Paulo",
-  inicio: "14:00",
-  previsto: "16:00",
-  valor: 180,
-};
-
-const ETAPAS_INFO: Array<{ id: Etapa; label: string; numero: number }> = [
+const ETAPAS_INFO: Array<{ id: PrestadorEtapa; label: string; numero: number }> = [
   { id: "confirmar-chegada", label: "Chegada", numero: 1 },
   { id: "em-execucao", label: "Em execucao", numero: 2 },
   { id: "aguardando-pagamento", label: "Pagamento", numero: 3 },
   { id: "aguardando-avaliacao", label: "Avaliacao", numero: 4 },
 ];
 
-export function Acompanhamento() {
-  const [etapa, setEtapa] = useState<Etapa>("confirmar-chegada");
+function etapaBackendParaPrestador(etapa: string): PrestadorEtapa {
+  switch (etapa) {
+    case "EM_ANDAMENTO":
+      return "em-execucao";
+    case "AGUARDANDO_PAGAMENTO":
+      return "aguardando-pagamento";
+    case "AGUARDANDO_AVALIACAO":
+      return "aguardando-avaliacao";
+    case "CONCLUIDA":
+      return "concluido";
+    default:
+      return "confirmar-chegada";
+  }
+}
+
+type Props = {
+  solicitacaoId: number;
+};
+
+export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
+  const navigate = useNavigate();
+  const [detalhe, setDetalhe] = useState<AcompanhamentoDetalhe | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [codigo, setCodigo] = useState(["", "", "", ""]);
   const [novaAtualizacao, setNovaAtualizacao] = useState("");
-  const [novaFoto, setNovaFoto] = useState<string>("");
-  const [atualizacoes, setAtualizacoes] = useState<Atualizacao[]>(ATUALIZACOES_INICIAIS);
+  const [novaFoto, setNovaFoto] = useState<File | null>(null);
+  const [previewFoto, setPreviewFoto] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const carregar = useCallback(async () => {
+    try {
+      const dados = await iniciarAcompanhamento(solicitacaoId);
+      setDetalhe(dados);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao carregar acompanhamento.");
+      navigate("/acompanhamento");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate, solicitacaoId]);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  const etapa = detalhe ? etapaBackendParaPrestador(detalhe.etapa) : "confirmar-chegada";
+  const tituloServico = detalhe
+    ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
+    : "";
+  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === etapa);
+  const valorExibir = detalhe?.valorFinal ?? detalhe?.valorAceito ?? 0;
+
+  const iniciaisCliente = useMemo(() => {
+    const nome = detalhe?.clienteNome ?? "";
+    return nome
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "C";
+  }, [detalhe?.clienteNome]);
 
   function handleCodigoChange(index: number, valor: string) {
     const apenasDigito = valor.replace(/\D/g, "").slice(-1);
@@ -67,59 +113,79 @@ export function Acompanhamento() {
     }
   }
 
-  function confirmarChegada() {
-    // Mock: aceita qualquer codigo
-    setEtapa("em-execucao");
-  }
-
   function handleFotoUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    setNovaFoto(file);
     const reader = new FileReader();
-    reader.onload = () => setNovaFoto(String(reader.result));
+    reader.onload = () => setPreviewFoto(String(reader.result));
     reader.readAsDataURL(file);
   }
 
-  function enviarAtualizacao() {
+  async function handleConfirmarChegada() {
+    const codigoCompleto = codigo.join("");
+    if (codigoCompleto.length !== 4) {
+      toast.error("Informe o codigo de 4 digitos.");
+      return;
+    }
+    setEnviando(true);
+    try {
+      setDetalhe(await confirmarChegada(solicitacaoId, codigoCompleto));
+      setCodigo(["", "", "", ""]);
+      toast.success("Chegada confirmada. Servico iniciado.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Codigo invalido.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  async function handleEnviarAtualizacao() {
     if (!novaAtualizacao.trim()) return;
-    const agora = new Date();
-    const hora = `${agora.getHours().toString().padStart(2, "0")}:${agora.getMinutes().toString().padStart(2, "0")}`;
-    setAtualizacoes([
-      {
-        id: Date.now(),
-        horario: `${hora} - Agora`,
-        descricao: novaAtualizacao.trim(),
-        fotos: novaFoto ? [novaFoto] : [],
-      },
-      ...atualizacoes,
-    ]);
-    setNovaAtualizacao("");
-    setNovaFoto("");
+    setEnviando(true);
+    try {
+      setDetalhe(await registrarAtualizacao(solicitacaoId, novaAtualizacao.trim(), novaFoto ?? undefined));
+      setNovaAtualizacao("");
+      setNovaFoto(null);
+      setPreviewFoto(null);
+      toast.success("Atualizacao enviada.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar atualizacao.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
-  function concluirServico() {
-    setEtapa("aguardando-pagamento");
+  async function handleConcluirServico() {
+    setEnviando(true);
+    try {
+      setDetalhe(await concluirExecucao(solicitacaoId));
+      toast.success("Execucao concluida. Aguardando pagamento do cliente.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao concluir servico.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
-  function confirmarPagamentoRecebido() {
-    setEtapa("aguardando-avaliacao");
+  if (isLoading || !detalhe) {
+    return (
+      <div className="painel-vazio">
+        <p>Carregando acompanhamento...</p>
+      </div>
+    );
   }
-
-  function reiniciarFluxo() {
-    setEtapa("confirmar-chegada");
-    setCodigo(["", "", "", ""]);
-    setAtualizacoes(ATUALIZACOES_INICIAIS);
-    setNovaAtualizacao("");
-    setNovaFoto("");
-  }
-
-  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === etapa);
 
   return (
     <>
+      <button type="button" className="painel-btn-ghost" onClick={() => navigate("/acompanhamento")} style={{ marginBottom: 12 }}>
+        <ArrowLeft size={16} />
+        Voltar para lista
+      </button>
+
       <PainelSectionHeader
         eyebrow="Servico em andamento"
-        title="Acompanhar servico"
+        title={tituloServico}
         description="Confirme sua chegada e mantenha o cliente informado sobre o andamento."
       />
 
@@ -144,7 +210,6 @@ export function Acompanhamento() {
         </div>
       )}
 
-      {/* ETAPA 1: confirmar chegada */}
       {etapa === "confirmar-chegada" && (
         <section className="painel-card">
           <div className="acomp-codigo-centro">
@@ -155,11 +220,11 @@ export function Acompanhamento() {
             <p className="acomp-codigo-sub">Digite o codigo de 4 digitos que o cliente vai te mostrar</p>
 
             <div className="acomp-cliente-mini">
-              <div className="acomp-cliente-mini-avatar">MS</div>
+              <div className="acomp-cliente-mini-avatar">{iniciaisCliente}</div>
               <div className="acomp-cliente-mini-info">
-                <strong>{SERVICO_MOCK.cliente}</strong>
-                <span>{SERVICO_MOCK.clienteEndereco}</span>
-                <span style={{ display: "block", marginTop: 6 }}>{SERVICO_MOCK.titulo}</span>
+                <strong>{detalhe.clienteNome}</strong>
+                <span>{detalhe.endereco}</span>
+                <span style={{ display: "block", marginTop: 6 }}>{tituloServico}</span>
               </div>
             </div>
 
@@ -184,33 +249,30 @@ export function Acompanhamento() {
             <button
               type="button"
               className="acomp-btn-primary"
-              onClick={confirmarChegada}
+              onClick={() => void handleConfirmarChegada()}
+              disabled={enviando}
             >
-              Codigo valido (mock)
+              Confirmar chegada
             </button>
-            <span style={{ fontSize: 12, color: "var(--workspace-muted)", marginTop: -4 }}>
-              A validacao real sera feita pelo back-end. Por enquanto, qualquer codigo e aceito.
-            </span>
           </div>
         </section>
       )}
 
-      {/* ETAPA 2: em execucao */}
       {etapa === "em-execucao" && (
         <>
           <section className="painel-card acomp-card-servico">
             <div className="acomp-card-servico-cabecalho">
               <div>
-                <h2>{SERVICO_MOCK.titulo}</h2>
+                <h2>{tituloServico}</h2>
                 <p style={{ margin: "4px 0 0", color: "var(--workspace-muted)", fontSize: 13 }}>
-                  Cliente: {SERVICO_MOCK.cliente}
+                  Cliente: {detalhe.clienteNome}
                 </p>
               </div>
               <span className="painel-status agendado">EM ANDAMENTO</span>
             </div>
             <div className="acomp-card-servico-meta">
-              <span><Clock size={14} /> Iniciado as {SERVICO_MOCK.inicio}</span>
-              <span><Clock size={14} /> Previsao de termino: {SERVICO_MOCK.previsto}</span>
+              <span><Clock size={14} /> Iniciado as {formatarHorarioAcompanhamento(detalhe.iniciadoEm)}</span>
+              <span><Clock size={14} /> Previsao: {formatarHorarioAcompanhamento(detalhe.previstoTerminoEm)}</span>
             </div>
           </section>
 
@@ -229,21 +291,21 @@ export function Acompanhamento() {
 
               <label className="acomp-upload">
                 <Camera size={20} />
-                <span>{novaFoto ? "Trocar foto" : "Tirar ou adicionar foto"}</span>
+                <span>{previewFoto ? "Trocar foto" : "Tirar ou adicionar foto"}</span>
                 <input type="file" accept="image/*" onChange={handleFotoUpload} />
               </label>
 
-              {novaFoto && (
+              {previewFoto && (
                 <div className="acomp-foto-preview">
-                  <img src={novaFoto} alt="Preview da nova atualizacao" />
+                  <img src={previewFoto} alt="Preview da nova atualizacao" />
                 </div>
               )}
 
               <button
                 type="button"
                 className="acomp-btn-primary"
-                onClick={enviarAtualizacao}
-                disabled={!novaAtualizacao.trim()}
+                onClick={() => void handleEnviarAtualizacao()}
+                disabled={!novaAtualizacao.trim() || enviando}
               >
                 <Send size={16} />
                 Enviar atualizacao
@@ -255,26 +317,27 @@ export function Acompanhamento() {
             <div className="painel-card-cabecalho">
               <h2>Atualizacoes anteriores</h2>
             </div>
-            <div className="acomp-timeline">
-              {atualizacoes.map((atualizacao) => (
-                <div key={atualizacao.id} className="acomp-timeline-item">
-                  <span className="acomp-timeline-data">{atualizacao.horario}</span>
-                  <p>{atualizacao.descricao}</p>
-                  {atualizacao.fotos.length > 0 && (
-                    <div className="acomp-timeline-fotos">
-                      {atualizacao.fotos.map((foto, idx) => (
-                        <img key={idx} src={foto} alt={`Atualizacao ${atualizacao.id} foto ${idx + 1}`} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            {detalhe.atualizacoes.length === 0 ? (
+              <p style={{ color: "var(--workspace-muted)", fontSize: 13 }}>Nenhuma atualizacao enviada ainda.</p>
+            ) : (
+              <div className="acomp-timeline">
+                {detalhe.atualizacoes.map((atualizacao) => (
+                  <div key={atualizacao.id} className="acomp-timeline-item">
+                    <span className="acomp-timeline-data">{formatarDataHoraAcompanhamento(atualizacao.criadoEm)}</span>
+                    <p>{atualizacao.descricao}</p>
+                    {atualizacao.fotoUrl && (
+                      <AtualizacaoFoto fotoUrl={atualizacao.fotoUrl} alt={`Atualizacao ${atualizacao.id}`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             <button
               type="button"
               className="acomp-btn-primary"
-              onClick={concluirServico}
+              onClick={() => void handleConcluirServico()}
+              disabled={enviando}
               style={{ marginTop: 18 }}
             >
               <CheckCircle2 size={16} />
@@ -284,7 +347,6 @@ export function Acompanhamento() {
         </>
       )}
 
-      {/* ETAPA 3: aguardando pagamento */}
       {etapa === "aguardando-pagamento" && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
@@ -292,12 +354,12 @@ export function Acompanhamento() {
           </div>
 
           <div className="acomp-pagamento-total">
-            <span>Total do servico - {SERVICO_MOCK.titulo}</span>
-            <strong>R$ {SERVICO_MOCK.valor.toFixed(2).replace(".", ",")}</strong>
+            <span>Total do servico - {tituloServico}</span>
+            <strong>{formatarMoedaBrl(valorExibir)}</strong>
           </div>
 
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            O cliente escolheu o seguinte metodo de pagamento:
+            O cliente confirmara o pagamento na plataforma. Aguarde a confirmacao.
           </p>
 
           <div className="acomp-pagamento-opcao selecionada" style={{ marginBottom: 18 }}>
@@ -305,20 +367,14 @@ export function Acompanhamento() {
               <Smartphone size={18} />
             </span>
             <span className="acomp-pagamento-opcao-info">
-              <strong>PIX</strong>
-              <span>Pagamento instantaneo</span>
+              <strong>Aguardando cliente</strong>
+              <span>Pagamento via app</span>
             </span>
             <QrCode size={20} style={{ marginLeft: "auto", color: "var(--brand-strong)" }} />
           </div>
-
-          <button type="button" className="acomp-btn-primary" onClick={confirmarPagamentoRecebido}>
-            <CreditCard size={16} />
-            Pagamento recebido
-          </button>
         </section>
       )}
 
-      {/* ETAPA 4: aguardando avaliacao */}
       {etapa === "aguardando-avaliacao" && (
         <section className="painel-card">
           <div className="acomp-final">
@@ -327,10 +383,34 @@ export function Acompanhamento() {
             </div>
             <h2>Aguardando avaliacao do cliente</h2>
             <p>
-              O servico foi concluido e o pagamento confirmado. Em breve voce recebera a avaliacao
-              do cliente.
+              O servico foi concluido e o pagamento confirmado. Em breve voce recebera a avaliacao do cliente.
             </p>
-            <button type="button" className="acomp-btn-primary" onClick={reiniciarFluxo} style={{ maxWidth: 280 }}>
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => navigate("/acompanhamento")}
+              style={{ maxWidth: 280 }}
+            >
+              Voltar para lista
+            </button>
+          </div>
+        </section>
+      )}
+
+      {etapa === "concluido" && (
+        <section className="painel-card">
+          <div className="acomp-final">
+            <div className="acomp-final-icone">
+              <CheckCircle2 size={36} />
+            </div>
+            <h2>Servico finalizado!</h2>
+            <p>O cliente concluiu a avaliacao. Obrigado por usar a Servnow.</p>
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => navigate("/acompanhamento")}
+              style={{ maxWidth: 280 }}
+            >
               Atender novo servico
             </button>
           </div>
@@ -340,4 +420,4 @@ export function Acompanhamento() {
   );
 }
 
-export default Acompanhamento;
+export default AcompanhamentoPrestadorDetalhe;

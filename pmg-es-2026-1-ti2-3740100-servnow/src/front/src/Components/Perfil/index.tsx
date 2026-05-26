@@ -90,6 +90,8 @@ export function Perfil() {
   const [form, setForm] = useState<FormState>(initialState);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const descricaoPreenchida = form.descricaoProfissional.trim().length > 0;
+  const podeSalvar = isCliente || descricaoPreenchida;
 
   useEffect(() => {
     async function carregarPerfil() {
@@ -487,7 +489,7 @@ export function Perfil() {
                     <p className="workspace-hint">Adicione uma foto para identificar seu perfil na plataforma.</p>
                   </div>
 
-                  <label className="perfil-upload">
+                  <label className="home-button home-button-primary perfil-upload">
                     <ImageIcon size={18} />
                     <span>{form.fotoPerfilPreview ? "Trocar foto" : "Selecionar foto"}</span>
                     <input
@@ -580,13 +582,18 @@ export function Perfil() {
               <div className="form-actions perfil-actions">
                 <button
                   type="button"
-                  className="btn-secondary"
+                  className="home-button home-button-secondary"
                   onClick={() => navigate(-1)}
                   disabled={isSaving}
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="btn-primary perfil-button-primary" disabled={isSaving}>
+                <button
+                  type="submit"
+                  className="home-button home-button-primary"
+                  disabled={isSaving || !podeSalvar}
+                  title={!podeSalvar ? "Preencha a descricao profissional para salvar." : undefined}
+                >
                   <Save size={16} />
                   {isSaving ? "Salvando..." : "Salvar alteracoes"}
                 </button>
@@ -622,6 +629,11 @@ function validarEndereco(form: FormState) {
 }
 
 function validarPerfilPrestador(form: FormState) {
+  if (!form.descricaoProfissional.trim()) {
+    toast.error("Preencha a descricao profissional para salvar o perfil.");
+    return false;
+  }
+
   if (form.especialidades.length === 0) {
     toast.error("Escolha pelo menos um tipo de servico.");
     return false;
