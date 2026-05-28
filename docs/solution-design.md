@@ -4,7 +4,6 @@
 
 ![Modelo de dados](images/ModelodeDadosServNow.svg)
 
-
 ### 4.2. Tecnologias
 
 Este projeto utiliza um conjunto de tecnologias modernas para desenvolvimento full-stack, garantindo escalabilidade, desempenho e facilidade de manutenção.
