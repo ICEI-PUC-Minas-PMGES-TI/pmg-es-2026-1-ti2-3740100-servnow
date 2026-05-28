@@ -23,7 +23,5 @@ Este projeto utiliza um conjunto de tecnologias modernas para desenvolvimento fu
 | IDE | VS Code  |
 
 
-### 4.4. Atualização do diagrama to do
-//2. Adicionar `latitude` e `longitude` em **USUARIOS** e **SOLICITACOES_SERVICO**.
 
 

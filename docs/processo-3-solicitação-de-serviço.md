@@ -1,8 +1,6 @@
-### 3.3.3 Processo 3 –SOLICITAR SERVIÇOS
+### 3.3.3 Processo 3 –SOLICITAR SERVIÇO
 
-Atualmente, o processo de solicitação de serviços ocorre de forma desorganizada e pouco padronizada, geralmente por meio de contatos informais, como mensagens ou indicações. Nesse cenário, o cliente precisa explicar o problema repetidas vezes, nem sempre consegue detalhar corretamente as informações e não possui um registro estruturado da solicitação. Além disso, há pouca ou nenhuma visibilidade sobre o andamento do serviço, o que gera incerteza, dificuldade de comunicação e falta de controle durante todo o processo.
-
-A oportunidade de melhoria está na digitalização e centralização desse fluxo por meio da plataforma. Com ela, o cliente passa a realizar a solicitação de forma estruturada, preenchendo informações essenciais como tipo de serviço, descrição do problema, endereço, data e horário desejados, além de poder anexar imagens. Após o envio, a solicitação é registrada e pode ser acompanhada em um painel, onde o cliente visualiza o status em tempo real, acessa o histórico de atualizações e consulta os detalhes do atendimento. Dessa forma, o processo se torna mais organizado, transparente e eficiente, proporcionando maior controle, segurança e praticidade ao cliente durante toda a jornada do serviço.
+ cliente cadastra de forma estruturada o tipo de serviço, a descrição do problema, o endereço, a data/horário desejados e fotos opcionais; revisa e confirma o envio na plataforma. A solicitação é publicada e o prestador consulta as oportunidades, analisa os detalhes e envia propostas (valor e mensagem) ou pode recusar participar. O cliente acompanha todas as solicitações no painel, com filtros, status e detalhes; compara e aceita uma proposta, o que agenda o serviço (vincula prestador, valor e data/horário). Solicitações recusadas ou sem proposta aceita permanecem em aberto ou encerradas conforme o fluxo. Após o agendamento, o processo segue para o Processo 4 
 
 
 ![Processo 3)](images/BPMN/SolicitarServiços.svg)

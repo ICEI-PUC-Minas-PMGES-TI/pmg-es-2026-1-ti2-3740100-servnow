@@ -9,7 +9,7 @@
 ---
 Professores:
 
-** ProfLucca Soares de Paiva Lacerda 
+** Lucca Soares de Paiva Lacerda 
 
 ** Michelle Hanne Soares de Andrade **
 
@@ -31,89 +31,55 @@ mostrar algum resultado relevante do trabalho (até 10 linhas)._
 
 ## 1. Introdução
 
-Um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores como eletricistas, encanadores e profissionais de manutenção, proporcionando praticidade, segurança e organização.
+O presente projeto propõe o desenvolvimento de um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, como eletricistas, encanadores e profissionais de manutenção em geral. A plataforma busca proporcionar mais praticidade, segurança, agilidade e organização no processo de prestação de serviços domesticos
 
 ### 1.1 Contextualização
 
-Com o avanço da tecnologia e a popularização de aplicativos de serviços sob demanda, 
-como Uber, tornou-se comum a mediação digital entre prestadores de serviços e clientes. 
-Plataformas digitais passaram a facilitar o acesso a diferentes tipos de serviços, tornando os 
-processos mais rápidos, organizados e seguros. 
+Com o avanço da tecnologia e a popularização de plataformas digitais de serviços sob demanda, como aplicativos de transporte e entrega, tornou-se cada vez mais comum a utilização de sistemas digitais como intermediadores entre clientes e prestadores de serviços. Essas plataformas contribuíram significativamente para tornar os processos mais rápidos, acessíveis, organizados e seguros.
 
-Entretanto, muitos serviços do cotidiano  como pequenos reparos residenciais, serviços 
-hidráulicos, desentupimento, troca de chuveiro, montagem de móveis e manutenção elétrica 
-básica  ainda são contratados de maneira informal. Na maioria das vezes, os clientes dependem 
-de indicações de conhecidos, grupos em redes sociais ou contatos diretos por aplicativos de 
-mensagens. 
+Entretanto, muitos serviços residenciais ainda são contratados de maneira informal. Pequenos reparos domésticos, serviços hidráulicos, instalações elétricas, desentupimentos, montagem de móveis e manutenções em geral normalmente dependem de indicações de conhecidos, grupos em redes sociais ou contatos realizados diretamente por aplicativos de mensagens.
 
-Esse modelo de contratação pode gerar diversos problemas, como dificuldade em 
-encontrar profissionais confiáveis, falta de padronização de preços, ausência de avaliações sobre 
-o prestador e insegurança ao permitir a entrada de um profissional desconhecido em casa. Além 
-disso, a comunicação e o agendamento costumam ocorrer de forma manual, o que pode gerar 
-atrasos e desencontros. 
+Esse modelo informal apresenta diversas limitações, como a dificuldade em encontrar profissionais confiáveis e disponíveis, ausência de padronização de preços, falta de avaliações sobre os prestadores e insegurança ao permitir a entrada de um profissional desconhecido na residência do cliente. Além disso, a comunicação e o agendamento dos serviços costumam ocorrer de forma manual, aumentando as chances de atrasos, falhas de comunicação e desencontros entre as partes.
 
-Diante desse cenário, surge a necessidade de um sistema digital que conecte clientes a 
-profissionais de manutenção residencial de forma prática, segura e organizada. A proposta do 
-projeto é desenvolver uma plataforma que permita solicitar serviços de forma rápida, além de 
-avaliar o prestador após a conclusão do serviço.
+Diante desse cenário, surge a necessidade de uma plataforma digital capaz de conectar clientes e prestadores de serviços residenciais de maneira prática, segura e organizada. O sistema proposto permitirá a solicitação de serviços, acompanhamento do atendimento, avaliação dos profissionais e gerenciamento das ordens de serviço de forma centralizada.
 
 ### 1.2 Problema
 
-Atualmente, a contratação de profissionais para serviços domésticos apresenta diversos desafios: 
+Atualmente, a contratação de profissionais para serviços residenciais enfrenta diversos desafios que comprometem a experiência do cliente e dificultam a profissionalização do setor. Entre os principais problemas identificados, destacam-se:
 
-• Dificuldade em encontrar profissionais confiáveis e disponíveis 
-rapidamente. 
+-Dificuldade em encontrar profissionais confiáveis e disponíveis rapidamente;
+-Falta de transparência em relação a preços, prazos e qualidade do serviço;
+-Ausência de histórico, avaliações e reputação dos prestadores;
+-Dependência de processos manuais de contato, como telefone, mensagens ou indicações;
+-Falta de organização no acompanhamento dos serviços solicitados;
+-Insegurança do cliente ao permitir a entrada de profissionais desconhecidos em sua residência.
 
-• Falta de transparência quanto a preços e prazos. 
-
-• Ausência de histórico, avaliações e reputação dos prestadores. 
-
-• Processos manuais de contato (telefone, mensagens ou indicações), que 
-tornam a experiência do cliente pouco prática. 
-
-• Insegurança do cliente ao permitir a entrada de profissionais desconhecidos 
-em sua residência. 
-
-Esses fatores impactam negativamente a experiência do usuário e dificultam a 
-profissionalização do setor de prestação de serviços residenciais.
+Esses fatores tornam a contratação de serviços residenciais pouco prática, menos segura e frequentemente desorganizada.
 
 ### 1.3 Objetivo geral
 
-Desenvolver um sistema digital de intermediação de serviços residenciais sob demanda, 
-conectando clientes a prestadores de serviços como eletricistas, encanadores e profissionais de 
-manutenção, proporcionando mais praticidade, segurança e organização no processo de 
-solicitação e execução dos serviços.
+Desenvolver um sistema digital Sass de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, , proporcionando maior praticidade, segurança, confiabilidade e organização.
 
 #### 1.3.1 Objetivos específicos
 
-• Desenvolver uma plataforma digital para cadastro de clientes e prestadores 
-de serviços. 
-
-• Permitir a conclusão do serviço após a finalização do atendimento pelo prestador(vinculado a uma avaliação final do serviço e o respectivo pagamento).
-
-• Implementar gestão de prestadores (Media de preços de serviços,  historico de serviços, demandas, solicitações de serviço)
-
-• Implementar gestão de clientes( Solicitar serviço, serviços em analise, em andamento, aceitos)
-
-• Implementar mecanismos de segurança, como verificação da identidade do 
-prestador por código de confirmação  quando o profissional 
-chegar ao local para iniciar o serviço.
+-Desenvolver uma plataforma digital para cadastro e gerenciamento de clientes e prestadores de serviços;
+-Permitir a solicitação, acompanhamento e conclusão de serviços residenciais;
+-Implementar um sistema de avaliação dos prestadores após a finalização do atendimento;
+-Vincular a conclusão do serviço ao processo de pagamento e avaliação final;
+-Implementar funcionalidades de gestão para os prestadores, incluindo histórico de serviços, média de preços, demandas recebidas e solicitações em andamento;
+-Implementar funcionalidades de gestão para os clientes, permitindo acompanhar serviços solicitados, em análise, aceitos e concluídos;
+-Implementar mecanismos de segurança, como validação de identidade do prestador por meio de código de confirmação no momento da chegada ao local do atendimento;
+-Desenvolver mecanismos de organização e acompanhamento das ordens de serviço.
 
 ### 1.4 Justificativas
 
-A criação de um sistema de prestação de serviços residenciais sob demanda se justifica 
-pela necessidade de modernizar e organizar um mercado ainda bastante informal. 
+O desenvolvimento de um sistema de prestação de serviços residenciais sob demanda se justifica pela necessidade de modernizar, organizar e profissionalizar um mercado que ainda opera, em grande parte, de maneira informal.
 
-Para os clientes, o sistema oferece mais praticidade, rapidez, segurança e previsibilidade 
-de custos, além da possibilidade de escolher profissionais com base em avaliações reais de outros 
-usuários. 
+Para os clientes, a plataforma proporcionará maior praticidade na contratação de serviços, mais rapidez no atendimento, maior segurança durante o processo e melhor previsibilidade de custos. Além disso, o sistema permitirá a escolha de profissionais com base em avaliações e histórico de serviços realizados.
 
-Para os prestadores de serviço, a plataforma proporciona maior visibilidade, organização 
-da agenda e ampliação da carteira de clientes. 
+Para os prestadores de serviço, a plataforma oferecerá maior visibilidade, melhor organização da agenda, ampliação da carteira de clientes e centralização do gerenciamento de demandas e pagamentos.
 
-No contexto acadêmico, o projeto permite aplicar conhecimentos de análise de sistemas, 
-modelagem de processos, banco de dados e desenvolvimento de aplicações. 
-
+### Prestador de serviço
 
 ## 2. Participantes do processo
 Cliente
@@ -126,29 +92,31 @@ Profissional responsável por executar os serviços solicitados, como eletricist
 
 ### 3.1. Análise da situação atual
 
-A análise da situação atual permite identificar diversos pontos de atenção e problemas no processo de contratação de serviços residenciais.
+No modelo tradicional de contratação de serviços residenciais, observa-se a ausência de um sistema centralizado capaz de organizar, registrar e acompanhar as solicitações realizadas pelos clientes. Atualmente, a contratação de profissionais ocorre, em grande parte, de maneira informal, por meio de indicações, redes sociais, aplicativos de mensagens ou contatos telefônicos.
 
-Primeiramente, existe dificuldade em localizar profissionais confiáveis e disponíveis rapidamente, pois o processo depende principalmente de indicações informais ou buscas em redes sociais.
+Nesse cenário, não existe um ponto central de controle sobre os serviços solicitados, orçamentos realizados, atendimentos executados ou pagamentos efetuados. O cliente frequentemente entra em contato com diversos profissionais simultaneamente, sem possuir mecanismos padronizados para comparação de preços, qualidade ou reputação dos prestadores.
 
-Outro problema é a falta de transparência nos valores dos serviços, já que cada profissional define o preço individualmente, sem qualquer referência ou comparação.
+Da mesma forma, os profissionais dependem principalmente de indicações e contatos informais para conseguir novos serviços, não dispondo de uma plataforma estruturada para gerenciamento de agenda, histórico de atendimentos e organização de demandas.
 
-Também não existe um sistema estruturado de avaliações e histórico de serviços, o que impede que os clientes tomem decisões baseadas na experiência de outros usuários.
+Outro problema identificado é a ausência de um sistema confiável de avaliações e reputação, dificultando que os clientes tomem decisões baseadas na experiência de outros usuários. Além disso, a comunicação entre cliente e prestador ocorre de forma manual, aumentando a possibilidade de atrasos, falhas de comunicação, conflitos de horários e dificuldades no acompanhamento do serviço.
 
-Além disso, a comunicação ocorre de forma manual, por telefone ou aplicativos de mensagens, o que pode gerar atrasos, falhas de comunicação e dificuldades para organizar horários e agendamentos.
-
-Esses fatores tornam o processo atual pouco eficiente, inseguro e pouco profissional.
+A informalidade presente nesse processo reduz a eficiência da contratação, compromete a segurança das partes envolvidas e dificulta a profissionalização do setor de serviços residenciais.
 
 ### 3.2. Descrição geral da proposta de solução
 
-Para solucionar os problemas identificados, o projeto propõe a criação de uma plataforma digital que intermedeie a contratação de serviços residenciais de forma organizada e segura.
+Com o objetivo de solucionar os problemas identificados, o projeto propõe o desenvolvimento de uma plataforma digital de intermediação de serviços residenciais sob demanda, permitindo que clientes e prestadores interajam de forma organizada, segura e centralizada.
 
-Com a utilização do sistema, os clientes poderão solicitar serviços diretamente pela plataforma, informando o tipo de serviço, descrição do problema e localização. O sistema utilizará geolocalização para encontrar prestadores próximos e disponíveis.
+Por meio da plataforma, os clientes poderão solicitar serviços residenciais informando o tipo de serviço desejado, descrição do problema, endereço e demais informações necessárias para o atendimento. O sistema utilizará recursos de geolocalização para localizar prestadores próximos e disponíveis, tornando o processo de contratação mais rápido e eficiente.
 
-Os prestadores de serviço receberão as solicitações e poderão aceitar ou recusar o atendimento. Após a conclusão do serviço, o cliente poderá avaliar o profissional, criando um histórico de reputação dentro da plataforma.
+Os prestadores de serviço receberão as solicitações diretamente na plataforma e poderão aceitar ou recusar os atendimentos conforme sua disponibilidade. Durante o processo, o sistema permitirá o acompanhamento do status da ordem de serviço, desde a solicitação até a conclusão do atendimento.
 
-Além disso, o sistema poderá incluir mecanismos de segurança, como verificação da identidade do prestador por meio de código de confirmação ou Face ID quando o profissional chegar ao local.
+Após a execução do serviço, o cliente poderá realizar uma avaliação do prestador, contribuindo para a construção de um histórico de reputação dentro da plataforma. Esse mecanismo auxiliará futuros clientes na escolha de profissionais mais confiáveis e qualificados.
 
-Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e organizado, reduzindo a informalidade e melhorando a experiência tanto para clientes quanto para prestadores de serviço.
+Além disso, a solução incluirá mecanismos adicionais de segurança, como validação de identidade do prestador por meio de código de confirmação ou autenticação facial (Face ID) no momento da chegada ao local do atendimento.
+
+O sistema também permitirá maior organização das ordens de serviço, acompanhamento de pagamentos, gerenciamento de histórico de atendimentos e controle das solicitações realizadas, proporcionando maior transparência, praticidade e segurança para ambas as partes envolvidas.
+
+Dessa forma, a solução proposta busca reduzir a informalidade na contratação de serviços residenciais, melhorar a experiência dos usuários e contribuir para a modernização e profissionalização do setor.
 
 ### 3.3. Modelagem dos processos
 
@@ -162,6 +130,9 @@ Dessa forma, a solução proposta busca tornar o processo mais rápido, seguro e
 
 ## 4. Projeto da solução
 
+A seção de projeto da solução consolida as decisões técnicas e o **modelo de dados** que sustentam os processos descritos. São apresentados o diagrama entidade-relacionamento do ServNow, as tecnologias adotadas no front-end e no back-end (incluindo React, Vite, Spring Boot, JPA/Hibernate e PostgreSQL hospedado em nuvem), bem como integrações com serviços externos de CEP e mapas.
+
+O modelo relacional foi pensado para suportar não apenas o funcionamento operacional da aplicação, mas também os **indicadores de desempenho** definidos para o trabalho (avaliações, serviços concluídos e pagos, totais financeiros por período).
 O documento a seguir apresenta o detalhamento do projeto da solução. São apresentadas duas seções que descrevem, respectivamente: modelo relacional e tecnologias._
 
 [Projeto da solução](solution-design.md "Detalhamento do projeto da solução: modelo relacional e tecnologias.")
@@ -169,6 +140,7 @@ O documento a seguir apresenta o detalhamento do projeto da solução. São apre
 
 ## 5. Indicadores de desempenho
 
+Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade e o volume dos serviços mediados pela plataforma. Foram definidos, no mínimo, três indicadores — avaliação média, serviços concluídos e gastos/ganhos mensais — com fórmulas de cálculo e fontes de dados explicitamente vinculadas às tabelas do modelo relacional, conforme exigência do template acadêmico.
 _O documento a seguir apresenta os indicadores de desempenho dos processos._
 
 [Indicadores de desempenho dos processos](performance-indicators.md)
@@ -176,6 +148,7 @@ _O documento a seguir apresenta os indicadores de desempenho dos processos._
 
 ## 6. Interface do sistema
 
+A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, fluxo de solicitação e propostas, mapa de oportunidades, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e telas de perfil. O objetivo é demonstrar como os processos modelados se materializam na experiência do usuário.
 _A sessão a seguir apresenta a descrição do produto de software desenvolvido._ 
 
 [Documentação da interface do sistema](interface.md)
@@ -185,6 +158,22 @@ _A sessão a seguir apresenta a descrição do produto de software desenvolvido.
 _Apresente aqui a conclusão do seu trabalho. Deve ser apresentada aqui uma discussão dos resultados obtidos no trabalho, local em que se verifica as observações pessoais de cada aluno. Essa seção poderá também apresentar sugestões de novas linhas de estudo._
 
 # REFERÊNCIAS
+
+_Como um projeto de software não exige revisão bibliográfica extensa, a inclusão de referências não é obrigatória. Caso desejem incluir fontes sobre tecnologias, padrões ou metodologias utilizadas, relacionem-nas conforme a ABNT._
+
+_Verifique no link abaixo o padrão de referências da PUC Minas:_
+
+http://portal.pucminas.br/imagedb/documento/DOC_DSC_NOME_ARQUI20160217102425.pdf
+
+**[1.1]** — ELMASRI, Ramez; NAVATHE, Sham. **Sistemas de banco de dados**. 7. ed. São Paulo: Pearson, c2019. E-book. ISBN 9788543025001.
+
+**[1.2]** — COPPIN, Ben. **Inteligência artificial**. Rio de Janeiro, RJ: LTC, c2010. E-book. ISBN 978-85-216-2936-8.
+
+**[1.3]** — CORMEN, Thomas H. et al. **Algoritmos: teoria e prática**. Rio de Janeiro, RJ: Elsevier, Campus, c2012. xvi, 926 p. ISBN 9788535236996.
+
+**[1.4]** — SUTHERLAND, Jeffrey Victor. **Scrum: a arte de fazer o dobro do trabalho na metade do tempo**. 2. ed. rev. São Paulo, SP: Leya, 2016. 236, [4] p. ISBN 9788544104514.
+
+**[1.5]** — RUSSELL, Stuart J.; NORVIG, Peter. **Inteligência artificial**. Rio de Janeiro: Elsevier, c2013. xxi, 988 p. ISBN 9788535237016.
 
 _Como um projeto de software não requer revisão bibliográfica, a inclusão das referências não é obrigatória. No entanto, caso você deseje incluir referências relacionadas às tecnologias, padrões, ou metodologias que serão usadas no seu trabalho, relacione-as de acordo com a ABNT._
 
