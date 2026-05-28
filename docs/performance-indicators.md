@@ -6,8 +6,15 @@ _Usar o seguinte modelo:_
 
 | **Indicador** | **Objetivos** | **Descrição** | **Fonte de dados** | **Fórmula de cálculo** |
 | ---           | ---           | ---           | ---             | ---             |
-| Percentual de reclamações | Avaliar quantitativamente as reclamações | Percentual de reclamações em relação ao total de atendimentos | Tabela Reclamações | número total de reclamações / número total de atendimentos |
-| Taxa de requisições atendidas | Melhorar a prestação de serviços medindo a porcentagem de requisições atendidas| Mede a % de requisições atendidas na semana | Tabela Solicitações | (número de requisições atendidas / número total de requisições) * 100 |
-| Taxa de entrega de material | Manter controle sobre os materiais que estão sendo entregues | Mede % de material entregue dentro do mês | Tabela Pedidos | (número de pedidos entregues / número total de pedidos) * 100 |
+| Avaliação média| Medir a reputação de clientes e prestadores na plataforma |Média das notas de 1 a 5 estrelas, considerando apenas serviços concluídos e pagos. | Tabela AVALIACAO E  USUARIO | somadasavaliações / número totaldeavaliacoes |
+| Serviços concluídos | Medir o volume de serviços finalizados com sucesso na plataforma| Contagem de ordens de serviço encerradas somente após a confirmação de pagamento | Tabela ORDEM_SERVICO| Numero de ordens de serviço concluidas |
+| Gastos mensais (cliente) / Ganhos mensais (prestador)| Acompanhar o fluxo financeiro mensal dos usuários na plataforma | Cliente: total pago em serviços no ano/mês/semana Prestador: total recebido por serviços prestados no mesmo período| Tabela ORDEM_SERVICO e PAGAMENTO | totalrecebido/mes/ano/semana
 
-_Obs.: todas as informações para gerar os indicadores devem estar no modelo relacional._
+### Metas 
+
+| **Indicador** | Meta  |
+| --- | --- |
+| Avaliação média | Manter média ≥ 4,0 estrelas (escala 1–5) para prestadores e clientes ativos |
+| Serviços concluídos | Aumentar o número de serviços concluídos e pagos por mês (5/mês por prestador ativo) |
+| Gastos / ganhos mensais | Cliente: controle de orçamento mensal  Prestador: meta de receita mensal conforme perfil profissional |
+
