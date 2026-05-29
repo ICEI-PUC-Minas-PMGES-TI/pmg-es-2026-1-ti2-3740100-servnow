@@ -7,14 +7,22 @@ import { toast } from "react-toastify";
 import { ClientePerfil } from "../../pages/Configurarperfil/Cliente";
 import { PrestadorPerfil } from "../../pages/Configurarperfil/Prestador";
 import {
+  criarChavePix,
+  criarEnderecoCliente,
+  type ChavePixItem,
+  type EnderecoClienteItem,
+} from "./clienteCadastroTypes";
+import {
     API_URL,
     authHeaders,
     clearAuthSession,
     getAuthSession,
     saveAuthSession,
+    type ClienteCadastroSyncRequest,
     type PerfilResponse,
     type PerfilUpdateRequest,
 } from "../../services/auth";
+import { enviarFotoEnderecoCliente, sincronizarCadastrosCliente } from "../../services/clienteCadastro";
 import { carregarArquivoAutenticado } from "../../utils/arquivoAutenticado";
 import { otimizarImagemParaUpload } from "../../utils/otimizarImagemArquivo";
 import { Header } from "../Header/Header";
@@ -48,6 +56,8 @@ export type FormState = {
   documentoPendente: File | null;
   documentoEhPdf: boolean;
   removerDocumentoIdentidade: boolean;
+  enderecos: EnderecoClienteItem[];
+  chavesPix: ChavePixItem[];
 };
 
 const initialState: FormState = {
@@ -78,6 +88,8 @@ const initialState: FormState = {
   documentoPendente: null,
   documentoEhPdf: false,
   removerDocumentoIdentidade: false,
+  enderecos: [criarEnderecoCliente(true)],
+  chavesPix: [],
 };
 
 const MAX_FOTO_FILE_BYTES = 5 * 1024 * 1024;
@@ -118,17 +130,77 @@ export function Perfil() {
         }
 
         const data = (await response.json()) as PerfilResponse;
-        const [fotoPerfilArquivo, fotoLocalArquivo, documentoArquivo] = await Promise.all([
-          data.fotoPerfilUrl
-            ? carregarArquivoAutenticado(data.fotoPerfilUrl, session.token).catch(() => null)
-            : Promise.resolve(null),
-          data.fotoLocalUrl
-            ? carregarArquivoAutenticado(data.fotoLocalUrl, session.token).catch(() => null)
-            : Promise.resolve(null),
-          data.documentoIdentidadeUrl
-            ? carregarArquivoAutenticado(data.documentoIdentidadeUrl, session.token).catch(() => null)
-            : Promise.resolve(null),
-        ]);
+        const fotoPerfilArquivo = data.fotoPerfilUrl
+          ? await carregarArquivoAutenticado(data.fotoPerfilUrl, session.token).catch(() => null)
+          : null;
+        const documentoArquivo =
+          session.tipoUsuario === "PRESTADOR" && data.documentoIdentidadeUrl
+            ? await carregarArquivoAutenticado(data.documentoIdentidadeUrl, session.token).catch(() => null)
+            : null;
+
+        let enderecos: EnderecoClienteItem[] = [criarEnderecoCliente(true)];
+        let chavesPix: ChavePixItem[] = [];
+
+        if (session.tipoUsuario === "CLIENTE") {
+          if (data.enderecos && data.enderecos.length > 0) {
+            enderecos = await Promise.all(
+              data.enderecos.map(async (item) => {
+                const foto = item.fotoUrl
+                  ? await carregarArquivoAutenticado(item.fotoUrl, session.token).catch(() => null)
+                  : null;
+                return {
+                  clientKey: crypto.randomUUID(),
+                  id: item.id,
+                  rotulo: item.rotulo ?? "",
+                  rua: item.rua ?? "",
+                  numero: item.numero ?? "",
+                  cep: item.cep ?? "",
+                  complemento: item.complemento ?? "",
+                  bairro: item.bairro ?? "",
+                  cidade: item.cidade ?? "",
+                  estado: item.estado ?? "",
+                  fotoPreview: foto?.url ?? null,
+                  fotoPendente: null,
+                  removerFoto: false,
+                  principal: item.principal,
+                };
+              }),
+            );
+          } else if (data.cep) {
+            const fotoLocal = data.fotoLocalUrl
+              ? await carregarArquivoAutenticado(data.fotoLocalUrl, session.token).catch(() => null)
+              : null;
+            enderecos = [{
+              clientKey: crypto.randomUUID(),
+              rotulo: "Principal",
+              rua: data.rua ?? "",
+              numero: data.numero ?? "",
+              cep: data.cep ?? "",
+              complemento: data.complemento ?? "",
+              bairro: data.bairro ?? "",
+              cidade: data.cidade ?? "",
+              estado: data.estado ?? "",
+              fotoPreview: fotoLocal?.url ?? null,
+              fotoPendente: null,
+              removerFoto: false,
+              principal: true,
+            }];
+          }
+
+          chavesPix =
+            data.chavesPix && data.chavesPix.length > 0
+              ? data.chavesPix.map((item) => ({
+                  clientKey: crypto.randomUUID(),
+                  id: item.id,
+                  rotulo: item.rotulo ?? "",
+                  chave: item.chave,
+                  tipo: (item.tipo as ChavePixItem["tipo"]) || "OUTRA",
+                  principal: item.principal,
+                }))
+              : data.chavePix
+                ? [{ ...criarChavePix(true), chave: data.chavePix, rotulo: "Principal" }]
+                : [];
+        }
 
         setForm({
           nome: data.nome ?? "",
@@ -145,7 +217,7 @@ export function Perfil() {
           fotoPerfilAjusteX: String(data.fotoPerfilAjusteX ?? 50),
           fotoPerfilAjusteY: String(data.fotoPerfilAjusteY ?? 50),
           fotoPerfilEnquadramento: data.fotoPerfilEnquadramento ?? "cover",
-          fotoLocalPreview: fotoLocalArquivo?.url ?? null,
+          fotoLocalPreview: null,
           fotoLocalPendente: null,
           removerFotoLocal: false,
           descricaoProfissional: data.descricaoProfissional ?? "",
@@ -162,6 +234,8 @@ export function Perfil() {
           documentoPendente: null,
           documentoEhPdf: documentoArquivo?.mimeType === "application/pdf",
           removerDocumentoIdentidade: false,
+          enderecos,
+          chavesPix,
         });
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar perfil.");
@@ -242,7 +316,7 @@ export function Perfil() {
     }
   }
 
-  async function handleFotoLocalChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFotoEnderecoChange(clientKey: string, event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -253,15 +327,21 @@ export function Perfil() {
 
     try {
       const otimizado = await otimizarImagemParaUpload(file);
-      setForm((current) => {
-        revogarPreview(current.fotoLocalPreview);
-        return {
-          ...current,
-          fotoLocalPendente: otimizado,
-          fotoLocalPreview: URL.createObjectURL(otimizado),
-          removerFotoLocal: false,
-        };
-      });
+      setForm((current) => ({
+        ...current,
+        enderecos: current.enderecos.map((item) => {
+          if (item.clientKey !== clientKey) return item;
+          if (item.fotoPreview?.startsWith("blob:")) {
+            URL.revokeObjectURL(item.fotoPreview);
+          }
+          return {
+            ...item,
+            fotoPendente: otimizado,
+            fotoPreview: URL.createObjectURL(otimizado),
+            removerFoto: false,
+          };
+        }),
+      }));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
     } finally {
@@ -339,7 +419,11 @@ export function Perfil() {
       return;
     }
 
-    if (!validarEndereco(form)) {
+    if (session.tipoUsuario === "CLIENTE") {
+      if (!validarCadastrosCliente(form)) {
+        return;
+      }
+    } else if (!validarEndereco(form)) {
       return;
     }
 
@@ -352,18 +436,10 @@ export function Perfil() {
     const payload: PerfilUpdateRequest = session.tipoUsuario === "CLIENTE"
       ? {
           nome: form.nome.trim(),
-          rua: form.rua,
-          numero: form.numero,
-          cep: form.cep,
-          complemento: form.complemento,
-          bairro: form.bairro,
-          cidade: form.cidade,
-          estado: form.estado,
           fotoPerfilAjusteX: Number(form.fotoPerfilAjusteX),
           fotoPerfilAjusteY: Number(form.fotoPerfilAjusteY),
           fotoPerfilEnquadramento: form.fotoPerfilEnquadramento,
           removerFotoPerfil: form.removerFotoPerfil,
-          removerFotoLocal: form.removerFotoLocal,
         }
       : {
           nome: form.nome.trim(),
@@ -392,9 +468,6 @@ export function Perfil() {
     if (form.fotoPerfilPendente) {
       formData.append("fotoPerfil", form.fotoPerfilPendente);
     }
-    if (session.tipoUsuario === "CLIENTE" && form.fotoLocalPendente) {
-      formData.append("fotoLocal", form.fotoLocalPendente);
-    }
     if (session.tipoUsuario === "PRESTADOR" && form.documentoPendente) {
       formData.append("documentoIdentidade", form.documentoPendente);
     }
@@ -418,7 +491,57 @@ export function Perfil() {
         throw new Error(await getResponseError(response, "Nao foi possivel salvar o perfil."));
       }
 
-      const perfilAtualizado = (await response.json()) as PerfilResponse;
+      let perfilAtualizado = (await response.json()) as PerfilResponse;
+
+      if (session.tipoUsuario === "CLIENTE") {
+        const cadastrosPayload: ClienteCadastroSyncRequest = {
+          enderecos: form.enderecos.map((item) => ({
+            id: item.id,
+            rotulo: item.rotulo || undefined,
+            rua: item.rua.trim(),
+            numero: item.numero.trim(),
+            cep: item.cep,
+            complemento: item.complemento || undefined,
+            bairro: item.bairro.trim(),
+            cidade: item.cidade.trim(),
+            estado: item.estado.trim(),
+            principal: item.principal,
+            removerFoto: item.removerFoto,
+          })),
+          chavesPix: form.chavesPix
+            .filter((item) => item.chave.trim())
+            .map((item) => ({
+              id: item.id,
+              rotulo: item.rotulo || undefined,
+              chave: item.chave.trim(),
+              tipo: item.tipo,
+              principal: item.principal,
+            })),
+        };
+
+        for (const item of form.enderecos) {
+          if (item.id && item.fotoPendente) {
+            await enviarFotoEnderecoCliente(session.token, item.id, item.fotoPendente);
+          }
+        }
+
+        perfilAtualizado = await sincronizarCadastrosCliente(session.token, cadastrosPayload);
+
+        for (const item of form.enderecos) {
+          if (item.fotoPendente && !item.id) {
+            const salvo = perfilAtualizado.enderecos?.find(
+              (e) =>
+                e.rua === item.rua.trim() &&
+                e.numero === item.numero.trim() &&
+                e.cep.replace(/\D/g, "") === item.cep.replace(/\D/g, ""),
+            );
+            if (salvo?.id) {
+              await enviarFotoEnderecoCliente(session.token, salvo.id, item.fotoPendente);
+            }
+          }
+        }
+      }
+
       saveAuthSession({
         ...session,
         nome: perfilAtualizado.nome,
@@ -564,9 +687,11 @@ export function Perfil() {
 
               {isCliente ? (
                 <ClientePerfil
-                  form={form}
-                  updateField={updateField}
-                  handleFotoChange={handleFotoLocalChange}
+                  enderecos={form.enderecos}
+                  chavesPix={form.chavesPix}
+                  onEnderecosChange={(enderecos) => setForm((current) => ({ ...current, enderecos }))}
+                  onChavesPixChange={(chavesPix) => setForm((current) => ({ ...current, chavesPix }))}
+                  onFotoEnderecoChange={handleFotoEnderecoChange}
                 />
               ) : (
                 <PrestadorPerfil
@@ -613,6 +738,42 @@ async function getResponseError(response: Response, fallback: string) {
   } catch {
     return fallback;
   }
+}
+
+function validarCadastrosCliente(form: FormState) {
+  if (form.enderecos.length === 0) {
+    toast.error("Cadastre pelo menos um endereco.");
+    return false;
+  }
+
+  const principaisEndereco = form.enderecos.filter((item) => item.principal).length;
+  if (principaisEndereco !== 1) {
+    toast.error("Selecione exatamente um endereco principal.");
+    return false;
+  }
+
+  for (const [indice, item] of form.enderecos.entries()) {
+    const cep = item.cep.replace(/\D/g, "");
+    if (cep.length !== 8) {
+      toast.error(`Endereco ${indice + 1}: informe um CEP valido.`);
+      return false;
+    }
+    if (!item.rua.trim() || !item.numero.trim() || !item.bairro.trim() || !item.cidade.trim() || !item.estado.trim()) {
+      toast.error(`Endereco ${indice + 1}: preencha rua, numero, bairro, cidade e estado.`);
+      return false;
+    }
+  }
+
+  const chavesPreenchidas = form.chavesPix.filter((item) => item.chave.trim());
+  if (chavesPreenchidas.length > 0) {
+    const principaisPix = chavesPreenchidas.filter((item) => item.principal).length;
+    if (principaisPix !== 1) {
+      toast.error("Selecione exatamente uma chave PIX principal.");
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function validarEndereco(form: FormState) {

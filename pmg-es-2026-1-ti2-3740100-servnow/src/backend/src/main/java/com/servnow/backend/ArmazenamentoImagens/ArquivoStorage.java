@@ -21,6 +21,7 @@ public class ArquivoStorage {
     public static final String PASTA_ACOMPANHAMENTO = "acompanhamento";
     public static final String PASTA_PERFIL = "usuarios/perfil";
     public static final String PASTA_FOTO_LOCAL = "usuarios/fotos";
+    public static final String PASTA_ENDERECO_CLIENTE = "usuarios/enderecos";
     public static final String PASTA_DOCUMENTOS = "usuarios/documentos";
 
     private static final long TAMANHO_MAXIMO_IMAGEM_BYTES = 2 * 1024 * 1024;

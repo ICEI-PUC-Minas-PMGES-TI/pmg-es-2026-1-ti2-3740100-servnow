@@ -351,3 +351,84 @@
     height: 320px;
   }
 }
+
+.perfil-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.perfil-section-header h2 {
+  margin: 0 0 6px;
+}
+
+.perfil-endereco-card,
+.perfil-pix-card {
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--workspace-surface-soft);
+}
+
+.perfil-endereco-card--principal,
+.perfil-pix-card--principal {
+  border-color: var(--perfil-accent-border);
+  box-shadow: 0 0 0 1px var(--perfil-accent-soft);
+}
+
+.perfil-endereco-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.perfil-endereco-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.perfil-endereco-remover {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.perfil-endereco-indice {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: var(--workspace-muted);
+  font-weight: 600;
+}
+
+.perfil-endereco-foto {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--workspace-border);
+}
+
+.perfil-endereco-foto h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.perfil-lista-vazia {
+  margin: 0;
+  color: var(--workspace-muted);
+  font-size: 0.9rem;
+}
