@@ -233,7 +233,7 @@ export function Propostas() {
                       {avaliacao != null ? (
                         <div className="painel-proposta-avaliacao" aria-label={`${avaliacao} estrelas`}>
                           <Star size={15} fill="currentColor" />
-                          {avaliacao.toFixed(1)}
+                          {avaliacao.toFixed(2).replace(".", ",")}
                         </div>
                       ) : null}
                       <span className={`painel-status ${getPropostaStatusClass(proposta.status)}`}>

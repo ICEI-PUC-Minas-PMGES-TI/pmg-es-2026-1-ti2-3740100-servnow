@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.acompanhamento.pix.PixQrCodeService;
 import com.servnow.backend.acompanhamento.domain.EtapaOrdemServico;
 import com.servnow.backend.acompanhamento.domain.OrdemServico;
 import com.servnow.backend.acompanhamento.dto.ConfirmarChegadaRequest;
@@ -49,6 +50,9 @@ class AcompanhamentoServiceTest {
 
     @Mock
     private ArquivoStorage arquivoStorage;
+
+    @Mock
+    private PixQrCodeService pixQrCodeService;
 
     @InjectMocks
     private AcompanhamentoService acompanhamentoService;

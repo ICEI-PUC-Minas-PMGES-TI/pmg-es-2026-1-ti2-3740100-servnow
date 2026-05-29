@@ -2,8 +2,10 @@ package com.servnow.backend.perfil.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,12 @@ class PerfilServiceTest {
     @Mock
     private GeocodingService geocodingService;
 
+    @Mock
+    private AvaliacaoService avaliacaoService;
+
+    @Mock
+    private ClienteCadastroService clienteCadastroService;
+
     @InjectMocks
     private PerfilService perfilService;
 
@@ -43,6 +51,9 @@ class PerfilServiceTest {
         Usuario usuario = usuario(TipoUsuario.CLIENTE);
         usuario.setRua("Rua A");
         usuario.setCidade("Belo Horizonte");
+        when(avaliacaoService.calcularResumo(any(Usuario.class))).thenReturn(AvaliacaoService.ResumoAvaliacoes.vazio());
+        when(clienteCadastroService.listarEnderecos(any(Usuario.class))).thenReturn(List.of());
+        when(clienteCadastroService.listarChavesPix(any(Usuario.class))).thenReturn(List.of());
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
         PerfilResponse response = perfilService.buscar(usuarioAutenticado());
@@ -65,17 +76,18 @@ class PerfilServiceTest {
     }
 
     @Test
-    void atualizarClienteNormalizaCamposDeEndereco() {
+    void atualizarClienteAtualizaNome() {
         Usuario usuario = usuario(TipoUsuario.CLIENTE);
         PerfilUpdateRequest request = new PerfilUpdateRequest(
             " Maria Silva ",
-            " Rua A ",
-            " 123 ",
-            " 30100-000 ",
-            " Apto 301 ",
-            " Centro ",
-            " Belo Horizonte ",
-            " mg ",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -90,16 +102,16 @@ class PerfilServiceTest {
             null
         );
 
+        when(avaliacaoService.calcularResumo(any(Usuario.class))).thenReturn(AvaliacaoService.ResumoAvaliacoes.vazio());
+        when(clienteCadastroService.listarEnderecos(any(Usuario.class))).thenReturn(List.of());
+        when(clienteCadastroService.listarChavesPix(any(Usuario.class))).thenReturn(List.of());
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(usuarioRepository.save(usuario)).thenReturn(usuario);
 
         PerfilResponse response = perfilService.atualizarCliente(usuarioAutenticado(), request, null, null, null);
 
         assertThat(response.nome()).isEqualTo("Maria Silva");
-        assertThat(response.rua()).isEqualTo("Rua A");
-        assertThat(response.numero()).isEqualTo("123");
-        assertThat(response.complemento()).isEqualTo("Apto 301");
-        assertThat(response.estado()).isEqualTo("MG");
+        assertThat(usuario.getNome()).isEqualTo("Maria Silva");
     }
 
     @Test
@@ -125,7 +137,8 @@ class PerfilServiceTest {
             "SEGUNDA",
             "08:00",
             "17:00",
-            10
+            10,
+            null
         );
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
