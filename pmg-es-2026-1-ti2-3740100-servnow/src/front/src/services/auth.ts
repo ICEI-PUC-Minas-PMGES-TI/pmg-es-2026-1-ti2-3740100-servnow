@@ -63,6 +63,60 @@ export type PerfilResponse = {
   horarioFim: string | null;
   raioAtendimentoKm: number | null;
   documentoIdentidadeUrl: string | null;
+  chavePix?: string | null;
+  avaliacaoMedia: number | null;
+  totalAvaliacoes: number;
+  enderecos?: ClienteEnderecoResponse[];
+  chavesPix?: ClienteChavePixResponse[];
+};
+
+export type ClienteEnderecoResponse = {
+  id: number;
+  rotulo: string | null;
+  rua: string;
+  numero: string;
+  cep: string;
+  complemento: string | null;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  fotoUrl: string | null;
+  principal: boolean;
+};
+
+export type ClienteChavePixResponse = {
+  id: number;
+  rotulo: string | null;
+  chave: string;
+  tipo: string;
+  principal: boolean;
+};
+
+export type ClienteEnderecoRequest = {
+  id?: number;
+  rotulo?: string;
+  rua: string;
+  numero: string;
+  cep: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  principal: boolean;
+  removerFoto?: boolean;
+};
+
+export type ClienteChavePixRequest = {
+  id?: number;
+  rotulo?: string;
+  chave: string;
+  tipo: string;
+  principal: boolean;
+};
+
+export type ClienteCadastroSyncRequest = {
+  enderecos: ClienteEnderecoRequest[];
+  chavesPix: ClienteChavePixRequest[];
 };
 
 export type PerfilUpdateRequest = {
@@ -197,7 +251,7 @@ export async function buscarPerfilPublico(
 }
 
 const AUTH_STORAGE_KEY = "servnow.auth";
-export const API_URL = "http://localhost:8080";
+export const API_URL = import.meta.env.VITE_API_URL?.trim() || "http://localhost:8080";
 
 export function saveAuthSession(session: AuthResponse) {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));

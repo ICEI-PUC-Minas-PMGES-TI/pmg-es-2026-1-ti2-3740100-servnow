@@ -37,6 +37,9 @@ public class JwtService {
         claims.put("id", usuario.getId());
         claims.put("nome", usuario.getNome());
         claims.put("tipoUsuario", usuario.getTipoUsuario().name());
+        // Claims exigidos pelo PostgREST/Supabase Data API (role authenticated + aud)
+        claims.put("role", "authenticated");
+        claims.put("aud", "authenticated");
 
         Instant agora = Instant.now();
         Instant expiracao = agora.plusMillis(expirationMs);
