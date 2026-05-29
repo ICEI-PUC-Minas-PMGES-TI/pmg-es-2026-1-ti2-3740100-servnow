@@ -21,6 +21,7 @@ import {
   iniciarAcompanhamento,
   obterDetalhe,
   renovarCodigo,
+  selecionarMetodoPagamento,
   type AcompanhamentoDetalhe,
 } from "../../../../services/acompanhamento";
 import {
@@ -91,6 +92,20 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     void carregar();
   }, [carregar]);
 
+  useEffect(() => {
+    if (!detalhe || etapaBackendParaCliente(detalhe.etapa) !== "pagamento") {
+      return;
+    }
+    if (detalhe.metodoPagamentoSelecionado === metodoPagamento) {
+      return;
+    }
+    void selecionarMetodoPagamento(solicitacaoId, metodoPagamento)
+      .then(setDetalhe)
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : "Erro ao sincronizar metodo de pagamento.");
+      });
+  }, [detalhe, metodoPagamento, solicitacaoId]);
+
   const etapa = detalhe ? etapaBackendParaCliente(detalhe.etapa) : "aguardando-chegada";
   const tituloServico = detalhe
     ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
@@ -109,6 +124,15 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       toast.error(error instanceof Error ? error.message : "Erro ao renovar codigo.");
     } finally {
       setEnviando(false);
+    }
+  }
+
+  async function handleMetodoPagamentoChange(metodo: MetodoPagamento) {
+    setMetodoPagamento(metodo);
+    try {
+      setDetalhe(await selecionarMetodoPagamento(solicitacaoId, metodo));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao selecionar metodo de pagamento.");
     }
   }
 
@@ -310,7 +334,7 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
                     name="metodo-pagamento"
                     value={metodo.id}
                     checked={metodoPagamento === metodo.id}
-                    onChange={() => setMetodoPagamento(metodo.id)}
+                    onChange={() => void handleMetodoPagamentoChange(metodo.id)}
                   />
                 </label>
               );

@@ -17,9 +17,12 @@ import { toast } from "react-toastify";
 import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
+  avaliarCliente,
+  carregarPixQrCode,
   confirmarChegada,
   concluirExecucao,
   iniciarAcompanhamento,
+  obterDetalhe,
   registrarAtualizacao,
   type AcompanhamentoDetalhe,
 } from "../../../../services/acompanhamento";
@@ -67,6 +70,11 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const [novaFoto, setNovaFoto] = useState<File | null>(null);
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [pixQrUrl, setPixQrUrl] = useState<string | null>(null);
+  const [carregandoPixQr, setCarregandoPixQr] = useState(false);
+  const [pixQrErro, setPixQrErro] = useState<string | null>(null);
+  const [notaCliente, setNotaCliente] = useState(0);
+  const [comentarioCliente, setComentarioCliente] = useState("");
 
   const carregar = useCallback(async () => {
     try {
@@ -85,6 +93,91 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   }, [carregar]);
 
   const etapa = detalhe ? etapaBackendParaPrestador(detalhe.etapa) : "confirmar-chegada";
+
+  useEffect(() => {
+    if (etapa !== "aguardando-pagamento") {
+      return;
+    }
+    const intervalo = window.setInterval(() => {
+      void obterDetalhe(solicitacaoId)
+        .then(setDetalhe)
+        .catch(() => undefined);
+    }, 3000);
+    return () => window.clearInterval(intervalo);
+  }, [etapa, solicitacaoId]);
+
+  const clienteEscolheuPix = detalhe?.metodoPagamentoSelecionado === "PIX";
+
+  useEffect(() => {
+    if (etapa !== "aguardando-pagamento") {
+      setPixQrUrl((anterior) => {
+        if (anterior) {
+          URL.revokeObjectURL(anterior);
+        }
+        return null;
+      });
+      setPixQrErro(null);
+      return;
+    }
+
+    let cancelado = false;
+
+    async function carregarQr() {
+      setCarregandoPixQr(true);
+      setPixQrErro(null);
+      try {
+        const url = await carregarPixQrCode(solicitacaoId);
+        if (cancelado) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        setPixQrUrl((anterior) => {
+          if (anterior) {
+            URL.revokeObjectURL(anterior);
+          }
+          return url;
+        });
+      } catch (error) {
+        if (!cancelado) {
+          setPixQrUrl((anterior) => {
+            if (anterior) {
+              URL.revokeObjectURL(anterior);
+            }
+            return null;
+          });
+          setPixQrErro(error instanceof Error ? error.message : "Nao foi possivel gerar o QR Code PIX.");
+        }
+      } finally {
+        if (!cancelado) {
+          setCarregandoPixQr(false);
+        }
+      }
+    }
+
+    void carregarQr();
+    const intervalo = window.setInterval(() => {
+      if (!cancelado) {
+        void carregarQr();
+      }
+    }, 8000);
+
+    return () => {
+      cancelado = true;
+      window.clearInterval(intervalo);
+    };
+  }, [etapa, solicitacaoId]);
+
+  useEffect(() => {
+    return () => {
+      setPixQrUrl((anterior) => {
+        if (anterior) {
+          URL.revokeObjectURL(anterior);
+        }
+        return null;
+      });
+    };
+  }, []);
+
   const tituloServico = detalhe
     ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
     : "";
@@ -167,6 +260,24 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       setEnviando(false);
     }
   }
+
+  async function handleAvaliarCliente() {
+    if (notaCliente === 0) return;
+    setEnviando(true);
+    try {
+      setDetalhe(await avaliarCliente(solicitacaoId, notaCliente, comentarioCliente || undefined));
+      setNotaCliente(0);
+      setComentarioCliente("");
+      toast.success("Avaliacao do cliente enviada.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliacao.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  const prestadorJaAvaliouCliente = detalhe?.notaAvaliacaoPrestador != null;
+  const clienteJaAvaliouPrestador = detalhe?.notaAvaliacao != null;
 
   if (isLoading || !detalhe) {
     return (
@@ -359,61 +470,127 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
           </div>
 
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            O cliente confirmara o pagamento na plataforma. Aguarde a confirmacao.
+            {clienteEscolheuPix
+              ? "O cliente escolheu PIX. Mostre o QR Code abaixo para receber o pagamento."
+              : "QR Code PIX disponivel abaixo. O cliente ainda pode alterar a forma de pagamento no app."}
           </p>
 
-          <div className="acomp-pagamento-opcao selecionada" style={{ marginBottom: 18 }}>
-            <span className="acomp-pagamento-opcao-icone">
-              <Smartphone size={18} />
-            </span>
-            <span className="acomp-pagamento-opcao-info">
-              <strong>Aguardando cliente</strong>
-              <span>Pagamento via app</span>
-            </span>
-            <QrCode size={20} style={{ marginLeft: "auto", color: "var(--brand-strong)" }} />
+          <div className="acomp-pix-qr-container">
+            {carregandoPixQr && !pixQrUrl && (
+              <p className="acomp-pix-qr-status">Gerando QR Code PIX...</p>
+            )}
+            {pixQrUrl && (
+              <img
+                src={pixQrUrl}
+                alt="QR Code PIX para pagamento do servico"
+                className="acomp-pix-qr-imagem"
+              />
+            )}
+            {!carregandoPixQr && !pixQrUrl && (
+              <p className="acomp-pix-qr-status">
+                {pixQrErro ?? "Nao foi possivel carregar o QR Code. Tentando novamente..."}
+              </p>
+            )}
           </div>
+
+          <p className="acomp-pix-qr-legenda">
+            Valor: {formatarMoedaBrl(valorExibir)} — recebedor: {detalhe.prestadorNome ?? "Prestador"}
+          </p>
+
+          {!clienteEscolheuPix && (
+            <div className="acomp-pagamento-opcao selecionada" style={{ marginTop: 18 }}>
+              <span className="acomp-pagamento-opcao-icone">
+                <Smartphone size={18} />
+              </span>
+              <span className="acomp-pagamento-opcao-info">
+                <strong>Aguardando confirmacao do cliente</strong>
+                <span>Selecao de pagamento no app do cliente</span>
+              </span>
+              <QrCode size={20} style={{ marginLeft: "auto", color: "var(--brand-strong)" }} />
+            </div>
+          )}
         </section>
       )}
 
-      {etapa === "aguardando-avaliacao" && (
+      {(etapa === "aguardando-avaliacao" || etapa === "concluido") && (
         <section className="painel-card">
-          <div className="acomp-final">
-            <div className="acomp-final-icone">
-              <Star size={36} fill="#facc15" color="#facc15" />
-            </div>
-            <h2>Aguardando avaliacao do cliente</h2>
-            <p>
-              O servico foi concluido e o pagamento confirmado. Em breve voce recebera a avaliacao do cliente.
+          <div className="painel-card-cabecalho">
+            <h2>{prestadorJaAvaliouCliente ? "Avaliacao enviada" : "Avaliar cliente"}</h2>
+          </div>
+
+          {etapa === "aguardando-avaliacao" && !clienteJaAvaliouPrestador && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
+              O pagamento foi confirmado. Aguardando o cliente avaliar seu atendimento.
             </p>
-            <button
-              type="button"
-              className="acomp-btn-primary"
-              onClick={() => navigate("/acompanhamento")}
-              style={{ maxWidth: 280 }}
-            >
-              Voltar para lista
-            </button>
-          </div>
-        </section>
-      )}
+          )}
 
-      {etapa === "concluido" && (
-        <section className="painel-card">
-          <div className="acomp-final">
-            <div className="acomp-final-icone">
-              <CheckCircle2 size={36} />
+          {etapa === "concluido" && clienteJaAvaliouPrestador && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
+              O cliente ja avaliou seu servico. Avalie o cliente para registrar a experiencia.
+            </p>
+          )}
+
+          {prestadorJaAvaliouCliente ? (
+            <div className="acomp-final" style={{ padding: "12px 0" }}>
+              <p style={{ margin: 0, color: "var(--workspace-muted)", fontSize: 14 }}>
+                Voce avaliou {detalhe.clienteNome} com {detalhe.notaAvaliacaoPrestador} estrela(s).
+              </p>
             </div>
-            <h2>Servico finalizado!</h2>
-            <p>O cliente concluiu a avaliacao. Obrigado por usar a Servnow.</p>
-            <button
-              type="button"
-              className="acomp-btn-primary"
-              onClick={() => navigate("/acompanhamento")}
-              style={{ maxWidth: 280 }}
-            >
-              Atender novo servico
-            </button>
-          </div>
+          ) : (
+            <>
+              <div className="acomp-cliente-mini" style={{ marginBottom: 16 }}>
+                <div className="acomp-cliente-mini-avatar">{iniciaisCliente}</div>
+                <div className="acomp-cliente-mini-info">
+                  <strong>{detalhe.clienteNome}</strong>
+                  <span>{tituloServico}</span>
+                </div>
+              </div>
+
+              <p style={{ textAlign: "center", margin: "8px 0 4px", fontSize: 13, color: "var(--workspace-muted)" }}>
+                Como foi o atendimento com este cliente?
+              </p>
+
+              <div className="acomp-estrelas">
+                {[1, 2, 3, 4, 5].map((valor) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    className={`acomp-estrela ${valor <= notaCliente ? "ativa" : ""}`}
+                    onClick={() => setNotaCliente(valor)}
+                    aria-label={`${valor} estrelas`}
+                  >
+                    <Star size={28} fill={valor <= notaCliente ? "#facc15" : "transparent"} />
+                  </button>
+                ))}
+              </div>
+
+              <textarea
+                className="acomp-textarea"
+                placeholder="Comentario sobre o cliente (opcional)"
+                value={comentarioCliente}
+                onChange={(event) => setComentarioCliente(event.target.value)}
+                style={{ marginTop: 8, marginBottom: 14 }}
+              />
+
+              <button
+                type="button"
+                className="acomp-btn-primary"
+                onClick={() => void handleAvaliarCliente()}
+                disabled={notaCliente === 0 || enviando}
+              >
+                Enviar avaliacao do cliente
+              </button>
+            </>
+          )}
+
+          <button
+            type="button"
+            className="acomp-btn-primary"
+            onClick={() => navigate("/acompanhamento")}
+            style={{ maxWidth: 280, marginTop: 16 }}
+          >
+            Voltar para lista
+          </button>
         </section>
       )}
     </>

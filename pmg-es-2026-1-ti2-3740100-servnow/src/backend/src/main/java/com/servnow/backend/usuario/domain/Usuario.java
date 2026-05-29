@@ -95,6 +95,9 @@ public class Usuario {
     @Column(name = "documento_identidade_arquivo", length = 255)
     private String documentoIdentidadeArquivoRelativo;
 
+    @Column(name = "chave_pix", length = 140)
+    private String chavePix;
+
     @Column
     private Double latitude;
 
@@ -306,6 +309,14 @@ public class Usuario {
 
     public void setDocumentoIdentidadeArquivoRelativo(String documentoIdentidadeArquivoRelativo) {
         this.documentoIdentidadeArquivoRelativo = documentoIdentidadeArquivoRelativo;
+    }
+
+    public String getChavePix() {
+        return chavePix;
+    }
+
+    public void setChavePix(String chavePix) {
+        this.chavePix = chavePix;
     }
 
     public Double getLatitude() {

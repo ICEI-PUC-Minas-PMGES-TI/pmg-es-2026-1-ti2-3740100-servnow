@@ -38,8 +38,11 @@ export type AcompanhamentoDetalhe = {
   previstoTerminoEm: string | null;
   valorFinal: number | null;
   metodoPagamento: string | null;
+  metodoPagamentoSelecionado: string | null;
   notaAvaliacao: number | null;
   comentarioAvaliacao: string | null;
+  notaAvaliacaoPrestador: number | null;
+  comentarioAvaliacaoPrestador: string | null;
   atualizacoes: AtualizacaoServico[];
 };
 
@@ -136,6 +139,20 @@ export function concluirExecucao(solicitacaoId: number) {
   });
 }
 
+export function selecionarMetodoPagamento(
+  solicitacaoId: number,
+  metodoPagamento: "PIX" | "CREDITO" | "DEBITO",
+) {
+  return requestJson<AcompanhamentoDetalhe>(
+    `/api/acompanhamento/${solicitacaoId}/selecionar-metodo-pagamento`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metodoPagamento }),
+    },
+  );
+}
+
 export function confirmarPagamento(solicitacaoId: number, metodoPagamento: "PIX" | "CREDITO" | "DEBITO") {
   return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/confirmar-pagamento`, {
     method: "POST",
@@ -144,8 +161,44 @@ export function confirmarPagamento(solicitacaoId: number, metodoPagamento: "PIX"
   });
 }
 
+export async function carregarPixQrCode(solicitacaoId: number): Promise<string> {
+  const session = getValidAuthSession();
+  if (!session?.token) {
+    throw new Error("Sessao expirada.");
+  }
+
+  const response = await fetch(`${API_URL}/api/acompanhamento/${solicitacaoId}/pix-qrcode`, {
+    headers: authHeader(session.token),
+  });
+
+  if (!response.ok) {
+    const texto = await response.text();
+    let mensagem = "Nao foi possivel carregar o QR Code PIX.";
+    try {
+      const json = JSON.parse(texto) as { detail?: string; title?: string };
+      mensagem = json.detail ?? json.title ?? mensagem;
+    } catch {
+      if (texto) {
+        mensagem = texto;
+      }
+    }
+    throw new Error(mensagem);
+  }
+
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
+}
+
 export function avaliarServico(solicitacaoId: number, nota: number, comentario?: string) {
   return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/avaliar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nota, comentario: comentario ?? null }),
+  });
+}
+
+export function avaliarCliente(solicitacaoId: number, nota: number, comentario?: string) {
+  return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/avaliar-cliente`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nota, comentario: comentario ?? null }),

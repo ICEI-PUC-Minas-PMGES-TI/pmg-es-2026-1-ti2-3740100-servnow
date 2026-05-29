@@ -20,6 +20,7 @@ public record PerfilUpdateRequest(
     String diasDisponiveis,
     String horarioInicio,
     String horarioFim,
-    Integer raioAtendimentoKm
+    Integer raioAtendimentoKm,
+    String chavePix
 ) {
 }
