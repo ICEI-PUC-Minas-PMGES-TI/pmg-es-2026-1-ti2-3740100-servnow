@@ -59,11 +59,20 @@ public class OrdemServico {
     @Column(name = "metodo_pagamento", length = 20)
     private String metodoPagamento;
 
+    @Column(name = "metodo_pagamento_selecionado", length = 20)
+    private String metodoPagamentoSelecionado;
+
     @Column(name = "nota_avaliacao")
     private Short notaAvaliacao;
 
     @Column(name = "comentario_avaliacao", length = 200)
     private String comentarioAvaliacao;
+
+    @Column(name = "nota_avaliacao_prestador")
+    private Short notaAvaliacaoPrestador;
+
+    @Column(name = "comentario_avaliacao_prestador", length = 200)
+    private String comentarioAvaliacaoPrestador;
 
     @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;
@@ -157,6 +166,14 @@ public class OrdemServico {
         this.metodoPagamento = metodoPagamento;
     }
 
+    public String getMetodoPagamentoSelecionado() {
+        return metodoPagamentoSelecionado;
+    }
+
+    public void setMetodoPagamentoSelecionado(String metodoPagamentoSelecionado) {
+        this.metodoPagamentoSelecionado = metodoPagamentoSelecionado;
+    }
+
     public Short getNotaAvaliacao() {
         return notaAvaliacao;
     }
@@ -171,6 +188,22 @@ public class OrdemServico {
 
     public void setComentarioAvaliacao(String comentarioAvaliacao) {
         this.comentarioAvaliacao = comentarioAvaliacao;
+    }
+
+    public Short getNotaAvaliacaoPrestador() {
+        return notaAvaliacaoPrestador;
+    }
+
+    public void setNotaAvaliacaoPrestador(Short notaAvaliacaoPrestador) {
+        this.notaAvaliacaoPrestador = notaAvaliacaoPrestador;
+    }
+
+    public String getComentarioAvaliacaoPrestador() {
+        return comentarioAvaliacaoPrestador;
+    }
+
+    public void setComentarioAvaliacaoPrestador(String comentarioAvaliacaoPrestador) {
+        this.comentarioAvaliacaoPrestador = comentarioAvaliacaoPrestador;
     }
 
     public OffsetDateTime getCriadoEm() {

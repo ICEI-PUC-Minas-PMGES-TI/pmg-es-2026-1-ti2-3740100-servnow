@@ -22,6 +22,7 @@ import com.servnow.backend.acompanhamento.dto.AtualizacaoServicoResponse;
 import com.servnow.backend.acompanhamento.dto.AvaliarServicoRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarChegadaRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarPagamentoRequest;
+import com.servnow.backend.acompanhamento.pix.PixQrCodeService;
 import com.servnow.backend.acompanhamento.repository.AtualizacaoServicoRepository;
 import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -42,6 +43,7 @@ public class AcompanhamentoService {
     private final AtualizacaoServicoRepository atualizacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
+    private final PixQrCodeService pixQrCodeService;
     private final SecureRandom random = new SecureRandom();
 
     public AcompanhamentoService(
@@ -49,13 +51,15 @@ public class AcompanhamentoService {
         OrdemServicoRepository ordemRepository,
         AtualizacaoServicoRepository atualizacaoRepository,
         UsuarioRepository usuarioRepository,
-        ArquivoStorage arquivoStorage
+        ArquivoStorage arquivoStorage,
+        PixQrCodeService pixQrCodeService
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.ordemRepository = ordemRepository;
         this.atualizacaoRepository = atualizacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
+        this.pixQrCodeService = pixQrCodeService;
     }
 
     @Transactional(readOnly = true)
@@ -218,9 +222,60 @@ public class AcompanhamentoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando pagamento.");
         }
         ordem.setMetodoPagamento(request.metodoPagamento());
+        ordem.setMetodoPagamentoSelecionado(null);
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_AVALIACAO);
         ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    @Transactional
+    public AcompanhamentoDetalheResponse selecionarMetodoPagamento(
+        Long solicitacaoId,
+        UsuarioAutenticado usuarioAutenticado,
+        ConfirmarPagamentoRequest request
+    ) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        if (usuario.getTipoUsuario() != TipoUsuario.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o cliente pode selecionar o metodo de pagamento.");
+        }
+        validarPodeAcompanhar(solicitacao);
+        OrdemServico ordem = obterOuCriarOrdem(solicitacao);
+        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_PAGAMENTO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando pagamento.");
+        }
+        ordem.setMetodoPagamentoSelecionado(request.metodoPagamento());
+        ordemRepository.save(ordem);
+        return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] gerarQrCodePix(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        if (usuario.getTipoUsuario() != TipoUsuario.PRESTADOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode visualizar o QR Code PIX.");
+        }
+        validarPodeAcompanhar(solicitacao);
+        OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacao.getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Ordem de servico nao iniciada."));
+        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_PAGAMENTO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando pagamento.");
+        }
+        Usuario prestador = solicitacao.getPrestador();
+        if (prestador == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Prestador nao vinculado a esta solicitacao.");
+        }
+        BigDecimal valor = ordem.getValorFinal() != null ? ordem.getValorFinal() : solicitacao.getValorAceito();
+        if (valor == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Valor do servico nao definido.");
+        }
+        String txid = "SN" + solicitacao.getId();
+        try {
+            return pixQrCodeService.gerarImagemPng(prestador, valor, txid);
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
     }
 
     @Transactional
@@ -247,6 +302,33 @@ public class AcompanhamentoService {
         solicitacao.setStatus(StatusSolicitacao.CONCLUIDA);
         ordemRepository.save(ordem);
         solicitacaoRepository.save(solicitacao);
+        return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    @Transactional
+    public AcompanhamentoDetalheResponse avaliarCliente(
+        Long solicitacaoId,
+        UsuarioAutenticado usuarioAutenticado,
+        AvaliarServicoRequest request
+    ) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        if (usuario.getTipoUsuario() != TipoUsuario.PRESTADOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode avaliar o cliente.");
+        }
+        OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Ordem de servico nao iniciada."));
+        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_AVALIACAO
+            && ordem.getEtapa() != EtapaOrdemServico.CONCLUIDA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta na etapa de avaliacao.");
+        }
+        if (ordem.getNotaAvaliacaoPrestador() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Voce ja avaliou este cliente.");
+        }
+
+        ordem.setNotaAvaliacaoPrestador(request.nota());
+        ordem.setComentarioAvaliacaoPrestador(normalizarComentario(request.comentario()));
+        ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
 
@@ -424,8 +506,11 @@ public class AcompanhamentoService {
             ordem.getPrevistoTerminoEm(),
             ordem.getValorFinal(),
             ordem.getMetodoPagamento(),
+            ordem.getMetodoPagamentoSelecionado(),
             ordem.getNotaAvaliacao(),
             ordem.getComentarioAvaliacao(),
+            ordem.getNotaAvaliacaoPrestador(),
+            ordem.getComentarioAvaliacaoPrestador(),
             atualizacoes
         );
     }

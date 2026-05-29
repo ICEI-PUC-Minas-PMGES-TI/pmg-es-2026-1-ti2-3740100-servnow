@@ -1,5 +1,7 @@
 package com.servnow.backend.perfil.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,15 +23,21 @@ public class PerfilService {
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
     private final GeocodingService geocodingService;
+    private final AvaliacaoService avaliacaoService;
+    private final ClienteCadastroService clienteCadastroService;
 
     public PerfilService(
         UsuarioRepository usuarioRepository,
         ArquivoStorage arquivoStorage,
-        GeocodingService geocodingService
+        GeocodingService geocodingService,
+        AvaliacaoService avaliacaoService,
+        ClienteCadastroService clienteCadastroService
     ) {
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
         this.geocodingService = geocodingService;
+        this.avaliacaoService = avaliacaoService;
+        this.clienteCadastroService = clienteCadastroService;
     }
 
     public PerfilResponse buscar(UsuarioAutenticado usuarioAutenticado) {
@@ -56,6 +64,7 @@ public class PerfilService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado."));
 
         boolean prestador = usuario.getTipoUsuario() == TipoUsuario.PRESTADOR;
+        var avaliacoes = avaliacaoService.buscarRecebidas(usuario);
         return new PerfilPublicoResponse(
             usuario.getId(),
             usuario.getNome(),
@@ -70,11 +79,19 @@ public class PerfilService {
             prestador ? usuario.getHorarioInicio() : null,
             prestador ? usuario.getHorarioFim() : null,
             prestador ? usuario.getRaioAtendimentoKm() : null,
-            null,
-            0,
-            null,
+            avaliacoes.avaliacaoMedia(),
+            avaliacoes.totalAvaliacoes() > Integer.MAX_VALUE
+                ? Integer.MAX_VALUE
+                : avaliacoes.totalAvaliacoes().intValue(),
+            avaliacoes.comentarioDestaque(),
             usuario.getCriadoEm()
         );
+    }
+
+    public com.servnow.backend.perfil.dto.AvaliacoesRecebidasResponse listarAvaliacoesRecebidas(
+        UsuarioAutenticado usuarioAutenticado
+    ) {
+        return avaliacaoService.buscarRecebidas(encontrarUsuario(usuarioAutenticado));
     }
 
     public PerfilResponse atualizar(
@@ -101,7 +118,9 @@ public class PerfilService {
     ) {
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
         validarTipo(usuario, TipoUsuario.CLIENTE);
-        aplicarAtualizacaoComum(usuario, request, fotoPerfil, fotoLocal);
+        atualizarNome(usuario, request);
+        aplicarFotoPerfil(usuario, request, fotoPerfil);
+        atualizarEnquadramentoFotoPerfil(usuario, request);
         return toResponse(usuarioRepository.save(usuario));
     }
 
@@ -218,6 +237,7 @@ public class PerfilService {
         usuario.setHorarioFim(validarHorario(request.horarioFim(), "Horario de fim invalido."));
         validarIntervaloHorarios(usuario.getHorarioInicio(), usuario.getHorarioFim());
         usuario.setRaioAtendimentoKm(validarRaioAtendimento(request.raioAtendimentoKm()));
+        usuario.setChavePix(validarChavePix(request.chavePix()));
         aplicarDocumentoIdentidade(usuario, request, documentoIdentidade);
     }
 
@@ -360,7 +380,25 @@ public class PerfilService {
         return valor;
     }
 
+    private String validarChavePix(String valor) {
+        String texto = normalizarTexto(valor);
+        if (texto == null) {
+            return null;
+        }
+        if (texto.length() > 140) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A chave PIX deve ter no maximo 140 caracteres.");
+        }
+        return texto;
+    }
+
     private PerfilResponse toResponse(Usuario usuario) {
+        var resumoAvaliacoes = avaliacaoService.calcularResumo(usuario);
+        List<com.servnow.backend.perfil.dto.ClienteEnderecoResponse> enderecos = List.of();
+        List<com.servnow.backend.perfil.dto.ClienteChavePixResponse> chavesPix = List.of();
+        if (usuario.getTipoUsuario() == TipoUsuario.CLIENTE) {
+            enderecos = clienteCadastroService.listarEnderecos(usuario);
+            chavesPix = clienteCadastroService.listarChavesPix(usuario);
+        }
         return new PerfilResponse(
             usuario.getId(),
             usuario.getNome(),
@@ -384,7 +422,12 @@ public class PerfilService {
             usuario.getHorarioInicio(),
             usuario.getHorarioFim(),
             usuario.getRaioAtendimentoKm(),
-            urlDocumentoIdentidade(usuario)
+            urlDocumentoIdentidade(usuario),
+            usuario.getChavePix(),
+            resumoAvaliacoes.media(),
+            resumoAvaliacoes.total(),
+            enderecos,
+            chavesPix
         );
     }
 

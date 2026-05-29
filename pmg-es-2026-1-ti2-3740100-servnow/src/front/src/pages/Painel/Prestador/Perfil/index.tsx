@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, MapPin, MessageSquare, Star, User } from "lucide-react";
+import { MapPin, MessageSquare, Star, User } from "lucide-react";
 
+import { AvaliacoesPerfilSecao } from "../../../../Components/Perfil/AvaliacoesPerfilSecao";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   API_URL,
@@ -10,40 +11,7 @@ import {
   type PerfilResponse,
 } from "../../../../services/auth";
 import { useArquivoUrl } from "../../../../hooks/useArquivoUrl";
-
-const avaliacoesRecebidas = [
-  {
-    id: 1,
-    autor: "Carlos Mendes",
-    servico: "Instalacao eletrica",
-    data: "24/04/2026",
-    nota: 5,
-    comentario: "Cliente acompanhou tudo com clareza e deixou o local preparado para o atendimento.",
-  },
-  {
-    id: 2,
-    autor: "Marina Costa",
-    servico: "Pintura residencial",
-    data: "12/04/2026",
-    nota: 4,
-    comentario: "Comunicacao objetiva e pagamento confirmado no prazo combinado.",
-  },
-];
-
-const comentariosRecebidos = [
-  {
-    id: 1,
-    autor: "Joao Pereira",
-    data: "03/05/2026",
-    texto: "Otima experiencia no agendamento. As informacoes do servico estavam completas.",
-  },
-  {
-    id: 2,
-    autor: "Ana Ribeiro",
-    data: "18/04/2026",
-    texto: "Cliente respondeu rapido durante a negociacao e facilitou a visita tecnica.",
-  },
-];
+import { formatarRotuloAvaliacoes } from "../../../../utils/formatarAvaliacao";
 
 export function PerfilPrestador() {
   const session = getAuthSession();
@@ -84,6 +52,11 @@ export function PerfilPrestador() {
     ? [perfil.rua, perfil.numero, perfil.bairro, perfil.cidade, perfil.estado].filter(Boolean).join(", ")
     : "";
 
+  const resumoAvaliacoes = formatarRotuloAvaliacoes(
+    perfil?.avaliacaoMedia ?? null,
+    perfil?.totalAvaliacoes ?? 0,
+  );
+
   return (
     <>
       <PainelSectionHeader
@@ -108,6 +81,10 @@ export function PerfilPrestador() {
             <span className="painel-perfil-papel">Prestador</span>
             <h2>{nome}</h2>
             <p>{email}</p>
+            <p className="painel-perfil-resumo-avaliacao" style={{ marginTop: 10 }}>
+              <Star size={16} fill="currentColor" />
+              <strong>{resumoAvaliacoes}</strong>
+            </p>
             {enderecoResumo ? (
               <p className="painel-perfil-endereco">
                 <MapPin size={14} /> {enderecoResumo}
@@ -120,39 +97,10 @@ export function PerfilPrestador() {
           </div>
         </div>
 
-        <div className="painel-card painel-perfil-card">
-          <div className="painel-perfil-card-cabecalho">
-            <div className="painel-conta-card-icone">
-              <Star size={22} />
-            </div>
-            <div>
-              <h2>Avaliacoes recebidas</h2>
-              <p>Historico de notas deixadas por clientes.</p>
-            </div>
-          </div>
-
-          <div className="painel-feedback-lista">
-            {avaliacoesRecebidas.map((avaliacao) => (
-              <article className="painel-feedback-item" key={avaliacao.id}>
-                <div className="painel-feedback-topo">
-                  <div>
-                    <strong>{avaliacao.autor}</strong>
-                    <span>{avaliacao.servico}</span>
-                  </div>
-                  <div className="painel-feedback-nota" aria-label={`${avaliacao.nota} estrelas`}>
-                    <Star size={15} fill="currentColor" />
-                    {avaliacao.nota.toFixed(1)}
-                  </div>
-                </div>
-                <p>{avaliacao.comentario}</p>
-                <span className="painel-feedback-data">
-                  <CalendarDays size={14} />
-                  {avaliacao.data}
-                </span>
-              </article>
-            ))}
-          </div>
-        </div>
+        <AvaliacoesPerfilSecao
+          descricaoLista="Historico de notas deixadas por clientes apos servicos concluidos."
+          mensagemVazia="Voce ainda nao recebeu avaliacoes. Conclua atendimentos para que os clientes possam avaliar seu trabalho."
+        />
 
         <div className="painel-card painel-perfil-card">
           <div className="painel-perfil-card-cabecalho">
@@ -160,28 +108,13 @@ export function PerfilPrestador() {
               <MessageSquare size={22} />
             </div>
             <div>
-              <h2>Comentarios recebidos</h2>
-              <p>Registros enviados por clientes apos o atendimento.</p>
+              <h2>Comentarios em destaque</h2>
+              <p>Comentarios recentes vinculados as suas avaliacoes.</p>
             </div>
           </div>
-
-          <div className="painel-feedback-lista">
-            {comentariosRecebidos.map((comentario) => (
-              <article className="painel-feedback-item" key={comentario.id}>
-                <div className="painel-feedback-topo">
-                  <div>
-                    <strong>{comentario.autor}</strong>
-                    <span>Comentario recebido</span>
-                  </div>
-                </div>
-                <p>{comentario.texto}</p>
-                <span className="painel-feedback-data">
-                  <CalendarDays size={14} />
-                  {comentario.data}
-                </span>
-              </article>
-            ))}
-          </div>
+          <p className="painel-perfil-vazio">
+            Os comentarios aparecem junto de cada avaliacao na lista acima.
+          </p>
         </div>
       </section>
     </>

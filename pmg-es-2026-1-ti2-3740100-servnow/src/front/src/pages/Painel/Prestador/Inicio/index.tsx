@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
+import { listarAvaliacoesRecebidas } from "../../../../services/perfil";
+import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../../../utils/formatarAvaliacao";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { getFaixaPrecoLabel, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
 
@@ -17,6 +19,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
   const navigate = useNavigate();
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [avaliacaoMedia, setAvaliacaoMedia] = useState<number | null>(null);
+  const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -51,6 +55,18 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
 
     void carregarSolicitacoes();
   }, [navigate]);
+
+  useEffect(() => {
+    void listarAvaliacoesRecebidas()
+      .then((dados) => {
+        setAvaliacaoMedia(dados.avaliacaoMedia);
+        setTotalAvaliacoes(dados.totalAvaliacoes);
+      })
+      .catch(() => {
+        setAvaliacaoMedia(null);
+        setTotalAvaliacoes(0);
+      });
+  }, []);
 
   const solicitacoesRecentes = useMemo(() => solicitacoes.slice(0, 3), [solicitacoes]);
   const oportunidadesNovas = useMemo(
@@ -90,8 +106,12 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
             <Star size={22} />
           </div>
           <span className="painel-stat-label">Avaliacao media</span>
-          <strong className="painel-stat-valor">4,9</strong>
-          <span className="painel-stat-detalhe">124 avaliacoes</span>
+          <strong className="painel-stat-valor">
+            {avaliacaoMedia != null ? formatarNotaAvaliacao(avaliacaoMedia) : "—"}
+          </strong>
+          <span className="painel-stat-detalhe">
+            {totalAvaliacoes > 0 ? formatarQuantidadeAvaliacoes(totalAvaliacoes) : "Sem avaliacoes ainda"}
+          </span>
         </div>
       </section>
 

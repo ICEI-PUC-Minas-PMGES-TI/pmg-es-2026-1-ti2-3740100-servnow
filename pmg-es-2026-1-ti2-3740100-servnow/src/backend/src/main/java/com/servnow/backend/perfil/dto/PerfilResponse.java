@@ -1,5 +1,7 @@
 package com.servnow.backend.perfil.dto;
 
+import java.util.List;
+
 public record PerfilResponse(
     Long id,
     String nome,
@@ -23,6 +25,11 @@ public record PerfilResponse(
     String horarioInicio,
     String horarioFim,
     Integer raioAtendimentoKm,
-    String documentoIdentidadeUrl
+    String documentoIdentidadeUrl,
+    String chavePix,
+    Double avaliacaoMedia,
+    Long totalAvaliacoes,
+    List<ClienteEnderecoResponse> enderecos,
+    List<ClienteChavePixResponse> chavesPix
 ) {
 }

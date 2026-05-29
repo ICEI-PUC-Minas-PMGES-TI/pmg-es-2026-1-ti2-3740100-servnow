@@ -26,8 +26,11 @@ public record AcompanhamentoDetalheResponse(
     OffsetDateTime previstoTerminoEm,
     BigDecimal valorFinal,
     String metodoPagamento,
+    String metodoPagamentoSelecionado,
     Short notaAvaliacao,
     String comentarioAvaliacao,
+    Short notaAvaliacaoPrestador,
+    String comentarioAvaliacaoPrestador,
     List<AtualizacaoServicoResponse> atualizacoes
 ) {
 }

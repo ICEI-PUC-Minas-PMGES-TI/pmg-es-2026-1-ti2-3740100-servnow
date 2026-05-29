@@ -93,6 +93,15 @@ public class AcompanhamentoController {
         return acompanhamentoService.concluirExecucao(solicitacaoId, usuario);
     }
 
+    @PostMapping("/{solicitacaoId}/selecionar-metodo-pagamento")
+    public AcompanhamentoDetalheResponse selecionarMetodoPagamento(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody ConfirmarPagamentoRequest request
+    ) {
+        return acompanhamentoService.selecionarMetodoPagamento(solicitacaoId, usuario, request);
+    }
+
     @PostMapping("/{solicitacaoId}/confirmar-pagamento")
     public AcompanhamentoDetalheResponse confirmarPagamento(
         @AuthenticationPrincipal UsuarioAutenticado usuario,
@@ -102,6 +111,18 @@ public class AcompanhamentoController {
         return acompanhamentoService.confirmarPagamento(solicitacaoId, usuario, request);
     }
 
+    @GetMapping("/{solicitacaoId}/pix-qrcode")
+    public ResponseEntity<byte[]> obterQrCodePix(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId
+    ) {
+        byte[] imagem = acompanhamentoService.gerarQrCodePix(solicitacaoId, usuario);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CACHE_CONTROL, "no-store")
+            .contentType(MediaType.IMAGE_PNG)
+            .body(imagem);
+    }
+
     @PostMapping("/{solicitacaoId}/avaliar")
     public AcompanhamentoDetalheResponse avaliar(
         @AuthenticationPrincipal UsuarioAutenticado usuario,
@@ -109,6 +130,15 @@ public class AcompanhamentoController {
         @Valid @RequestBody AvaliarServicoRequest request
     ) {
         return acompanhamentoService.avaliar(solicitacaoId, usuario, request);
+    }
+
+    @PostMapping("/{solicitacaoId}/avaliar-cliente")
+    public AcompanhamentoDetalheResponse avaliarCliente(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody AvaliarServicoRequest request
+    ) {
+        return acompanhamentoService.avaliarCliente(solicitacaoId, usuario, request);
     }
 
     @GetMapping("/{solicitacaoId}/atualizacoes/{atualizacaoId}/foto")

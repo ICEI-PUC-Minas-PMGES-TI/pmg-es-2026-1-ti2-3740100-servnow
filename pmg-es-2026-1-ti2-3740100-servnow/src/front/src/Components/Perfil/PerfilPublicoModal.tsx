@@ -107,8 +107,8 @@ export function PerfilPublicoConteudo({
 
         <p className="perfil-publico-meta perfil-publico-avaliacao-linha">
           <Star size={14} fill="currentColor" />
-          {perfil.avaliacaoMedia != null
-            ? `${perfil.avaliacaoMedia.toFixed(1)} (${perfil.totalAvaliacoes} avaliacoes)`
+          {perfil.avaliacaoMedia != null && perfil.totalAvaliacoes > 0
+            ? `Nota: ${perfil.avaliacaoMedia.toFixed(2).replace(".", ",")} · ${perfil.totalAvaliacoes} ${perfil.totalAvaliacoes === 1 ? "avaliacao" : "avaliacoes"}`
             : "Usuario sem avaliacoes na plataforma"}
         </p>
 
