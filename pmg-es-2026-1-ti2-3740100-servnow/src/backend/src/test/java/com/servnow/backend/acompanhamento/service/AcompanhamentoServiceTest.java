@@ -22,7 +22,10 @@ import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
 import com.servnow.backend.acompanhamento.pix.PixQrCodeService;
 import com.servnow.backend.acompanhamento.domain.EtapaOrdemServico;
 import com.servnow.backend.acompanhamento.domain.OrdemServico;
+import com.servnow.backend.acompanhamento.dto.AvaliarServicoRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarChegadaRequest;
+import com.servnow.backend.acompanhamento.dto.ConfirmarReagendamentoRequest;
+import com.servnow.backend.acompanhamento.dto.SolicitarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.repository.AtualizacaoServicoRepository;
 import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -121,6 +124,156 @@ class AcompanhamentoServiceTest {
     }
 
     @Test
+    void solicitarReagendamentoAvancaEtapaEPercentual() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemEmAndamento(solicitacao);
+
+        when(usuarioRepository.findById(10L)).thenReturn(Optional.of(prestador));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.solicitarReagendamento(
+            100L,
+            usuarioAutenticado(10L, TipoUsuario.PRESTADOR),
+            new SolicitarReagendamentoRequest(60, "Falta concluir parte eletrica")
+        );
+
+        assertThat(response.etapa()).isEqualTo("AGUARDANDO_REAGENDAMENTO");
+        assertThat(response.percentualConcluido()).isEqualTo(60);
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO);
+    }
+
+    @Test
+    void confirmarReagendamentoAtualizaAgendamentoEResetaChegada() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemAguardandoReagendamento(solicitacao, 60);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.confirmarReagendamento(
+            100L,
+            usuarioAutenticado(1L, TipoUsuario.CLIENTE),
+            new ConfirmarReagendamentoRequest(LocalDate.now().plusDays(2), "10:30")
+        );
+
+        assertThat(response.etapa()).isEqualTo("VISITA_REAGENDADA");
+        assertThat(response.percentualConcluido()).isEqualTo(60);
+        assertThat(solicitacao.getData()).isEqualTo(LocalDate.now().plusDays(2));
+        assertThat(solicitacao.getHorario()).isEqualTo("10:30");
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.VISITA_REAGENDADA);
+        assertThat(ordem.getCodigoVerificacao()).isNull();
+    }
+
+    @Test
+    void avaliarClienteNaoConcluiSemAvaliacaoDoCliente() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemAguardandoAvaliacao(solicitacao);
+
+        when(usuarioRepository.findById(10L)).thenReturn(Optional.of(prestador));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.avaliarCliente(
+            100L,
+            usuarioAutenticado(10L, TipoUsuario.PRESTADOR),
+            new AvaliarServicoRequest((short) 5, "Cliente pontual")
+        );
+
+        assertThat(response.etapa()).isEqualTo("AGUARDANDO_AVALIACAO");
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.AGUARDANDO_AVALIACAO);
+        assertThat(ordem.getNotaAvaliacaoPrestador()).isEqualTo((short) 5);
+        assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.AGENDADA);
+    }
+
+    @Test
+    void avaliarClienteConcluiQuandoClienteJaAvaliou() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemAguardandoAvaliacao(solicitacao);
+        ordem.setNotaAvaliacao((short) 4);
+
+        when(usuarioRepository.findById(10L)).thenReturn(Optional.of(prestador));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.avaliarCliente(
+            100L,
+            usuarioAutenticado(10L, TipoUsuario.PRESTADOR),
+            new AvaliarServicoRequest((short) 5, "Cliente pontual")
+        );
+
+        assertThat(response.etapa()).isEqualTo("CONCLUIDA");
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.CONCLUIDA);
+        assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.CONCLUIDA);
+        assertThat(ordem.getConcluidoEm()).isNotNull();
+    }
+
+    @Test
+    void avaliarServicoNaoConcluiSemAvaliacaoDoPrestador() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemAguardandoAvaliacao(solicitacao);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.avaliar(
+            100L,
+            usuarioAutenticado(1L, TipoUsuario.CLIENTE),
+            new AvaliarServicoRequest((short) 5, "Otimo servico")
+        );
+
+        assertThat(response.etapa()).isEqualTo("AGUARDANDO_AVALIACAO");
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.AGUARDANDO_AVALIACAO);
+        assertThat(ordem.getNotaAvaliacao()).isEqualTo((short) 5);
+        assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.AGENDADA);
+    }
+
+    @Test
+    void avaliarServicoConcluiQuandoPrestadorJaAvaliou() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordemAguardandoAvaliacao(solicitacao);
+        ordem.setNotaAvaliacaoPrestador((short) 5);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        when(solicitacaoRepository.save(any(SolicitacaoServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = acompanhamentoService.avaliar(
+            100L,
+            usuarioAutenticado(1L, TipoUsuario.CLIENTE),
+            new AvaliarServicoRequest((short) 4, "Otimo servico")
+        );
+
+        assertThat(response.etapa()).isEqualTo("CONCLUIDA");
+        assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.CONCLUIDA);
+        assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.CONCLUIDA);
+        assertThat(ordem.getConcluidoEm()).isNotNull();
+    }
+
+    @Test
     void acessoNegadoParaTerceiro() {
         Usuario outro = usuario(99L, TipoUsuario.CLIENTE);
         Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
@@ -186,6 +339,28 @@ class AcompanhamentoServiceTest {
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_CHEGADA);
         ordem.setCodigoVerificacao(codigo);
         ordem.setCodigoExpiraEm(OffsetDateTime.now().plusMinutes(30));
+        return ordem;
+    }
+
+    private static OrdemServico ordemEmAndamento(SolicitacaoServico solicitacao) {
+        OrdemServico ordem = new OrdemServico();
+        ordem.setSolicitacao(solicitacao);
+        ordem.setEtapa(EtapaOrdemServico.EM_ANDAMENTO);
+        ordem.setIniciadoEm(OffsetDateTime.now());
+        return ordem;
+    }
+
+    private static OrdemServico ordemAguardandoReagendamento(SolicitacaoServico solicitacao, int percentual) {
+        OrdemServico ordem = ordemEmAndamento(solicitacao);
+        ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO);
+        ordem.setPercentualConcluido(percentual);
+        ordem.setObservacaoReagendamento("Observacao teste");
+        return ordem;
+    }
+
+    private static OrdemServico ordemAguardandoAvaliacao(SolicitacaoServico solicitacao) {
+        OrdemServico ordem = ordemEmAndamento(solicitacao);
+        ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_AVALIACAO);
         return ordem;
     }
 }
