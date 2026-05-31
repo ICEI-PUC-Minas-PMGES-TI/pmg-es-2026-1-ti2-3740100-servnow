@@ -8,7 +8,6 @@ import {
   API_URL,
   authHeader,
   authHeaders,
-  buscarPerfilPublico,
   formatarDataIso,
   getResponseError,
   getValidAuthSession,
@@ -41,7 +40,6 @@ export function Propostas() {
   const [propostas, setPropostas] = useState<PropostaServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [acaoId, setAcaoId] = useState<number | null>(null);
-  const [avaliacoes, setAvaliacoes] = useState<Record<number, number | null>>({});
   const [perfilUsuarioId, setPerfilUsuarioId] = useState<number | null>(null);
   const [filtro, setFiltro] = useState<FiltroProposta>("todas");
   const [confirmarRecusa, setConfirmarRecusa] = useState<PropostaServicoResponse | null>(null);
@@ -72,7 +70,6 @@ export function Propostas() {
         }
         const lista = (await response.json()) as PropostaServicoResponse[];
         setPropostas(lista);
-        void carregarAvaliacoes(lista, session.token);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar propostas.");
         if (!opcoes?.silencioso) {
@@ -86,17 +83,6 @@ export function Propostas() {
     },
     [navigate],
   );
-
-  async function carregarAvaliacoes(lista: PropostaServicoResponse[], token: string) {
-    const prestadoresUnicos = [...new Set(lista.map((item) => item.prestadorId))];
-    const entradas = await Promise.all(
-      prestadoresUnicos.map(async (prestadorId) => {
-        const perfil = await buscarPerfilPublico(prestadorId, token);
-        return [prestadorId, perfil?.avaliacaoMedia ?? null] as const;
-      }),
-    );
-    setAvaliacoes(Object.fromEntries(entradas));
-  }
 
   useEffect(() => {
     void carregar();
@@ -214,7 +200,7 @@ export function Propostas() {
         ) : (
           <div className="painel-propostas-lista">
             {lista.map((proposta) => {
-              const avaliacao = avaliacoes[proposta.prestadorId];
+              const avaliacao = proposta.prestadorAvaliacaoMedia;
               const pendente = proposta.status === "PENDENTE";
               const processando = acaoId === proposta.id;
 

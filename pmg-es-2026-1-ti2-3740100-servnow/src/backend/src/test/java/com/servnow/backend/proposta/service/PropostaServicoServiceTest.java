@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.servnow.backend.notificacao.service.NotificacaoService;
+import com.servnow.backend.perfil.service.AvaliacaoService;
 import com.servnow.backend.proposta.domain.PropostaServico;
 import com.servnow.backend.proposta.domain.StatusProposta;
 import com.servnow.backend.proposta.repository.PropostaServicoRepository;
@@ -43,6 +44,9 @@ class PropostaServicoServiceTest {
 
     @Mock
     private NotificacaoService notificacaoService;
+
+    @Mock
+    private AvaliacaoService avaliacaoService;
 
     @InjectMocks
     private PropostaServicoService propostaService;

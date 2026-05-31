@@ -4,7 +4,7 @@
 cd pmg-es-2026-1-ti2-3740100-servnow\src\front
 npm run dev
 ```
-
+cd pmg-es-2026-1-ti2-3740100-servnow-1
 ```
 cd pmg-es-2026-1-ti2-3740100-servnow\src\backend
 .\mvnw spring-boot:run
@@ -31,3 +31,7 @@ chore: → coisas gerais (config, limpeza, etc.)
 docs: → documentação  
 test: → testes  
 style: → formatação (indentação, etc.)
+6
+7
+6
+9
