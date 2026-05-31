@@ -8,7 +8,7 @@ type PerfilBotaoAdicionarProps = {
 
 export function PerfilBotaoAdicionar({ onClick, children }: PerfilBotaoAdicionarProps) {
   return (
-    <button type="button" className="perfil-btn perfil-btn-secondary" onClick={onClick}>
+    <button type="button" className="perfil-btn perfil-btn-primary perfil-btn-adicionar" onClick={onClick}>
       {children}
     </button>
   );
