@@ -64,7 +64,9 @@ public class PerfilService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado."));
 
         boolean prestador = usuario.getTipoUsuario() == TipoUsuario.PRESTADOR;
-        var avaliacoes = avaliacaoService.buscarRecebidas(usuario);
+        var resumoAvaliacoes = avaliacaoService.calcularResumo(usuario);
+        String comentarioDestaque = avaliacaoService.buscarComentarioDestaque(usuario);
+        long totalAvaliacoes = resumoAvaliacoes.total();
         return new PerfilPublicoResponse(
             usuario.getId(),
             usuario.getNome(),
@@ -79,11 +81,9 @@ public class PerfilService {
             prestador ? usuario.getHorarioInicio() : null,
             prestador ? usuario.getHorarioFim() : null,
             prestador ? usuario.getRaioAtendimentoKm() : null,
-            avaliacoes.avaliacaoMedia(),
-            avaliacoes.totalAvaliacoes() > Integer.MAX_VALUE
-                ? Integer.MAX_VALUE
-                : avaliacoes.totalAvaliacoes().intValue(),
-            avaliacoes.comentarioDestaque(),
+            resumoAvaliacoes.media(),
+            totalAvaliacoes > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) totalAvaliacoes,
+            comentarioDestaque,
             usuario.getCriadoEm()
         );
     }

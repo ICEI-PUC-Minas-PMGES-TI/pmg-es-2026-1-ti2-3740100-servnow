@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.function.Function;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,27 +64,57 @@ public class AvaliacaoService {
         };
     }
 
+    @Transactional(readOnly = true)
+    public String buscarComentarioDestaque(Usuario usuario) {
+        return switch (usuario.getTipoUsuario()) {
+            case PRESTADOR -> ordemRepository
+                .findAvaliacoesRecebidasPrestador(usuario.getId(), PageRequest.of(0, 1))
+                .stream()
+                .map(OrdemServico::getComentarioAvaliacao)
+                .filter(comentario -> comentario != null && !comentario.isBlank())
+                .findFirst()
+                .orElse(null);
+            case CLIENTE -> ordemRepository
+                .findAvaliacoesRecebidasCliente(usuario.getId(), PageRequest.of(0, 1))
+                .stream()
+                .map(OrdemServico::getComentarioAvaliacaoPrestador)
+                .filter(comentario -> comentario != null && !comentario.isBlank())
+                .findFirst()
+                .orElse(null);
+            default -> null;
+        };
+    }
+
     private ResumoAvaliacoes calcularResumoPrestador(Long prestadorId) {
-        Object[] estatisticas = ordemRepository.estatisticasAvaliacoesPrestador(prestadorId);
-        return extrairResumo(estatisticas);
+        return extrairResumo(ordemRepository.estatisticasAvaliacoesPrestador(prestadorId));
     }
 
     private ResumoAvaliacoes calcularResumoCliente(Long clienteId) {
-        Object[] estatisticas = ordemRepository.estatisticasAvaliacoesCliente(clienteId);
-        return extrairResumo(estatisticas);
+        return extrairResumo(ordemRepository.estatisticasAvaliacoesCliente(clienteId));
     }
 
     private ResumoAvaliacoes extrairResumo(Object[] estatisticas) {
-        long total = estatisticas[1] == null ? 0L : ((Number) estatisticas[1]).longValue();
+        Object[] valores = normalizarResultadoAgregado(estatisticas);
+        long total = valores[1] == null ? 0L : ((Number) valores[1]).longValue();
         if (total == 0L) {
             return ResumoAvaliacoes.vazio();
         }
-        Double media = estatisticas[0] == null
+        Double media = valores[0] == null
             ? null
-            : BigDecimal.valueOf(((Number) estatisticas[0]).doubleValue())
+            : BigDecimal.valueOf(((Number) valores[0]).doubleValue())
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
         return new ResumoAvaliacoes(media, total, null);
+    }
+
+    private Object[] normalizarResultadoAgregado(Object[] resultado) {
+        if (resultado == null) {
+            return new Object[] { null, 0L };
+        }
+        if (resultado.length == 1 && resultado[0] instanceof Object[] nested) {
+            return nested;
+        }
+        return resultado;
     }
 
     private AvaliacoesRecebidasResponse montarResposta(
