@@ -20,19 +20,19 @@ public final class PixBrCodeGenerator {
         BigDecimal valor,
         String identificadorTransacao
     ) {
-        String chave = chavePix.trim();
+        String chave = PixChaveNormalizer.normalizar(chavePix);
         String nome = normalizarTexto(nomeRecebedor, 25);
         String cidadeNorm = normalizarTexto(cidade == null || cidade.isBlank() ? "BRASIL" : cidade, 15);
-        String txid = normalizarTexto(
+        String txid = normalizarIdentificador(
             identificadorTransacao == null || identificadorTransacao.isBlank()
-                ? "SERVNOW"
-                : identificadorTransacao,
-            25
+                ? "***"
+                : identificadorTransacao
         );
 
         String merchantAccount = tlv("00", "br.gov.bcb.pix") + tlv("01", chave);
         StringBuilder payload = new StringBuilder();
         payload.append(tlv("00", "01"));
+        payload.append(tlv("01", "11"));
         payload.append(tlv("26", merchantAccount));
         payload.append(tlv("52", "0000"));
         payload.append(tlv("53", "986"));
@@ -69,20 +69,27 @@ public final class PixBrCodeGenerator {
         return semAcento.length() <= tamanhoMaximo ? semAcento : semAcento.substring(0, tamanhoMaximo);
     }
 
+    private static String normalizarIdentificador(String texto) {
+        if (texto == null || texto.isBlank() || "***".equals(texto.trim())) {
+            return "***";
+        }
+        return normalizarTexto(texto, 25).replaceAll("[^A-Z0-9]", "");
+    }
+
     private static String calcularCrc16(String payload) {
         int polinomio = 0x1021;
         int resultado = 0xFFFF;
         byte[] bytes = payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         for (byte b : bytes) {
-            resultado ^= (b & 0xFF) << 8;
             for (int i = 0; i < 8; i++) {
-                if ((resultado & 0x8000) != 0) {
-                    resultado = (resultado << 1) ^ polinomio;
-                } else {
-                    resultado <<= 1;
+                boolean bit = ((b >> (7 - i) & 1) == 1);
+                boolean c15 = ((resultado >> 15 & 1) == 1);
+                resultado <<= 1;
+                if (c15 ^ bit) {
+                    resultado ^= polinomio;
                 }
-                resultado &= 0xFFFF;
             }
+            resultado &= 0xFFFF;
         }
         return String.format(Locale.ROOT, "%04X", resultado);
     }
