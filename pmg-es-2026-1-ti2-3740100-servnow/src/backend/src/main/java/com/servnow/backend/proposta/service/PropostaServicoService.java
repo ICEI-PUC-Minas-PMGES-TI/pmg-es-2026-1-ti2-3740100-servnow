@@ -1,7 +1,11 @@
 package com.servnow.backend.proposta.service;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.notificacao.domain.TipoNotificacao;
 import com.servnow.backend.notificacao.service.NotificacaoService;
+import com.servnow.backend.perfil.service.AvaliacaoService;
 import com.servnow.backend.proposta.domain.PropostaServico;
 import com.servnow.backend.proposta.domain.StatusProposta;
 import com.servnow.backend.proposta.dto.PropostaCreateRequest;
@@ -30,17 +35,20 @@ public class PropostaServicoService {
     private final SolicitacaoServicoRepository solicitacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final NotificacaoService notificacaoService;
+    private final AvaliacaoService avaliacaoService;
 
     public PropostaServicoService(
         PropostaServicoRepository propostaRepository,
         SolicitacaoServicoRepository solicitacaoRepository,
         UsuarioRepository usuarioRepository,
-        NotificacaoService notificacaoService
+        NotificacaoService notificacaoService,
+        AvaliacaoService avaliacaoService
     ) {
         this.propostaRepository = propostaRepository;
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.notificacaoService = notificacaoService;
+        this.avaliacaoService = avaliacaoService;
     }
 
     @Transactional
@@ -88,9 +96,10 @@ public class PropostaServicoService {
         Usuario cliente = encontrarUsuario(usuarioAutenticado);
         validarTipo(cliente, TipoUsuario.CLIENTE);
 
-        return propostaRepository.findBySolicitacaoClienteIdOrderByCriadoEmDesc(cliente.getId())
-            .stream()
-            .map(this::toResponse)
+        List<PropostaServico> propostas = propostaRepository.findBySolicitacaoClienteIdOrderByCriadoEmDesc(cliente.getId());
+        Map<Long, Double> avaliacoesPrestadores = carregarAvaliacoesPrestadores(propostas);
+        return propostas.stream()
+            .map(proposta -> toResponse(proposta, avaliacoesPrestadores.get(proposta.getPrestador().getId())))
             .toList();
     }
 
@@ -226,6 +235,10 @@ public class PropostaServicoService {
     }
 
     private PropostaServicoResponse toResponse(PropostaServico proposta) {
+        return toResponse(proposta, null);
+    }
+
+    private PropostaServicoResponse toResponse(PropostaServico proposta, Double prestadorAvaliacaoMedia) {
         SolicitacaoServico solicitacao = proposta.getSolicitacao();
         return new PropostaServicoResponse(
             proposta.getId(),
@@ -242,7 +255,23 @@ public class PropostaServicoService {
             proposta.getMensagem(),
             proposta.getStatus().name(),
             proposta.getCriadoEm(),
-            proposta.getRespondidoEm()
+            proposta.getRespondidoEm(),
+            prestadorAvaliacaoMedia
         );
+    }
+
+    private Map<Long, Double> carregarAvaliacoesPrestadores(List<PropostaServico> propostas) {
+        Set<Long> prestadorIds = propostas.stream()
+            .map(proposta -> proposta.getPrestador().getId())
+            .collect(Collectors.toSet());
+
+        Map<Long, Double> avaliacoes = new HashMap<>();
+        for (Long prestadorId : prestadorIds) {
+            Usuario prestador = new Usuario();
+            prestador.setId(prestadorId);
+            prestador.setTipoUsuario(TipoUsuario.PRESTADOR);
+            avaliacoes.put(prestadorId, avaliacaoService.calcularResumo(prestador).media());
+        }
+        return avaliacoes;
     }
 }

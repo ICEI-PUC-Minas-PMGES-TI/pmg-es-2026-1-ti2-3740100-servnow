@@ -19,6 +19,7 @@ public record PropostaServicoResponse(
     String mensagem,
     String status,
     OffsetDateTime criadoEm,
-    OffsetDateTime respondidoEm
+    OffsetDateTime respondidoEm,
+    Double prestadorAvaliacaoMedia
 ) {
 }

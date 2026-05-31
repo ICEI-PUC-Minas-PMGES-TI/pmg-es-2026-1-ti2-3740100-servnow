@@ -10,11 +10,6 @@ export function isSupabaseConfigured(): boolean {
 export function getSupabaseUrl(): string {
   return supabaseUrl?.trim() ?? "";
 }
-
-/**
- * Cliente PostgREST com JWT do Spring (login ServNow).
- * Requer JWT Secret do Supabase = app.jwt.secret e claims role/aud/id.
- */
 export function createSupabaseClient(accessToken: string): SupabaseClient {
   if (!isSupabaseConfigured()) {
     throw new Error(

@@ -140,6 +140,7 @@ export type PerfilUpdateRequest = {
   horarioInicio?: string;
   horarioFim?: string;
   raioAtendimentoKm?: number;
+  chavePix?: string | null;
 };
 
 export type SolicitacaoServicoResponse = {
@@ -211,6 +212,7 @@ export type PropostaServicoResponse = {
   status: "PENDENTE" | "ACEITA" | "RECUSADA" | "CANCELADA";
   criadoEm: string;
   respondidoEm: string | null;
+  prestadorAvaliacaoMedia: number | null;
 };
 
 export type PerfilPublicoResponse = {

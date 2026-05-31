@@ -49,18 +49,20 @@ public class ClienteCadastroService {
         this.geocodingService = geocodingService;
     }
 
+    @Transactional
     public List<ClienteEnderecoResponse> listarEnderecos(Usuario usuario) {
         validarCliente(usuario);
         garantirMigracaoLegado(usuario);
-        return enderecoRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
+        return enderecoRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
             .map(this::toEnderecoResponse)
             .toList();
     }
 
+    @Transactional
     public List<ClienteChavePixResponse> listarChavesPix(Usuario usuario) {
         validarCliente(usuario);
         garantirMigracaoLegadoChavePix(usuario);
-        return chavePixRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
+        return chavePixRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
             .map(this::toChavePixResponse)
             .toList();
     }
@@ -84,7 +86,7 @@ public class ClienteCadastroService {
     @Transactional
     public void salvarFotoEndereco(Usuario usuario, Long enderecoId, MultipartFile arquivo) {
         validarCliente(usuario);
-        ClienteEndereco endereco = enderecoRepository.findByIdAndUsuarioId(enderecoId, usuario.getId())
+        ClienteEndereco endereco = enderecoRepository.findByIdAndUsuario_Id(enderecoId, usuario.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereco nao encontrado."));
 
         if (arquivo == null || arquivo.isEmpty()) {
@@ -100,7 +102,7 @@ public class ClienteCadastroService {
 
     public String caminhoFotoEndereco(Usuario usuario, Long enderecoId) {
         validarCliente(usuario);
-        ClienteEndereco endereco = enderecoRepository.findByIdAndUsuarioId(enderecoId, usuario.getId())
+        ClienteEndereco endereco = enderecoRepository.findByIdAndUsuario_Id(enderecoId, usuario.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereco nao encontrado."));
         return endereco.getFotoArquivoRelativo();
     }
@@ -111,7 +113,7 @@ public class ClienteCadastroService {
 
     private void sincronizarEnderecos(Usuario usuario, List<ClienteEnderecoRequest> requests) {
         garantirUmPrincipalEndereco(requests);
-        List<ClienteEndereco> existentes = enderecoRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId());
+        List<ClienteEndereco> existentes = enderecoRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId());
         Set<Long> idsMantidos = new HashSet<>();
 
         for (ClienteEnderecoRequest req : requests) {
@@ -139,7 +141,7 @@ public class ClienteCadastroService {
 
     private void sincronizarChavesPix(Usuario usuario, List<ClienteChavePixRequest> requests) {
         if (requests.isEmpty()) {
-            for (ClienteChavePix antiga : chavePixRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId())) {
+            for (ClienteChavePix antiga : chavePixRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId())) {
                 chavePixRepository.delete(antiga);
             }
             usuario.setChavePix(null);
@@ -147,7 +149,7 @@ public class ClienteCadastroService {
         }
 
         garantirUmPrincipalChavePix(requests);
-        List<ClienteChavePix> existentes = chavePixRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId());
+        List<ClienteChavePix> existentes = chavePixRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId());
         Set<Long> idsMantidos = new HashSet<>();
 
         for (ClienteChavePixRequest req : requests) {
@@ -167,7 +169,7 @@ public class ClienteCadastroService {
 
     private void sincronizarUsuarioComPrincipal(Usuario usuario) {
         ClienteEndereco principalEndereco = enderecoRepository
-            .findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId())
+            .findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId())
             .stream()
             .filter(ClienteEndereco::isPrincipal)
             .findFirst()
@@ -190,7 +192,7 @@ public class ClienteCadastroService {
             });
         }
 
-        chavePixRepository.findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
+        chavePixRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
             .filter(ClienteChavePix::isPrincipal)
             .findFirst()
             .ifPresentOrElse(
@@ -249,7 +251,7 @@ public class ClienteCadastroService {
     }
 
     private void garantirMigracaoLegado(Usuario usuario) {
-        if (enderecoRepository.countByUsuarioId(usuario.getId()) > 0) {
+        if (enderecoRepository.countByUsuario_Id(usuario.getId()) > 0) {
             return;
         }
         if (!temEnderecoLegado(usuario)) {
@@ -272,7 +274,7 @@ public class ClienteCadastroService {
     }
 
     private void garantirMigracaoLegadoChavePix(Usuario usuario) {
-        if (chavePixRepository.countByUsuarioId(usuario.getId()) > 0) {
+        if (chavePixRepository.countByUsuario_Id(usuario.getId()) > 0) {
             return;
         }
         if (usuario.getChavePix() == null || usuario.getChavePix().isBlank()) {
