@@ -91,7 +91,7 @@ Modelo BPMN do Processo 4
 | Comando                    | Destino              | Tipo    |
 |-------------------------- -|----------------------|---------|
 | Concluir                   | Notificar cliente    | button  |
-| Enviar cobrança ao cliente | Notificar cliente    | default |
+| Enviar cobrança ao cliente | Notificar cliente    | button  |
 
 ---
 
