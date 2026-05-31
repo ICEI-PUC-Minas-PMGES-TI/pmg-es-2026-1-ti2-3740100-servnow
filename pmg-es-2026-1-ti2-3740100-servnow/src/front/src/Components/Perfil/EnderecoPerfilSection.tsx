@@ -80,7 +80,7 @@ export function EnderecoPerfilSection({ form, updateField, hint }: EnderecoPerfi
 
   return (
     <section className="workspace-card workspace-section">
-      <h2>Endereco</h2>
+      <h2>Endereço</h2>
       {hint && <p className="workspace-hint">{hint}</p>}
 
       <div className="perfil-grid">
@@ -97,8 +97,8 @@ export function EnderecoPerfilSection({ form, updateField, hint }: EnderecoPerfi
               maxLength={9}
             />
           </div>
-          {cepStatus === "not-found" && <span className="perfil-cep-feedback">CEP nao encontrado.</span>}
-          {cepStatus === "error" && <span className="perfil-cep-feedback">Nao foi possivel consultar o CEP.</span>}
+          {cepStatus === "not-found" && <span className="perfil-cep-feedback">CEP não encontrado.</span>}
+          {cepStatus === "error" && <span className="perfil-cep-feedback">Não foi possível consultar o CEP.</span>}
         </label>
 
         <label className="form-field perfil-field-wide">
@@ -115,7 +115,7 @@ export function EnderecoPerfilSection({ form, updateField, hint }: EnderecoPerfi
         </label>
 
         <label className="form-field">
-          <span className="form-label">Numero</span>
+          <span className="form-label">Número</span>
           <div className="form-control">
             <input
               type="text"

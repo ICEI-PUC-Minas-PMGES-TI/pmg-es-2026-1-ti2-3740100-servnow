@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Building, Hash, Home, Image as ImageIcon, LoaderCircle, MapPin, Trash2 } from "lucide-react";
+import { Building, Hash, Home, Image as ImageIcon, LoaderCircle, MapPin } from "lucide-react";
 
+import { PerfilBotaoRemover, PerfilBotaoUpload } from "./PerfilBotoes";
 import type { EnderecoClienteItem } from "./clienteCadastroTypes";
 
 const ESTADOS_BR = [
@@ -94,17 +95,16 @@ export function EnderecoClienteCard({
             checked={endereco.principal}
             onChange={onSelecionarPrincipal}
           />
-          <span>Usar este endereco</span>
+          <span>Usar este endereço</span>
         </label>
         {podeRemover && (
-          <button type="button" className="perfil-endereco-remover" onClick={onRemover}>
-            <Trash2 size={16} />
+          <PerfilBotaoRemover onClick={onRemover}>
             Remover
-          </button>
+          </PerfilBotaoRemover>
         )}
       </div>
 
-      <p className="perfil-endereco-indice">Endereco {indice + 1}</p>
+      <p className="perfil-endereco-indice">Endereço {indice + 1}</p>
 
       <div className="perfil-grid">
         <label className="form-field perfil-field-wide">
@@ -149,7 +149,7 @@ export function EnderecoClienteCard({
         </label>
 
         <label className="form-field">
-          <span className="form-label">Numero</span>
+          <span className="form-label">Número</span>
           <div className="form-control">
             <input
               type="text"
@@ -212,18 +212,17 @@ export function EnderecoClienteCard({
 
       <div className="perfil-endereco-foto">
         <h3>Foto do local</h3>
-        <p className="workspace-hint">Ajuda o prestador a encontrar o imovel neste endereco.</p>
-        <label className="home-button home-button-primary perfil-upload">
-          <ImageIcon size={18} />
-          <span>{endereco.fotoPreview ? "Trocar foto" : "Selecionar foto"}</span>
-          <input type="file" accept="image/*" onChange={onFotoChange} />
-        </label>
+        <p className="workspace-hint">Ajuda o prestador a encontrar o imóvel neste endereço.</p>
+        <PerfilBotaoUpload
+          icone={<ImageIcon size={18} />}
+          texto={endereco.fotoPreview ? "Trocar foto" : "Selecionar foto"}
+          accept="image/*"
+          onChange={onFotoChange}
+        />
         {endereco.fotoPreview && (
           <div className="perfil-foto-preview">
             <img src={endereco.fotoPreview} alt="Foto do local" />
-            <button
-              type="button"
-              className="perfil-foto-remover"
+            <PerfilBotaoRemover
               onClick={() => {
                 if (endereco.fotoPreview?.startsWith("blob:")) {
                   URL.revokeObjectURL(endereco.fotoPreview);
@@ -232,7 +231,7 @@ export function EnderecoClienteCard({
               }}
             >
               Remover foto
-            </button>
+            </PerfilBotaoRemover>
           </div>
         )}
       </div>

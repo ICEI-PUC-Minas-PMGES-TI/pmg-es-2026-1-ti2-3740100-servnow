@@ -2,30 +2,35 @@ import type { ChangeEvent } from "react";
 import { Clock, FileText, MapPin } from "lucide-react";
 
 import type { FormState } from "../../../Components/Perfil";
+import type { ChavePixItem } from "../../../Components/Perfil/clienteCadastroTypes";
 import { EnderecoPerfilSection } from "../../../Components/Perfil/EnderecoPerfilSection";
+import { PagamentosClienteSection } from "../../../Components/Perfil/PagamentosClienteSection";
+import { PerfilBotaoRemover, PerfilBotaoUpload } from "../../../Components/Perfil/PerfilBotoes";
 
 const TIPOS_SERVICO = [
-  { value: "ELETRICO", label: "Eletrico" },
-  { value: "HIDRAULICO", label: "Hidraulico" },
+  { value: "ELETRICO", label: "Elétrico" },
+  { value: "HIDRAULICO", label: "Hidráulico" },
   { value: "PINTURA", label: "Pintura" },
   { value: "MONTAGEM", label: "Montagem" },
   { value: "LIMPEZA", label: "Limpeza" },
-  { value: "MANUTENCAO_GERAL", label: "Manutencao geral" },
+  { value: "MANUTENCAO_GERAL", label: "Manutenção geral" },
 ];
 
 const DIAS_SEMANA = [
   { value: "SEGUNDA", label: "Segunda" },
-  { value: "TERCA", label: "Terca" },
+  { value: "TERCA", label: "Terça" },
   { value: "QUARTA", label: "Quarta" },
   { value: "QUINTA", label: "Quinta" },
   { value: "SEXTA", label: "Sexta" },
-  { value: "SABADO", label: "Sabado" },
+  { value: "SABADO", label: "Sábado" },
   { value: "DOMINGO", label: "Domingo" },
 ];
 
 type PrestadorPerfilProps = {
   form: FormState;
+  chavesPix: ChavePixItem[];
   updateField: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+  onChavesPixChange: (chaves: ChavePixItem[]) => void;
   toggleEspecialidade: (value: string) => void;
   toggleDiaDisponivel: (value: string) => void;
   handleDocumentoChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -34,7 +39,9 @@ type PrestadorPerfilProps = {
 
 export function PrestadorPerfil({
   form,
+  chavesPix,
   updateField,
+  onChavesPixChange,
   toggleEspecialidade,
   toggleDiaDisponivel,
   handleDocumentoChange,
@@ -45,24 +52,24 @@ export function PrestadorPerfil({
       <EnderecoPerfilSection
         form={form}
         updateField={updateField}
-        hint="Endereco da sua residencia ou base de atendimento, usado para calcular a distancia ate cada solicitacao."
+        hint="Endereço da sua residência ou base de atendimento, usado para calcular a distância até cada solicitação."
       />
 
       <section className="workspace-card workspace-section">
-        <h2>Descricao profissional</h2>
+        <h2>Descrição profissional</h2>
         <p className="workspace-hint">
-          Conte sobre sua experiencia e o que voce faz de melhor (ate 500 caracteres). Obrigatorio para salvar o perfil.
+          Conte sobre sua experiência e o que você faz de melhor (até 500 caracteres). Obrigatório para salvar o perfil.
         </p>
 
         <label className="form-field form-field-full">
-          <span className="form-label">Sobre voce *</span>
+          <span className="form-label">Sobre você *</span>
           <div className="form-control form-control-textarea">
             <textarea
               rows={6}
               maxLength={500}
               value={form.descricaoProfissional}
               onChange={(event) => updateField("descricaoProfissional", event.target.value)}
-              placeholder="Ex: Eletricista com 10 anos de experiencia em residencias e comercios..."
+              placeholder="Ex.: Eletricista com 10 anos de experiência em residências e comércios..."
             />
           </div>
           <small className="form-counter">
@@ -72,8 +79,8 @@ export function PrestadorPerfil({
       </section>
 
       <section className="workspace-card workspace-section">
-        <h2>Tipos de servico</h2>
-        <p className="workspace-hint">Escolha pelo menos uma especialidade que voce atende.</p>
+        <h2>Tipos de serviço</h2>
+        <p className="workspace-hint">Escolha pelo menos uma especialidade que você atende.</p>
 
         <div className="perfil-checkboxes">
           {TIPOS_SERVICO.map((tipo) => {
@@ -94,7 +101,7 @@ export function PrestadorPerfil({
 
       <section className="workspace-card workspace-section">
         <h2>Disponibilidade</h2>
-        <p className="workspace-hint">Informe quando voce costuma atender chamados.</p>
+        <p className="workspace-hint">Informe quando você costuma atender chamados.</p>
 
         <div className="perfil-checkboxes">
           {DIAS_SEMANA.map((dia) => {
@@ -114,7 +121,7 @@ export function PrestadorPerfil({
 
         <div className="perfil-grid perfil-grid-spaced">
           <label className="form-field">
-            <span className="form-label">Horario de inicio</span>
+            <span className="form-label">Horário de início</span>
             <div className="form-control">
               <Clock size={16} />
               <input
@@ -126,7 +133,7 @@ export function PrestadorPerfil({
           </label>
 
           <label className="form-field">
-            <span className="form-label">Horario de fim</span>
+            <span className="form-label">Horário de fim</span>
             <div className="form-control">
               <Clock size={16} />
               <input
@@ -154,43 +161,46 @@ export function PrestadorPerfil({
         </div>
       </section>
 
+      <PagamentosClienteSection
+        chavesPix={chavesPix}
+        onChange={onChavesPixChange}
+      />
+
       <section className="workspace-card workspace-section">
         <h2>Documento de identidade</h2>
-        <p className="workspace-hint">Envie um PDF ou imagem com tamanho maximo de 5 MB.</p>
 
-        <label className="home-button home-button-primary perfil-upload">
-          <FileText size={18} />
-          <span>{form.documentoPreview ? "Trocar documento" : "Selecionar documento"}</span>
-          <input
-            type="file"
+        <div className="perfil-upload-group">
+          <p className="workspace-hint">
+            Envie um PDF ou imagem com tamanho máximo de 5 MB.
+          </p>
+
+          <PerfilBotaoUpload
+            icone={<FileText size={18} />}
+            texto={form.documentoPreview ? "Trocar documento" : "Selecionar documento"}
             accept="application/pdf,image/*"
             onChange={handleDocumentoChange}
           />
-        </label>
 
-        {form.documentoPreview && (
-          <div className="perfil-documento-preview">
-            {form.documentoEhPdf ? (
-              <iframe
-                src={form.documentoPreview}
-                title="Pre-visualizacao do documento de identidade"
-              />
-            ) : (
-              <img
-                src={form.documentoPreview}
-                alt="Pre-visualizacao do documento de identidade"
-              />
-            )}
+          {form.documentoPreview && (
+            <div className="perfil-documento-preview">
+              {form.documentoEhPdf ? (
+                <iframe
+                  src={form.documentoPreview}
+                  title="Pré-visualização do documento de identidade"
+                />
+              ) : (
+                <img
+                  src={form.documentoPreview}
+                  alt="Pré-visualização do documento de identidade"
+                />
+              )}
 
-            <button
-              type="button"
-              className="perfil-foto-remover perfil-documento-remover"
-              onClick={removerDocumento}
-            >
-              Remover documento
-            </button>
-          </div>
-        )}
+              <PerfilBotaoRemover onClick={removerDocumento}>
+                Remover documento
+              </PerfilBotaoRemover>
+            </div>
+          )}
+        </div>
       </section>
     </>
   );

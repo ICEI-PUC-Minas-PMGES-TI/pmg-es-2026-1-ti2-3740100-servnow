@@ -1,4 +1,4 @@
-import { ArrowLeft, Image as ImageIcon, Save, User } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, User } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,12 @@ import { toast } from "react-toastify";
 
 import { ClientePerfil } from "../../pages/Configurarperfil/Cliente";
 import { PrestadorPerfil } from "../../pages/Configurarperfil/Prestador";
+import {
+  PerfilBotaoCancelar,
+  PerfilBotaoRemover,
+  PerfilBotaoSalvar,
+  PerfilBotaoUpload,
+} from "./PerfilBotoes";
 import {
   criarChavePix,
   criarEnderecoCliente,
@@ -130,46 +136,29 @@ export function Perfil() {
         }
 
         const data = (await response.json()) as PerfilResponse;
-        const fotoPerfilArquivo = data.fotoPerfilUrl
-          ? await carregarArquivoAutenticado(data.fotoPerfilUrl, session.token).catch(() => null)
-          : null;
-        const documentoArquivo =
-          session.tipoUsuario === "PRESTADOR" && data.documentoIdentidadeUrl
-            ? await carregarArquivoAutenticado(data.documentoIdentidadeUrl, session.token).catch(() => null)
-            : null;
 
         let enderecos: EnderecoClienteItem[] = [criarEnderecoCliente(true)];
         let chavesPix: ChavePixItem[] = [];
 
         if (session.tipoUsuario === "CLIENTE") {
           if (data.enderecos && data.enderecos.length > 0) {
-            enderecos = await Promise.all(
-              data.enderecos.map(async (item) => {
-                const foto = item.fotoUrl
-                  ? await carregarArquivoAutenticado(item.fotoUrl, session.token).catch(() => null)
-                  : null;
-                return {
-                  clientKey: crypto.randomUUID(),
-                  id: item.id,
-                  rotulo: item.rotulo ?? "",
-                  rua: item.rua ?? "",
-                  numero: item.numero ?? "",
-                  cep: item.cep ?? "",
-                  complemento: item.complemento ?? "",
-                  bairro: item.bairro ?? "",
-                  cidade: item.cidade ?? "",
-                  estado: item.estado ?? "",
-                  fotoPreview: foto?.url ?? null,
-                  fotoPendente: null,
-                  removerFoto: false,
-                  principal: item.principal,
-                };
-              }),
-            );
+            enderecos = data.enderecos.map((item) => ({
+              clientKey: crypto.randomUUID(),
+              id: item.id,
+              rotulo: item.rotulo ?? "",
+              rua: item.rua ?? "",
+              numero: item.numero ?? "",
+              cep: item.cep ?? "",
+              complemento: item.complemento ?? "",
+              bairro: item.bairro ?? "",
+              cidade: item.cidade ?? "",
+              estado: item.estado ?? "",
+              fotoPreview: null,
+              fotoPendente: null,
+              removerFoto: false,
+              principal: item.principal,
+            }));
           } else if (data.cep) {
-            const fotoLocal = data.fotoLocalUrl
-              ? await carregarArquivoAutenticado(data.fotoLocalUrl, session.token).catch(() => null)
-              : null;
             enderecos = [{
               clientKey: crypto.randomUUID(),
               rotulo: "Principal",
@@ -180,26 +169,16 @@ export function Perfil() {
               bairro: data.bairro ?? "",
               cidade: data.cidade ?? "",
               estado: data.estado ?? "",
-              fotoPreview: fotoLocal?.url ?? null,
+              fotoPreview: null,
               fotoPendente: null,
               removerFoto: false,
               principal: true,
             }];
           }
-
-          chavesPix =
-            data.chavesPix && data.chavesPix.length > 0
-              ? data.chavesPix.map((item) => ({
-                  clientKey: crypto.randomUUID(),
-                  id: item.id,
-                  rotulo: item.rotulo ?? "",
-                  chave: item.chave,
-                  tipo: (item.tipo as ChavePixItem["tipo"]) || "OUTRA",
-                  principal: item.principal,
-                }))
-              : data.chavePix
-                ? [{ ...criarChavePix(true), chave: data.chavePix, rotulo: "Principal" }]
-                : [];
+        } else {
+          chavesPix = data.chavePix
+            ? [{ ...criarChavePix(true), chave: data.chavePix, rotulo: "Principal" }]
+            : [criarChavePix(true)];
         }
 
         setForm({
@@ -211,7 +190,7 @@ export function Perfil() {
           bairro: data.bairro ?? "",
           cidade: data.cidade ?? "",
           estado: data.estado ?? "",
-          fotoPerfilPreview: fotoPerfilArquivo?.url ?? null,
+          fotoPerfilPreview: null,
           fotoPerfilPendente: null,
           removerFotoPerfil: false,
           fotoPerfilAjusteX: String(data.fotoPerfilAjusteX ?? 50),
@@ -230,16 +209,51 @@ export function Perfil() {
           horarioInicio: data.horarioInicio ?? "",
           horarioFim: data.horarioFim ?? "",
           raioAtendimentoKm: data.raioAtendimentoKm ? String(data.raioAtendimentoKm) : "",
-          documentoPreview: documentoArquivo?.url ?? null,
+          documentoPreview: null,
           documentoPendente: null,
-          documentoEhPdf: documentoArquivo?.mimeType === "application/pdf",
+          documentoEhPdf: false,
           removerDocumentoIdentidade: false,
           enderecos,
           chavesPix,
         });
+        setIsLoading(false);
+
+        void (async () => {
+          const fotoPerfilArquivo = data.fotoPerfilUrl
+            ? await carregarArquivoAutenticado(data.fotoPerfilUrl, session.token).catch(() => null)
+            : null;
+          const documentoArquivo =
+            session.tipoUsuario === "PRESTADOR" && data.documentoIdentidadeUrl
+              ? await carregarArquivoAutenticado(data.documentoIdentidadeUrl, session.token).catch(() => null)
+              : null;
+
+          let enderecosComFoto = enderecos;
+          if (session.tipoUsuario === "CLIENTE" && data.enderecos && data.enderecos.length > 0) {
+            enderecosComFoto = await Promise.all(
+              enderecos.map(async (item, index) => {
+                const origem = data.enderecos?.[index];
+                if (!origem?.fotoUrl) return item;
+                const foto = await carregarArquivoAutenticado(origem.fotoUrl, session.token).catch(() => null);
+                return foto ? { ...item, fotoPreview: foto.url } : item;
+              }),
+            );
+          } else if (session.tipoUsuario === "CLIENTE" && data.fotoLocalUrl && enderecos.length === 1 && !enderecos[0].id) {
+            const fotoLocal = await carregarArquivoAutenticado(data.fotoLocalUrl, session.token).catch(() => null);
+            if (fotoLocal) {
+              enderecosComFoto = [{ ...enderecos[0], fotoPreview: fotoLocal.url }];
+            }
+          }
+
+          setForm((current) => ({
+            ...current,
+            fotoPerfilPreview: fotoPerfilArquivo?.url ?? current.fotoPerfilPreview,
+            documentoPreview: documentoArquivo?.url ?? current.documentoPreview,
+            documentoEhPdf: documentoArquivo?.mimeType === "application/pdf",
+            enderecos: enderecosComFoto,
+          }));
+        })();
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar perfil.");
-      } finally {
         setIsLoading(false);
       }
     }
@@ -291,7 +305,7 @@ export function Perfil() {
     if (!file) return;
 
     if (file.size > MAX_FOTO_FILE_BYTES) {
-      toast.error("A imagem precisa ter no maximo 5 MB.");
+      toast.error("A imagem precisa ter no máximo 5 MB.");
       return;
     }
 
@@ -310,7 +324,7 @@ export function Perfil() {
         };
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível carregar a imagem.");
     } finally {
       event.target.value = "";
     }
@@ -321,7 +335,7 @@ export function Perfil() {
     if (!file) return;
 
     if (file.size > MAX_FOTO_FILE_BYTES) {
-      toast.error("A imagem precisa ter no maximo 5 MB.");
+      toast.error("A imagem precisa ter no máximo 5 MB.");
       return;
     }
 
@@ -343,7 +357,7 @@ export function Perfil() {
         }),
       }));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel carregar a imagem.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível carregar a imagem.");
     } finally {
       event.target.value = "";
     }
@@ -374,7 +388,7 @@ export function Perfil() {
     }
 
     if (file.size > MAX_DOCUMENTO_FILE_BYTES) {
-      toast.error("O documento precisa ter no maximo 5 MB.");
+      toast.error("O documento precisa ter no máximo 5 MB.");
       event.target.value = "";
       return;
     }
@@ -461,6 +475,7 @@ export function Perfil() {
           horarioFim: form.horarioFim,
           raioAtendimentoKm: Number(form.raioAtendimentoKm),
           removerDocumentoIdentidade: form.removerDocumentoIdentidade,
+          chavePix: resolverChavePixPrincipal(form.chavesPix),
         };
 
     const formData = new FormData();
@@ -508,15 +523,7 @@ export function Perfil() {
             principal: item.principal,
             removerFoto: item.removerFoto,
           })),
-          chavesPix: form.chavesPix
-            .filter((item) => item.chave.trim())
-            .map((item) => ({
-              id: item.id,
-              rotulo: item.rotulo || undefined,
-              chave: item.chave.trim(),
-              tipo: item.tipo,
-              principal: item.principal,
-            })),
+          chavesPix: [],
         };
 
         for (const item of form.enderecos) {
@@ -580,8 +587,8 @@ export function Perfil() {
             <h1 className="workspace-title">{isCliente ? "Meu perfil de cliente" : "Meu perfil de prestador"}</h1>
             <p className="workspace-description">
               {isCliente
-                ? "Atualize seus dados e o endereco onde voce costuma solicitar servicos."
-                : "Atualize seu perfil profissional e o endereco da sua base para calcular distancias ate as solicitacoes."}
+                ? "Atualize seus dados e o endereço onde você costuma solicitar serviços."
+                : "Atualize seu perfil profissional e o endereço da sua base para calcular distâncias até as solicitações."}
             </p>
           </header>
 
@@ -612,75 +619,70 @@ export function Perfil() {
                     <p className="workspace-hint">Adicione uma foto para identificar seu perfil na plataforma.</p>
                   </div>
 
-                  <label className="home-button home-button-primary perfil-upload">
-                    <ImageIcon size={18} />
-                    <span>{form.fotoPerfilPreview ? "Trocar foto" : "Selecionar foto"}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFotoPerfilChange}
-                    />
-                  </label>
+                  <PerfilBotaoUpload
+                    icone={<ImageIcon size={18} />}
+                    texto={form.fotoPerfilPreview ? "Trocar foto" : "Selecionar foto"}
+                    accept="image/*"
+                    onChange={handleFotoPerfilChange}
+                  />
 
                   {form.fotoPerfilPreview && (
-                    <div className="perfil-logo-editor">
-                      <div className="perfil-logo-preview">
-                        <img
-                          src={form.fotoPerfilPreview}
-                          alt="Pre-visualizacao da foto de perfil"
-                          style={{
-                            objectFit: form.fotoPerfilEnquadramento,
-                            objectPosition: `${form.fotoPerfilAjusteX}% ${form.fotoPerfilAjusteY}%`,
-                          }}
-                        />
+                    <>
+                      <div className="perfil-logo-editor">
+                        <div className="perfil-logo-preview">
+                          <img
+                            src={form.fotoPerfilPreview}
+                            alt="Pré-visualização da foto de perfil"
+                            style={{
+                              objectFit: form.fotoPerfilEnquadramento,
+                              objectPosition: `${form.fotoPerfilAjusteX}% ${form.fotoPerfilAjusteY}%`,
+                            }}
+                          />
+                        </div>
+
+                        <div className="perfil-logo-controls">
+                          <label className="perfil-logo-control">
+                            <span>Enquadramento</span>
+                            <select
+                              value={form.fotoPerfilEnquadramento}
+                              onChange={(event) => updateField(
+                                "fotoPerfilEnquadramento",
+                                event.target.value as FormState["fotoPerfilEnquadramento"],
+                              )}
+                            >
+                              <option value="cover">Preencher</option>
+                              <option value="contain">Mostrar inteira</option>
+                            </select>
+                          </label>
+
+                          <label className="perfil-logo-control">
+                            <span>Horizontal</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={form.fotoPerfilAjusteX}
+                              onChange={(event) => updateField("fotoPerfilAjusteX", event.target.value)}
+                            />
+                          </label>
+
+                          <label className="perfil-logo-control">
+                            <span>Vertical</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={form.fotoPerfilAjusteY}
+                              onChange={(event) => updateField("fotoPerfilAjusteY", event.target.value)}
+                            />
+                          </label>
+                        </div>
                       </div>
 
-                      <div className="perfil-logo-controls">
-                        <label className="perfil-logo-control">
-                          <span>Enquadramento</span>
-                          <select
-                            value={form.fotoPerfilEnquadramento}
-                            onChange={(event) => updateField(
-                              "fotoPerfilEnquadramento",
-                              event.target.value as FormState["fotoPerfilEnquadramento"],
-                            )}
-                          >
-                            <option value="cover">Preencher</option>
-                            <option value="contain">Mostrar inteira</option>
-                          </select>
-                        </label>
-
-                        <label className="perfil-logo-control">
-                          <span>Horizontal</span>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={form.fotoPerfilAjusteX}
-                            onChange={(event) => updateField("fotoPerfilAjusteX", event.target.value)}
-                          />
-                        </label>
-
-                        <label className="perfil-logo-control">
-                          <span>Vertical</span>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={form.fotoPerfilAjusteY}
-                            onChange={(event) => updateField("fotoPerfilAjusteY", event.target.value)}
-                          />
-                        </label>
-
-                        <button
-                          type="button"
-                          className="perfil-foto-remover"
-                          onClick={removerFotoPerfil}
-                        >
-                          Remover foto
-                        </button>
-                      </div>
-                    </div>
+                      <PerfilBotaoRemover onClick={removerFotoPerfil}>
+                        Remover foto
+                      </PerfilBotaoRemover>
+                    </>
                   )}
                 </div>
               </section>
@@ -688,15 +690,15 @@ export function Perfil() {
               {isCliente ? (
                 <ClientePerfil
                   enderecos={form.enderecos}
-                  chavesPix={form.chavesPix}
                   onEnderecosChange={(enderecos) => setForm((current) => ({ ...current, enderecos }))}
-                  onChavesPixChange={(chavesPix) => setForm((current) => ({ ...current, chavesPix }))}
                   onFotoEnderecoChange={handleFotoEnderecoChange}
                 />
               ) : (
                 <PrestadorPerfil
                   form={form}
+                  chavesPix={form.chavesPix}
                   updateField={updateField}
+                  onChavesPixChange={(chavesPix) => setForm((current) => ({ ...current, chavesPix }))}
                   toggleEspecialidade={toggleEspecialidade}
                   toggleDiaDisponivel={toggleDiaDisponivel}
                   handleDocumentoChange={handleDocumentoChange}
@@ -705,23 +707,12 @@ export function Perfil() {
               )}
 
               <div className="form-actions perfil-actions">
-                <button
-                  type="button"
-                  className="home-button home-button-secondary"
-                  onClick={() => navigate(-1)}
-                  disabled={isSaving}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="home-button home-button-primary"
+                <PerfilBotaoCancelar onClick={() => navigate(-1)} disabled={isSaving} />
+                <PerfilBotaoSalvar
                   disabled={isSaving || !podeSalvar}
-                  title={!podeSalvar ? "Preencha a descricao profissional para salvar." : undefined}
-                >
-                  <Save size={16} />
-                  {isSaving ? "Salvando..." : "Salvar alteracoes"}
-                </button>
+                  loading={isSaving}
+                  title={!podeSalvar ? "Preencha a descrição profissional para salvar." : undefined}
+                />
               </div>
             </form>
           )}
@@ -742,33 +733,24 @@ async function getResponseError(response: Response, fallback: string) {
 
 function validarCadastrosCliente(form: FormState) {
   if (form.enderecos.length === 0) {
-    toast.error("Cadastre pelo menos um endereco.");
+    toast.error("Cadastre pelo menos um endereço.");
     return false;
   }
 
   const principaisEndereco = form.enderecos.filter((item) => item.principal).length;
   if (principaisEndereco !== 1) {
-    toast.error("Selecione exatamente um endereco principal.");
+    toast.error("Selecione exatamente um endereço principal.");
     return false;
   }
 
   for (const [indice, item] of form.enderecos.entries()) {
     const cep = item.cep.replace(/\D/g, "");
     if (cep.length !== 8) {
-      toast.error(`Endereco ${indice + 1}: informe um CEP valido.`);
+      toast.error(`Endereço ${indice + 1}: informe um CEP válido.`);
       return false;
     }
     if (!item.rua.trim() || !item.numero.trim() || !item.bairro.trim() || !item.cidade.trim() || !item.estado.trim()) {
-      toast.error(`Endereco ${indice + 1}: preencha rua, numero, bairro, cidade e estado.`);
-      return false;
-    }
-  }
-
-  const chavesPreenchidas = form.chavesPix.filter((item) => item.chave.trim());
-  if (chavesPreenchidas.length > 0) {
-    const principaisPix = chavesPreenchidas.filter((item) => item.principal).length;
-    if (principaisPix !== 1) {
-      toast.error("Selecione exatamente uma chave PIX principal.");
+      toast.error(`Endereço ${indice + 1}: preencha rua, número, bairro, cidade e estado.`);
       return false;
     }
   }
@@ -779,11 +761,11 @@ function validarCadastrosCliente(form: FormState) {
 function validarEndereco(form: FormState) {
   const cep = form.cep.replace(/\D/g, "");
   if (cep.length !== 8) {
-    toast.error("Informe um CEP valido com 8 digitos.");
+    toast.error("Informe um CEP válido com 8 dígitos.");
     return false;
   }
   if (!form.rua.trim() || !form.numero.trim() || !form.bairro.trim() || !form.cidade.trim() || !form.estado.trim()) {
-    toast.error("Preencha rua, numero, bairro, cidade e estado.");
+    toast.error("Preencha rua, número, bairro, cidade e estado.");
     return false;
   }
   return true;
@@ -791,22 +773,22 @@ function validarEndereco(form: FormState) {
 
 function validarPerfilPrestador(form: FormState) {
   if (!form.descricaoProfissional.trim()) {
-    toast.error("Preencha a descricao profissional para salvar o perfil.");
+    toast.error("Preencha a descrição profissional para salvar o perfil.");
     return false;
   }
 
   if (form.especialidades.length === 0) {
-    toast.error("Escolha pelo menos um tipo de servico.");
+    toast.error("Escolha pelo menos um tipo de serviço.");
     return false;
   }
 
   if (form.diasDisponiveis.length === 0) {
-    toast.error("Selecione pelo menos um dia disponivel.");
+    toast.error("Selecione pelo menos um dia disponível.");
     return false;
   }
 
   if (!form.horarioInicio || !form.horarioFim || form.horarioInicio >= form.horarioFim) {
-    toast.error("Informe um horario de inicio anterior ao horario de fim.");
+    toast.error("Informe um horário de início anterior ao horário de fim.");
     return false;
   }
 
@@ -821,7 +803,28 @@ function validarPerfilPrestador(form: FormState) {
     return false;
   }
 
+  const chavePix = resolverChavePixPrincipal(form.chavesPix);
+  if (!chavePix) {
+    toast.error("Cadastre uma chave PIX para receber pagamentos.");
+    return false;
+  }
+
+  const chavesPreenchidas = form.chavesPix.filter((item) => item.chave.trim());
+  if (chavesPreenchidas.filter((item) => item.principal).length !== 1) {
+    toast.error("Selecione exatamente uma chave PIX principal.");
+    return false;
+  }
+
   return true;
+}
+
+function resolverChavePixPrincipal(chavesPix: ChavePixItem[]): string | null {
+  const preenchidas = chavesPix.filter((item) => item.chave.trim());
+  if (preenchidas.length === 0) {
+    return null;
+  }
+  const principal = preenchidas.find((item) => item.principal) ?? preenchidas[0];
+  return principal.chave.trim();
 }
 
 export default Perfil;

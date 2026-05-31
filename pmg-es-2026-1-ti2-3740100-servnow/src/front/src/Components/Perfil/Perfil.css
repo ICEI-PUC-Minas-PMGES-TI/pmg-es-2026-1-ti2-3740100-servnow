@@ -51,7 +51,8 @@
   accent-color: var(--perfil-accent-strong);
 }
 
-.perfil-page .home-button {
+.perfil-page .home-button,
+.perfil-page .perfil-btn {
   min-height: 48px;
   display: inline-flex;
   align-items: center;
@@ -65,42 +66,107 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.perfil-page .home-button:hover:not(:disabled) {
+.perfil-page label.perfil-btn {
+  user-select: none;
+}
+
+.perfil-page .home-button:hover:not(:disabled),
+.perfil-page .perfil-btn:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
-.perfil-page .home-button-primary {
+.perfil-page .home-button-primary,
+.perfil-page .perfil-btn-primary {
   color: #ffffff;
   background: #0f766e;
   box-shadow: none;
 }
 
-.perfil-page .home-button-primary:hover:not(:disabled) {
+.perfil-page .home-button-primary:hover:not(:disabled),
+.perfil-page .perfil-btn-primary:hover:not(:disabled) {
   background: #14b8a6;
 }
 
-.perfil-page .home-button:disabled {
+.perfil-page .home-button:disabled,
+.perfil-page .perfil-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
 
-.perfil-page .home-button-secondary {
+.perfil-page .home-button-secondary,
+.perfil-page .perfil-btn-secondary {
   color: var(--workspace-text);
   background: var(--workspace-surface-soft);
   border-color: var(--workspace-border);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
-.perfil-page .home-button-secondary:hover:not(:disabled) {
+.perfil-page .home-button-secondary:hover:not(:disabled),
+.perfil-page .perfil-btn-secondary:hover:not(:disabled) {
   border-color: var(--perfil-accent-border);
   background: var(--workspace-surface);
 }
 
-:root[data-theme="dark"] .perfil-page .home-button-secondary {
+:root[data-theme="dark"] .perfil-page .home-button-secondary,
+:root[data-theme="dark"] .perfil-page .perfil-btn-secondary {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.perfil-section-header .perfil-btn-secondary {
+  flex-shrink: 0;
+}
+
+.perfil-page .perfil-btn-upload,
+.perfil-page .perfil-upload {
+  align-self: flex-start;
+  cursor: pointer;
+}
+
+.perfil-page .perfil-btn-upload svg,
+.perfil-page .perfil-upload svg {
+  color: #ffffff;
+}
+
+.perfil-page .perfil-btn-upload input,
+.perfil-page .perfil-upload input {
+  display: none;
+}
+
+.perfil-btn-remover {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.perfil-btn-remover:hover {
+  opacity: 0.85;
+}
+
+.perfil-endereco-card-topo .perfil-btn-remover {
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.perfil-actions {
+  padding: 22px 26px;
+  background: var(--workspace-surface);
+  border: 1px solid var(--workspace-border);
+  border-radius: 8px;
 }
 
 .perfil-header .workspace-title {
@@ -115,7 +181,28 @@
 }
 
 .perfil-grid-spaced {
-  margin-top: 18px;
+  margin-top: 4px;
+}
+
+.perfil-page .workspace-section {
+  gap: 16px;
+}
+
+.perfil-page .workspace-section > p {
+  margin: 0;
+}
+
+.perfil-page .workspace-section > p + p {
+  margin-top: 4px;
+}
+
+.perfil-page .workspace-section > h2 + .workspace-hint {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.perfil-page .workspace-section > .perfil-checkboxes {
+  margin-top: 2px;
 }
 
 .perfil-grid .form-field {
@@ -164,7 +251,10 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: 20px;
+}
+
+.perfil-upload-group .workspace-hint {
+  margin: 0;
 }
 
 .perfil-upload-group h3 {
@@ -199,23 +289,10 @@
   box-shadow: 0 6px 16px var(--perfil-accent-shadow);
 }
 
-.perfil-page .perfil-upload {
-  align-self: flex-start;
-  cursor: pointer;
-}
-
-.perfil-page .perfil-upload svg {
-  color: #ffffff;
-}
-
-.perfil-page .perfil-upload input {
-  display: none;
-}
-
 .perfil-foto-preview {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
 }
 
@@ -275,30 +352,30 @@
   width: 100%;
 }
 
-.perfil-foto-remover {
-  border: none;
-  background: transparent;
-  color: #ef4444;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
+.perfil-endereco-foto {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--workspace-border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.perfil-foto-remover:hover {
-  text-decoration: underline;
+.perfil-endereco-foto h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--workspace-text);
 }
 
-.perfil-documento-remover {
-  margin-top: 10px;
+.perfil-endereco-foto .workspace-hint {
+  margin: 0;
 }
 
 .perfil-documento-preview {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
-  margin-top: 14px;
 }
 
 .perfil-documento-preview iframe,
@@ -332,7 +409,8 @@
     flex-direction: column-reverse;
   }
 
-  .perfil-actions .home-button {
+  .perfil-actions .home-button,
+  .perfil-actions .perfil-btn {
     width: 100%;
     justify-content: center;
   }
@@ -365,13 +443,22 @@
   margin: 0 0 6px;
 }
 
+.perfil-section-header .workspace-hint {
+  margin: 0;
+}
+
 .perfil-endereco-card,
 .perfil-pix-card {
   border: 1px solid var(--workspace-border);
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   background: var(--workspace-surface-soft);
+}
+
+.perfil-endereco-card:last-child,
+.perfil-pix-card:last-child {
+  margin-bottom: 0;
 }
 
 .perfil-endereco-card--principal,
@@ -397,34 +484,11 @@
   cursor: pointer;
 }
 
-.perfil-endereco-remover {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: none;
-  background: transparent;
-  color: #b91c1c;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 4px 8px;
-}
-
 .perfil-endereco-indice {
   margin: 0 0 12px;
   font-size: 0.85rem;
   color: var(--workspace-muted);
   font-weight: 600;
-}
-
-.perfil-endereco-foto {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px dashed var(--workspace-border);
-}
-
-.perfil-endereco-foto h3 {
-  margin: 0 0 6px;
-  font-size: 1rem;
 }
 
 .perfil-lista-vazia {

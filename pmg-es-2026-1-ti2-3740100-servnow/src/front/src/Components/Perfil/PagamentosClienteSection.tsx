@@ -1,12 +1,13 @@
-import { CreditCard, Plus, Trash2 } from "lucide-react";
+import { CreditCard, Plus } from "lucide-react";
 
+import { PerfilBotaoAdicionar, PerfilBotaoRemover } from "./PerfilBotoes";
 import type { ChavePixItem } from "./clienteCadastroTypes";
 
 const TIPOS_PIX = [
   { value: "EMAIL", label: "E-mail" },
   { value: "CPF", label: "CPF" },
   { value: "TELEFONE", label: "Telefone" },
-  { value: "ALEATORIA", label: "Chave aleatoria" },
+  { value: "ALEATORIA", label: "Chave aleatória" },
   { value: "OUTRA", label: "Outra" },
 ] as const;
 
@@ -15,7 +16,10 @@ type PagamentosClienteSectionProps = {
   onChange: (chaves: ChavePixItem[]) => void;
 };
 
-export function PagamentosClienteSection({ chavesPix, onChange }: PagamentosClienteSectionProps) {
+export function PagamentosClienteSection({
+  chavesPix,
+  onChange,
+}: PagamentosClienteSectionProps) {
   function atualizarChave(clientKey: string, partial: Partial<ChavePixItem>) {
     onChange(chavesPix.map((item) => (item.clientKey === clientKey ? { ...item, ...partial } : item)));
   }
@@ -51,13 +55,13 @@ export function PagamentosClienteSection({ chavesPix, onChange }: PagamentosClie
             Pagamentos
           </h2>
           <p className="workspace-hint">
-            Cadastre suas chaves PIX e escolha qual usar nos pagamentos de servicos.
+            Cadastre sua chave PIX para receber pagamentos.
           </p>
         </div>
-        <button type="button" className="home-button home-button-secondary" onClick={adicionarChave}>
+        <PerfilBotaoAdicionar onClick={adicionarChave}>
           <Plus size={16} />
           Nova chave PIX
-        </button>
+        </PerfilBotaoAdicionar>
       </div>
 
       {chavesPix.length === 0 && (
@@ -79,14 +83,9 @@ export function PagamentosClienteSection({ chavesPix, onChange }: PagamentosClie
               />
               <span>Usar esta chave</span>
             </label>
-            <button
-              type="button"
-              className="perfil-endereco-remover"
-              onClick={() => removerChave(chave.clientKey)}
-            >
-              <Trash2 size={16} />
+            <PerfilBotaoRemover onClick={() => removerChave(chave.clientKey)}>
               Remover
-            </button>
+            </PerfilBotaoRemover>
           </div>
 
           <p className="perfil-endereco-indice">Chave {indice + 1}</p>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapPin, MessageSquare, Star, User } from "lucide-react";
+import { CreditCard, MapPin, MessageSquare, Star, User } from "lucide-react";
 
 import { AvaliacoesPerfilSecao } from "../../../../Components/Perfil/AvaliacoesPerfilSecao";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
@@ -16,13 +16,18 @@ import { formatarRotuloAvaliacoes } from "../../../../utils/formatarAvaliacao";
 export function PerfilPrestador() {
   const session = getAuthSession();
   const [perfil, setPerfil] = useState<PerfilResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const validSession = getValidAuthSession();
-    if (!validSession?.token) return;
+    if (!validSession?.token) {
+      setIsLoading(false);
+      return;
+    }
     const token = validSession.token;
 
     async function carregarPerfil() {
+      setIsLoading(true);
       try {
         const response = await fetch(`${API_URL}/api/perfil/prestador`, {
           headers: authHeader(token),
@@ -30,9 +35,13 @@ export function PerfilPrestador() {
 
         if (response.ok) {
           setPerfil((await response.json()) as PerfilResponse);
+        } else {
+          setPerfil(null);
         }
       } catch {
         setPerfil(null);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -56,6 +65,19 @@ export function PerfilPrestador() {
     perfil?.avaliacaoMedia ?? null,
     perfil?.totalAvaliacoes ?? 0,
   );
+
+  const chavesPixExibicao =
+    perfil?.chavesPix && perfil.chavesPix.length > 0
+      ? perfil.chavesPix
+      : perfil?.chavePix
+        ? [{
+            id: 0,
+            rotulo: "Principal",
+            chave: perfil.chavePix,
+            tipo: "OUTRA",
+            principal: true,
+          }]
+        : [];
 
   return (
     <>
@@ -83,18 +105,57 @@ export function PerfilPrestador() {
             <p>{email}</p>
             <p className="painel-perfil-resumo-avaliacao" style={{ marginTop: 10 }}>
               <Star size={16} fill="currentColor" />
-              <strong>{resumoAvaliacoes}</strong>
+              <strong>{isLoading ? "Carregando..." : resumoAvaliacoes}</strong>
             </p>
-            {enderecoResumo ? (
-              <p className="painel-perfil-endereco">
-                <MapPin size={14} /> {enderecoResumo}
-              </p>
-            ) : (
-              <p className="painel-perfil-endereco painel-perfil-endereco--vazio">
-                Cadastre seu endereco em Configurar perfil para ver distancias nas solicitacoes.
-              </p>
-            )}
           </div>
+        </div>
+
+        <div className="painel-card painel-perfil-card">
+          <div className="painel-perfil-card-cabecalho">
+            <div className="painel-conta-card-icone">
+              <MapPin size={22} />
+            </div>
+            <div>
+              <h2>Endereco base</h2>
+              <p>Local usado para calcular distancias nas solicitacoes.</p>
+            </div>
+          </div>
+          {isLoading ? (
+            <p className="painel-perfil-vazio">Carregando endereco...</p>
+          ) : enderecoResumo ? (
+            <p className="painel-perfil-resumo-linha">{enderecoResumo}</p>
+          ) : (
+            <p className="painel-perfil-vazio">Nenhum endereco cadastrado. Configure em Configurar perfil.</p>
+          )}
+        </div>
+
+        <div className="painel-card painel-perfil-card">
+          <div className="painel-perfil-card-cabecalho">
+            <div className="painel-conta-card-icone">
+              <CreditCard size={22} />
+            </div>
+            <div>
+              <h2>Pagamentos (PIX)</h2>
+              <p>Chave cadastrada para receber pagamentos.</p>
+            </div>
+          </div>
+          {isLoading ? (
+            <p className="painel-perfil-vazio">Carregando chave PIX...</p>
+          ) : chavesPixExibicao.length > 0 ? (
+            <ul className="painel-perfil-lista-cadastros">
+              {chavesPixExibicao.map((item) => (
+                <li key={item.id || item.chave} className={item.principal ? "painel-perfil-item--ativo" : ""}>
+                  <strong>
+                    {item.rotulo || item.tipo}
+                    {item.principal ? " (em uso no QR Code)" : ""}
+                  </strong>
+                  <span>{item.chave}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="painel-perfil-vazio">Nenhuma chave PIX cadastrada. Configure em Configurar perfil.</p>
+          )}
         </div>
 
         <AvaliacoesPerfilSecao
