@@ -1,17 +1,21 @@
-import { Calendar, Clock, DollarSign, MapPin, User } from "lucide-react";
+import { CalendarDays, Calendar, Clock, DollarSign, List, MapPin, User } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AgendaCalendario } from "../../../../Components/Agenda/AgendaCalendario";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
 import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
+type Visao = "agenda" | "lista";
+
 export function Agendamentos() {
   const navigate = useNavigate();
   const [agendamentos, setAgendamentos] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [visao, setVisao] = useState<Visao>("agenda");
 
   useEffect(() => {
     async function carregar() {
@@ -55,6 +59,22 @@ export function Agendamentos() {
       <section className="painel-card">
         <div className="painel-card-cabecalho">
           <h2>Proximos servicos</h2>
+          <div className="painel-filtros">
+            <button
+              type="button"
+              className={`painel-filtro ${visao === "agenda" ? "ativo" : ""}`}
+              onClick={() => setVisao("agenda")}
+            >
+              <CalendarDays size={14} /> Agenda
+            </button>
+            <button
+              type="button"
+              className={`painel-filtro ${visao === "lista" ? "ativo" : ""}`}
+              onClick={() => setVisao("lista")}
+            >
+              <List size={14} /> Lista
+            </button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -71,6 +91,8 @@ export function Agendamentos() {
             </div>
             <p>Voce ainda nao tem servicos agendados.</p>
           </div>
+        ) : visao === "agenda" ? (
+          <AgendaCalendario agendamentos={lista} papel="CLIENTE" />
         ) : (
           <div className="painel-lista">
             {lista.map((item) => (
