@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
+import { BotaoRota } from "../../../../Components/Acompanhamento/BotaoRota";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   avaliarCliente,
@@ -420,6 +421,8 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
               </div>
             </div>
 
+            <BotaoRota endereco={detalhe.endereco} />
+
             <div className="acomp-codigo-input-grupo">
               <span className="acomp-codigo-label">Codigo do cliente</span>
               <div className="acomp-codigo-inputs">
@@ -477,6 +480,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
                 </div>
               </div>
             )}
+            <BotaoRota endereco={detalhe.endereco} />
           </section>
 
           <section className="painel-card">

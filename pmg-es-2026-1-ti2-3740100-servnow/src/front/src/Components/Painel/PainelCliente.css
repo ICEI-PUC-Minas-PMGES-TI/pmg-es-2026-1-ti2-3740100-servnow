@@ -1089,6 +1089,70 @@
   font-size: 12px;
 }
 
+/* Botao de rota (Google Maps / Waze) */
+.acomp-rota {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--workspace-surface-soft);
+  border: 1px solid var(--workspace-border);
+}
+
+.acomp-rota-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--workspace-text);
+}
+
+.acomp-rota-label svg {
+  color: var(--brand-strong);
+  flex-shrink: 0;
+}
+
+.acomp-rota-botoes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.acomp-rota-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 150px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Plus Jakarta Sans', 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: filter 0.18s, transform 0.18s;
+}
+
+.acomp-rota-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.acomp-rota-btn.google {
+  background: #1a73e8;
+}
+
+.acomp-rota-btn.waze {
+  background: #33ccff;
+  color: #0a2540;
+}
+
 .acomp-codigo-input-grupo {
   display: flex;
   flex-direction: column;
