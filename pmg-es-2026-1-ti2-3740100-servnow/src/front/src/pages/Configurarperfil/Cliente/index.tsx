@@ -2,23 +2,19 @@ import type { ChangeEvent } from "react";
 import { MapPin, Plus } from "lucide-react";
 
 import { EnderecoClienteCard } from "../../../Components/Perfil/EnderecoClienteCard";
-import { PagamentosClienteSection } from "../../../Components/Perfil/PagamentosClienteSection";
-import type { ChavePixItem, EnderecoClienteItem } from "../../../Components/Perfil/clienteCadastroTypes";
+import { PerfilBotaoAdicionar } from "../../../Components/Perfil/PerfilBotoes";
+import type { EnderecoClienteItem } from "../../../Components/Perfil/clienteCadastroTypes";
 import { criarEnderecoCliente } from "../../../Components/Perfil/clienteCadastroTypes";
 
 type ClientePerfilProps = {
   enderecos: EnderecoClienteItem[];
-  chavesPix: ChavePixItem[];
   onEnderecosChange: (enderecos: EnderecoClienteItem[]) => void;
-  onChavesPixChange: (chaves: ChavePixItem[]) => void;
   onFotoEnderecoChange: (clientKey: string, event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export function ClientePerfil({
   enderecos,
-  chavesPix,
   onEnderecosChange,
-  onChavesPixChange,
   onFotoEnderecoChange,
 }: ClientePerfilProps) {
   function atualizarEndereco(clientKey: string, atualizado: EnderecoClienteItem) {
@@ -48,16 +44,16 @@ export function ClientePerfil({
           <div>
             <h2>
               <MapPin size={20} style={{ display: "inline", verticalAlign: "middle", marginRight: 8 }} />
-              Enderecos
+              Endereços
             </h2>
             <p className="workspace-hint">
-              Cadastre os locais onde voce solicita servicos. A foto fica em cada endereco.
+              Cadastre os locais onde você solicita serviços. A foto fica em cada endereço.
             </p>
           </div>
-          <button type="button" className="home-button home-button-secondary" onClick={adicionarEndereco}>
+          <PerfilBotaoAdicionar onClick={adicionarEndereco}>
             <Plus size={16} />
-            Novo endereco
-          </button>
+            Novo endereço
+          </PerfilBotaoAdicionar>
         </div>
 
         {enderecos.map((endereco, indice) => (
@@ -73,8 +69,6 @@ export function ClientePerfil({
           />
         ))}
       </section>
-
-      <PagamentosClienteSection chavesPix={chavesPix} onChange={onChavesPixChange} />
     </>
   );
 }
