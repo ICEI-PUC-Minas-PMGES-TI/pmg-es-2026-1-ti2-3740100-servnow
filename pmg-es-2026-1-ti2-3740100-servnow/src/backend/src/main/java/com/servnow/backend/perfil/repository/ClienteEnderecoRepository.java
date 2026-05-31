@@ -9,9 +9,9 @@ import com.servnow.backend.perfil.domain.ClienteEndereco;
 
 public interface ClienteEnderecoRepository extends JpaRepository<ClienteEndereco, Long> {
 
-    List<ClienteEndereco> findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(Long usuarioId);
+    List<ClienteEndereco> findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(Long usuarioId);
 
-    Optional<ClienteEndereco> findByIdAndUsuarioId(Long id, Long usuarioId);
+    Optional<ClienteEndereco> findByIdAndUsuario_Id(Long id, Long usuarioId);
 
-    long countByUsuarioId(Long usuarioId);
+    long countByUsuario_Id(Long usuarioId);
 }

@@ -1,5 +1,6 @@
 package com.servnow.backend.common;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -25,6 +26,17 @@ public class ApiExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
         problemDetail.setTitle("Erro de validacao");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException exception) {
+        String detail = "Nao foi possivel salvar os dados. Verifique se o banco esta atualizado.";
+        if (exception.getMostSpecificCause() != null && exception.getMostSpecificCause().getMessage() != null) {
+            detail = exception.getMostSpecificCause().getMessage();
+        }
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, detail);
+        problemDetail.setTitle("Erro de integridade");
         return problemDetail;
     }
 }
