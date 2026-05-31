@@ -21,7 +21,6 @@ import { Solicitacoes } from "../../../pages/Painel/Cliente/Solicitacoes";
 import { Propostas } from "../../../pages/Painel/Cliente/Propostas";
 import { Agendamentos } from "../../../pages/Painel/Cliente/Agendamentos";
 import { Historico } from "../../../pages/Painel/Cliente/Historico";
-import { Conta } from "../../../pages/Painel/Cliente/Conta";
 import { PerfilCliente } from "../../../pages/Painel/Cliente/Perfil";
 
 import "../PainelCliente.css";
@@ -33,8 +32,7 @@ type Secao =
   | "propostas"
   | "agendamentos"
   | "historico"
-  | "perfil"
-  | "conta";
+  | "perfil";
 
 type ItemMenu = {
   id: Secao;
@@ -126,7 +124,6 @@ export function PainelCliente() {
           {secaoAtiva === "agendamentos" && <Agendamentos />}
           {secaoAtiva === "historico" && <Historico />}
           {secaoAtiva === "perfil" && <PerfilCliente />}
-          {secaoAtiva === "conta" && <Conta />}
         </main>
       </div>
     </>
