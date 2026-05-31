@@ -20,6 +20,8 @@ import com.servnow.backend.acompanhamento.dto.AcompanhamentoDisponivelResponse;
 import com.servnow.backend.acompanhamento.dto.AvaliarServicoRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarChegadaRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarPagamentoRequest;
+import com.servnow.backend.acompanhamento.dto.ConfirmarReagendamentoRequest;
+import com.servnow.backend.acompanhamento.dto.SolicitarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.service.AcompanhamentoService;
 import com.servnow.backend.security.UsuarioAutenticado;
 
@@ -93,6 +95,24 @@ public class AcompanhamentoController {
         return acompanhamentoService.concluirExecucao(solicitacaoId, usuario);
     }
 
+    @PostMapping("/{solicitacaoId}/solicitar-reagendamento")
+    public AcompanhamentoDetalheResponse solicitarReagendamento(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody SolicitarReagendamentoRequest request
+    ) {
+        return acompanhamentoService.solicitarReagendamento(solicitacaoId, usuario, request);
+    }
+
+    @PostMapping("/{solicitacaoId}/confirmar-reagendamento")
+    public AcompanhamentoDetalheResponse confirmarReagendamento(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody ConfirmarReagendamentoRequest request
+    ) {
+        return acompanhamentoService.confirmarReagendamento(solicitacaoId, usuario, request);
+    }
+
     @PostMapping("/{solicitacaoId}/selecionar-metodo-pagamento")
     public AcompanhamentoDetalheResponse selecionarMetodoPagamento(
         @AuthenticationPrincipal UsuarioAutenticado usuario,
@@ -121,6 +141,18 @@ public class AcompanhamentoController {
             .header(HttpHeaders.CACHE_CONTROL, "no-store")
             .contentType(MediaType.IMAGE_PNG)
             .body(imagem);
+    }
+
+    @GetMapping("/{solicitacaoId}/pix-copia-cola")
+    public ResponseEntity<String> obterCopiaColaPix(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId
+    ) {
+        String payload = acompanhamentoService.gerarCopiaColaPix(solicitacaoId, usuario);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CACHE_CONTROL, "no-store")
+            .contentType(MediaType.TEXT_PLAIN)
+            .body(payload);
     }
 
     @PostMapping("/{solicitacaoId}/avaliar")

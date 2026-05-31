@@ -74,6 +74,12 @@ public class OrdemServico {
     @Column(name = "comentario_avaliacao_prestador", length = 200)
     private String comentarioAvaliacaoPrestador;
 
+    @Column(name = "percentual_concluido")
+    private Integer percentualConcluido;
+
+    @Column(name = "observacao_reagendamento", length = 300)
+    private String observacaoReagendamento;
+
     @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;
 
@@ -204,6 +210,22 @@ public class OrdemServico {
 
     public void setComentarioAvaliacaoPrestador(String comentarioAvaliacaoPrestador) {
         this.comentarioAvaliacaoPrestador = comentarioAvaliacaoPrestador;
+    }
+
+    public Integer getPercentualConcluido() {
+        return percentualConcluido;
+    }
+
+    public void setPercentualConcluido(Integer percentualConcluido) {
+        this.percentualConcluido = percentualConcluido;
+    }
+
+    public String getObservacaoReagendamento() {
+        return observacaoReagendamento;
+    }
+
+    public void setObservacaoReagendamento(String observacaoReagendamento) {
+        this.observacaoReagendamento = observacaoReagendamento;
     }
 
     public OffsetDateTime getCriadoEm() {

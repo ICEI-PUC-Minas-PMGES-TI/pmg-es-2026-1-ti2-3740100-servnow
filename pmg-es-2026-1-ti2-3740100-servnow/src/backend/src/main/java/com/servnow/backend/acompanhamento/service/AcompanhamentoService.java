@@ -2,6 +2,7 @@ package com.servnow.backend.acompanhamento.service;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,8 @@ import com.servnow.backend.acompanhamento.dto.AtualizacaoServicoResponse;
 import com.servnow.backend.acompanhamento.dto.AvaliarServicoRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarChegadaRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarPagamentoRequest;
+import com.servnow.backend.acompanhamento.dto.ConfirmarReagendamentoRequest;
+import com.servnow.backend.acompanhamento.dto.SolicitarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.pix.PixQrCodeService;
 import com.servnow.backend.acompanhamento.repository.AtualizacaoServicoRepository;
 import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
@@ -95,10 +98,7 @@ public class AcompanhamentoService {
         SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
         validarPodeAcompanhar(solicitacao);
         OrdemServico ordem = obterOuCriarOrdem(solicitacao);
-        if (ordem.getCodigoVerificacao() == null || codigoExpirado(ordem)) {
-            gerarNovoCodigo(ordem);
-            ordemRepository.save(ordem);
-        }
+        prepararCodigoChegadaSeNecessario(solicitacao, ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
 
@@ -200,7 +200,74 @@ public class AcompanhamentoService {
         if (ordem.getValorFinal() == null && solicitacao.getValorAceito() != null) {
             ordem.setValorFinal(solicitacao.getValorAceito());
         }
+        ordem.setPercentualConcluido(100);
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_PAGAMENTO);
+        ordemRepository.save(ordem);
+        return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    @Transactional
+    public AcompanhamentoDetalheResponse solicitarReagendamento(
+        Long solicitacaoId,
+        UsuarioAutenticado usuarioAutenticado,
+        SolicitarReagendamentoRequest request
+    ) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        if (usuario.getTipoUsuario() != TipoUsuario.PRESTADOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode solicitar reagendamento.");
+        }
+        validarPodeAcompanhar(solicitacao);
+        OrdemServico ordem = obterOuCriarOrdem(solicitacao);
+        if (ordem.getEtapa() != EtapaOrdemServico.EM_ANDAMENTO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta em execucao.");
+        }
+
+        int percentualAtual = ordem.getPercentualConcluido() == null ? 0 : ordem.getPercentualConcluido();
+        if (request.percentualConcluido() <= percentualAtual) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "O percentual deve ser maior que o progresso atual (" + percentualAtual + "%)."
+            );
+        }
+
+        ordem.setPercentualConcluido(request.percentualConcluido());
+        ordem.setObservacaoReagendamento(normalizarObservacaoReagendamento(request.observacao()));
+        ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO);
+        ordemRepository.save(ordem);
+        return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    @Transactional
+    public AcompanhamentoDetalheResponse confirmarReagendamento(
+        Long solicitacaoId,
+        UsuarioAutenticado usuarioAutenticado,
+        ConfirmarReagendamentoRequest request
+    ) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
+        if (usuario.getTipoUsuario() != TipoUsuario.CLIENTE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o cliente pode confirmar o reagendamento.");
+        }
+        validarPodeAcompanhar(solicitacao);
+        OrdemServico ordem = obterOuCriarOrdem(solicitacao);
+        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nao ha reagendamento pendente.");
+        }
+        if (request.data().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data do servico nao pode ser no passado.");
+        }
+
+        solicitacao.setData(request.data());
+        solicitacao.setHorario(request.horario());
+        solicitacaoRepository.save(solicitacao);
+
+        ordem.setEtapa(EtapaOrdemServico.VISITA_REAGENDADA);
+        ordem.setIniciadoEm(null);
+        ordem.setPrevistoTerminoEm(null);
+        ordem.setObservacaoReagendamento(null);
+        ordem.setCodigoVerificacao(null);
+        ordem.setCodigoExpiraEm(null);
         ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
@@ -251,11 +318,30 @@ public class AcompanhamentoService {
 
     @Transactional(readOnly = true)
     public byte[] gerarQrCodePix(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
-        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
-        Usuario usuario = encontrarUsuario(usuarioAutenticado);
-        if (usuario.getTipoUsuario() != TipoUsuario.PRESTADOR) {
+        PixPagamentoContexto contexto = prepararPagamentoPix(solicitacaoId, usuarioAutenticado);
+        if (contexto.usuario().getTipoUsuario() != TipoUsuario.PRESTADOR) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode visualizar o QR Code PIX.");
         }
+        try {
+            return pixQrCodeService.gerarImagemPng(contexto.prestador(), contexto.valor(), contexto.txid());
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public String gerarCopiaColaPix(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
+        PixPagamentoContexto contexto = prepararPagamentoPix(solicitacaoId, usuarioAutenticado);
+        try {
+            return pixQrCodeService.gerarPayload(contexto.prestador(), contexto.valor(), contexto.txid());
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
+    }
+
+    private PixPagamentoContexto prepararPagamentoPix(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
+        SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
+        Usuario usuario = encontrarUsuario(usuarioAutenticado);
         validarPodeAcompanhar(solicitacao);
         OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacao.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Ordem de servico nao iniciada."));
@@ -270,12 +356,10 @@ public class AcompanhamentoService {
         if (valor == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Valor do servico nao definido.");
         }
-        String txid = "SN" + solicitacao.getId();
-        try {
-            return pixQrCodeService.gerarImagemPng(prestador, valor, txid);
-        } catch (IllegalStateException exception) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
-        }
+        return new PixPagamentoContexto(usuario, prestador, valor, "SN" + solicitacao.getId());
+    }
+
+    private record PixPagamentoContexto(Usuario usuario, Usuario prestador, BigDecimal valor, String txid) {
     }
 
     @Transactional
@@ -297,11 +381,8 @@ public class AcompanhamentoService {
 
         ordem.setNotaAvaliacao(request.nota());
         ordem.setComentarioAvaliacao(normalizarComentario(request.comentario()));
-        ordem.setEtapa(EtapaOrdemServico.CONCLUIDA);
-        ordem.setConcluidoEm(OffsetDateTime.now());
-        solicitacao.setStatus(StatusSolicitacao.CONCLUIDA);
+        finalizarAcompanhamentoSeAmbosAvaliaram(ordem, solicitacao);
         ordemRepository.save(ordem);
-        solicitacaoRepository.save(solicitacao);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
 
@@ -318,9 +399,8 @@ public class AcompanhamentoService {
         }
         OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Ordem de servico nao iniciada."));
-        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_AVALIACAO
-            && ordem.getEtapa() != EtapaOrdemServico.CONCLUIDA) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta na etapa de avaliacao.");
+        if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_AVALIACAO) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando avaliacao.");
         }
         if (ordem.getNotaAvaliacaoPrestador() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Voce ja avaliou este cliente.");
@@ -328,8 +408,19 @@ public class AcompanhamentoService {
 
         ordem.setNotaAvaliacaoPrestador(request.nota());
         ordem.setComentarioAvaliacaoPrestador(normalizarComentario(request.comentario()));
+        finalizarAcompanhamentoSeAmbosAvaliaram(ordem, solicitacao);
         ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
+    }
+
+    private void finalizarAcompanhamentoSeAmbosAvaliaram(OrdemServico ordem, SolicitacaoServico solicitacao) {
+        if (ordem.getNotaAvaliacao() == null || ordem.getNotaAvaliacaoPrestador() == null) {
+            return;
+        }
+        ordem.setEtapa(EtapaOrdemServico.CONCLUIDA);
+        ordem.setConcluidoEm(OffsetDateTime.now());
+        solicitacao.setStatus(StatusSolicitacao.CONCLUIDA);
+        solicitacaoRepository.save(solicitacao);
     }
 
     @Transactional(readOnly = true)
@@ -379,6 +470,25 @@ public class AcompanhamentoService {
         int numero = 1000 + random.nextInt(9000);
         ordem.setCodigoVerificacao(String.valueOf(numero));
         ordem.setCodigoExpiraEm(OffsetDateTime.now().plusMinutes(CODIGO_VALIDADE_MINUTOS));
+    }
+
+    private void prepararCodigoChegadaSeNecessario(SolicitacaoServico solicitacao, OrdemServico ordem) {
+        boolean alterado = false;
+        if (ordem.getEtapa() == EtapaOrdemServico.VISITA_REAGENDADA) {
+            if (LocalDate.now().isBefore(solicitacao.getData())) {
+                return;
+            }
+            ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_CHEGADA);
+            alterado = true;
+        }
+        if (ordem.getEtapa() == EtapaOrdemServico.AGUARDANDO_CHEGADA
+            && (ordem.getCodigoVerificacao() == null || codigoExpirado(ordem))) {
+            gerarNovoCodigo(ordem);
+            alterado = true;
+        }
+        if (alterado) {
+            ordemRepository.save(ordem);
+        }
     }
 
     private boolean codigoExpirado(OrdemServico ordem) {
@@ -437,6 +547,20 @@ public class AcompanhamentoService {
         }
         String texto = comentario.trim();
         return texto.isEmpty() ? null : texto;
+    }
+
+    private String normalizarObservacaoReagendamento(String observacao) {
+        if (observacao == null) {
+            return null;
+        }
+        String texto = observacao.trim();
+        if (texto.isEmpty()) {
+            return null;
+        }
+        if (texto.length() > 300) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A observacao deve ter no maximo 300 caracteres.");
+        }
+        return texto;
     }
 
     private AcompanhamentoDisponivelResponse toDisponivel(SolicitacaoServico solicitacao, TipoUsuario tipoUsuario) {
@@ -511,6 +635,8 @@ public class AcompanhamentoService {
             ordem.getComentarioAvaliacao(),
             ordem.getNotaAvaliacaoPrestador(),
             ordem.getComentarioAvaliacaoPrestador(),
+            ordem.getPercentualConcluido(),
+            ordem.getObservacaoReagendamento(),
             atualizacoes
         );
     }

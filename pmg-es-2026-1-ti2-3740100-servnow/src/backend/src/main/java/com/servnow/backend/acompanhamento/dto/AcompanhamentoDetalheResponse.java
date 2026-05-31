@@ -31,6 +31,8 @@ public record AcompanhamentoDetalheResponse(
     String comentarioAvaliacao,
     Short notaAvaliacaoPrestador,
     String comentarioAvaliacaoPrestador,
+    Integer percentualConcluido,
+    String observacaoReagendamento,
     List<AtualizacaoServicoResponse> atualizacoes
 ) {
 }

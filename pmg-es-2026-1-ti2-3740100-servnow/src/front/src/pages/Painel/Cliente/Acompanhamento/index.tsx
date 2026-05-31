@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  Calendar,
   CheckCircle2,
   Clock,
   CreditCard,
@@ -18,6 +19,7 @@ import { PainelSectionHeader } from "../../../../Components/Painel/PainelSection
 import {
   avaliarServico,
   confirmarPagamento,
+  confirmarReagendamento,
   iniciarAcompanhamento,
   obterDetalhe,
   renovarCodigo,
@@ -29,11 +31,12 @@ import {
   formatarHorarioAcompanhamento,
 } from "../../../../utils/acompanhamentoLabels";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
+import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 type MetodoPagamento = "PIX" | "CREDITO" | "DEBITO";
 
-type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "pagamento" | "avaliacao" | "concluido";
+type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "reagendamento" | "visita-reagendada" | "pagamento" | "avaliacao" | "concluido";
 
 const METODOS_PAGAMENTO: Array<{ id: MetodoPagamento; nome: string; desc: string; icone: typeof QrCode }> = [
   { id: "PIX", nome: "PIX", desc: "Pagamento instantaneo", icone: QrCode },
@@ -52,6 +55,10 @@ function etapaBackendParaCliente(etapa: string): ClienteEtapa {
   switch (etapa) {
     case "EM_ANDAMENTO":
       return "em-andamento";
+    case "AGUARDANDO_REAGENDAMENTO":
+      return "reagendamento";
+    case "VISITA_REAGENDADA":
+      return "visita-reagendada";
     case "AGUARDANDO_PAGAMENTO":
       return "pagamento";
     case "AGUARDANDO_AVALIACAO":
@@ -75,6 +82,8 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [novaDataReagendamento, setNovaDataReagendamento] = useState("");
+  const [novoHorarioReagendamento, setNovoHorarioReagendamento] = useState("");
 
   const carregar = useCallback(async () => {
     try {
@@ -107,11 +116,14 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
   }, [detalhe, metodoPagamento, solicitacaoId]);
 
   const etapa = detalhe ? etapaBackendParaCliente(detalhe.etapa) : "aguardando-chegada";
+  const progressoAtual = detalhe?.percentualConcluido ?? 0;
   const tituloServico = detalhe
     ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
     : "";
 
-  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === etapa);
+  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === (
+    etapa === "reagendamento" || etapa === "visita-reagendada" ? "em-andamento" : etapa
+  ));
 
   const valorExibir = detalhe?.valorFinal ?? detalhe?.valorAceito ?? 0;
 
@@ -126,6 +138,36 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       setEnviando(false);
     }
   }
+
+  async function handleConfirmarReagendamento() {
+    if (!novaDataReagendamento || !novoHorarioReagendamento) {
+      toast.error("Informe a nova data e horario.");
+      return;
+    }
+    setEnviando(true);
+    try {
+      await confirmarReagendamento(solicitacaoId, novaDataReagendamento, novoHorarioReagendamento);
+      const dataFormatada = formatarDataSolicitacao(novaDataReagendamento);
+      toast.success(`Reagendamento confirmado para ${dataFormatada} as ${novoHorarioReagendamento}.`);
+      navigate("/acompanhamento");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao confirmar reagendamento.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  useEffect(() => {
+    if (etapa !== "reagendamento" || !detalhe) {
+      return;
+    }
+    if (!novaDataReagendamento && detalhe.data) {
+      setNovaDataReagendamento(detalhe.data);
+    }
+    if (!novoHorarioReagendamento && detalhe.horario) {
+      setNovoHorarioReagendamento(detalhe.horario);
+    }
+  }, [detalhe, etapa, novaDataReagendamento, novoHorarioReagendamento]);
 
   async function handleMetodoPagamentoChange(metodo: MetodoPagamento) {
     setMetodoPagamento(metodo);
@@ -152,14 +194,22 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     if (nota === 0) return;
     setEnviando(true);
     try {
-      setDetalhe(await avaliarServico(solicitacaoId, nota, comentario || undefined));
-      toast.success("Avaliacao enviada.");
+      const atualizado = await avaliarServico(solicitacaoId, nota, comentario || undefined);
+      setDetalhe(atualizado);
+      if (atualizado.etapa === "CONCLUIDA") {
+        toast.success("Avaliacao enviada. Servico finalizado!");
+      } else {
+        toast.success("Avaliacao enviada. Aguardando o prestador avaliar o atendimento.");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliacao.");
     } finally {
       setEnviando(false);
     }
   }
+
+  const clienteJaAvaliouPrestador = detalhe?.notaAvaliacao != null;
+  const prestadorJaAvaliouCliente = detalhe?.notaAvaliacaoPrestador != null;
 
   const iniciaisPrestador = useMemo(() => {
     const nome = detalhe?.prestadorNome ?? "";
@@ -195,7 +245,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       {etapa !== "concluido" && (
         <div className="acomp-stepper">
           {ETAPAS_INFO.map((info, index) => {
-            const ativo = etapa === info.id;
+            const ativo = etapa === info.id
+              || (etapa === "reagendamento" && info.id === "em-andamento")
+              || (etapa === "visita-reagendada" && info.id === "aguardando-chegada");
             const concluido = index < etapaAtualIndex;
             const classe = ativo ? "ativo" : concluido ? "concluido" : "";
             return (
@@ -228,6 +280,11 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
                 <strong>{detalhe.prestadorNome}</strong>
                 <span>{detalhe.endereco}</span>
                 <span style={{ display: "block", marginTop: 4 }}>{tituloServico}</span>
+                {progressoAtual > 0 && (
+                  <span style={{ display: "block", marginTop: 8, color: "var(--brand-strong)", fontWeight: 600 }}>
+                    Progresso do servico: {progressoAtual}%
+                  </span>
+                )}
               </div>
             </div>
 
@@ -275,6 +332,17 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
               <span><Clock size={14} /> Iniciado as {formatarHorarioAcompanhamento(detalhe.iniciadoEm)}</span>
               <span><Clock size={14} /> Previsao: {formatarHorarioAcompanhamento(detalhe.previstoTerminoEm)}</span>
             </div>
+            {progressoAtual > 0 && (
+              <div className="acomp-progresso" style={{ marginTop: 14 }}>
+                <div className="acomp-progresso-cabecalho">
+                  <span>Progresso acumulado</span>
+                  <strong>{progressoAtual}%</strong>
+                </div>
+                <div className="acomp-progresso-barra">
+                  <span style={{ width: `${progressoAtual}%` }} />
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="painel-card">
@@ -301,6 +369,108 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             </button>
           </section>
         </>
+      )}
+
+      {etapa === "reagendamento" && (
+        <section className="painel-card">
+          <div className="painel-card-cabecalho">
+            <h2>Reagendar servico</h2>
+          </div>
+          <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
+            O prestador informou que o servico ainda nao foi concluido. Escolha um novo horario para continuar.
+          </p>
+
+          <div className="acomp-progresso">
+            <div className="acomp-progresso-cabecalho">
+              <span>Progresso informado pelo prestador</span>
+              <strong>{progressoAtual}%</strong>
+            </div>
+            <div className="acomp-progresso-barra">
+              <span style={{ width: `${progressoAtual}%` }} />
+            </div>
+          </div>
+
+          {detalhe.observacaoReagendamento && (
+            <p style={{ marginTop: 14, fontSize: 13 }}>
+              <strong>Observacao do prestador:</strong> {detalhe.observacaoReagendamento}
+            </p>
+          )}
+
+          <div className="acomp-form-bloco" style={{ marginTop: 18 }}>
+            <label className="acomp-codigo-label" htmlFor="nova-data-reagendamento">Nova data</label>
+            <input
+              id="nova-data-reagendamento"
+              type="date"
+              value={novaDataReagendamento}
+              onChange={(event) => setNovaDataReagendamento(event.target.value)}
+              style={{ width: "100%", marginBottom: 12 }}
+            />
+
+            <label className="acomp-codigo-label" htmlFor="novo-horario-reagendamento">Novo horario</label>
+            <input
+              id="novo-horario-reagendamento"
+              type="time"
+              value={novoHorarioReagendamento}
+              onChange={(event) => setNovoHorarioReagendamento(event.target.value)}
+              style={{ width: "100%", marginBottom: 16 }}
+            />
+
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => void handleConfirmarReagendamento()}
+              disabled={enviando}
+            >
+              Confirmar reagendamento
+            </button>
+          </div>
+        </section>
+      )}
+
+      {etapa === "visita-reagendada" && (
+        <section className="painel-card">
+          <div className="acomp-codigo-centro">
+            <div className="acomp-codigo-icone">
+              <Calendar size={26} />
+            </div>
+            <h2 className="acomp-codigo-titulo">Visita reagendada</h2>
+            <p className="acomp-codigo-sub">
+              O codigo de confirmacao ficara disponivel no dia da nova visita.
+            </p>
+
+            <div className="acomp-cliente-mini">
+              <div className="acomp-cliente-mini-avatar">{iniciaisPrestador}</div>
+              <div className="acomp-cliente-mini-info">
+                <strong>{detalhe.prestadorNome}</strong>
+                <span>{detalhe.endereco}</span>
+                <span style={{ display: "block", marginTop: 8 }}>
+                  Nova data: {detalhe.data ? formatarDataSolicitacao(detalhe.data) : "--"} as {detalhe.horario ?? "--:--"}
+                </span>
+              </div>
+            </div>
+
+            {progressoAtual > 0 && (
+              <div className="acomp-progresso" style={{ width: "100%", marginTop: 8 }}>
+                <div className="acomp-progresso-cabecalho">
+                  <span>Progresso do servico</span>
+                  <strong>{progressoAtual}%</strong>
+                </div>
+                <div className="acomp-progresso-barra">
+                  <span style={{ width: `${progressoAtual}%` }} />
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => navigate("/acompanhamento")}
+              style={{ marginTop: 8 }}
+            >
+              Voltar para lista
+            </button>
+          </div>
+        </section>
       )}
 
       {etapa === "pagamento" && (
@@ -355,53 +525,75 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       {etapa === "avaliacao" && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>Avaliar prestador</h2>
+            <h2>{clienteJaAvaliouPrestador ? "Avaliacao enviada" : "Avaliar prestador"}</h2>
           </div>
 
-          <div className="acomp-avaliar-prestador">
-            <div className="acomp-avaliar-avatar">
-              <User size={22} />
-            </div>
-            <div>
-              <strong>{detalhe.prestadorNome}</strong>
-              <span>{tituloServico}</span>
-            </div>
-          </div>
+          {clienteJaAvaliouPrestador && !prestadorJaAvaliouCliente && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
+              Sua avaliacao foi registrada. Aguardando {detalhe.prestadorNome} avaliar o atendimento para finalizar o servico.
+            </p>
+          )}
 
-          <p style={{ textAlign: "center", margin: "8px 0 4px", fontSize: 13, color: "var(--workspace-muted)" }}>
-            Como foi o servico?
-          </p>
+          {clienteJaAvaliouPrestador && prestadorJaAvaliouCliente && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
+              Avaliacoes concluidas. O servico sera finalizado em instantes.
+            </p>
+          )}
 
-          <div className="acomp-estrelas">
-            {[1, 2, 3, 4, 5].map((valor) => (
+          {!clienteJaAvaliouPrestador && (
+            <>
+              <div className="acomp-avaliar-prestador">
+                <div className="acomp-avaliar-avatar">
+                  <User size={22} />
+                </div>
+                <div>
+                  <strong>{detalhe.prestadorNome}</strong>
+                  <span>{tituloServico}</span>
+                </div>
+              </div>
+
+              <p style={{ textAlign: "center", margin: "8px 0 4px", fontSize: 13, color: "var(--workspace-muted)" }}>
+                Como foi o servico?
+              </p>
+
+              <div className="acomp-estrelas">
+                {[1, 2, 3, 4, 5].map((valor) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    className={`acomp-estrela ${valor <= nota ? "ativa" : ""}`}
+                    onClick={() => setNota(valor)}
+                    aria-label={`${valor} estrelas`}
+                  >
+                    <Star size={28} fill={valor <= nota ? "#facc15" : "transparent"} />
+                  </button>
+                ))}
+              </div>
+
+              <textarea
+                className="acomp-textarea"
+                placeholder="Comentario (opcional)"
+                value={comentario}
+                onChange={(event) => setComentario(event.target.value)}
+                style={{ marginTop: 8, marginBottom: 14 }}
+              />
+
               <button
-                key={valor}
                 type="button"
-                className={`acomp-estrela ${valor <= nota ? "ativa" : ""}`}
-                onClick={() => setNota(valor)}
-                aria-label={`${valor} estrelas`}
+                className="acomp-btn-primary"
+                onClick={() => void handleAvaliar()}
+                disabled={nota === 0 || enviando}
               >
-                <Star size={28} fill={valor <= nota ? "#facc15" : "transparent"} />
+                Enviar avaliacao
               </button>
-            ))}
-          </div>
+            </>
+          )}
 
-          <textarea
-            className="acomp-textarea"
-            placeholder="Comentario (opcional)"
-            value={comentario}
-            onChange={(event) => setComentario(event.target.value)}
-            style={{ marginTop: 8, marginBottom: 14 }}
-          />
-
-          <button
-            type="button"
-            className="acomp-btn-primary"
-            onClick={() => void handleAvaliar()}
-            disabled={nota === 0 || enviando}
-          >
-            Enviar avaliacao
-          </button>
+          {clienteJaAvaliouPrestador && (
+            <p style={{ margin: 0, fontSize: 14, color: "var(--workspace-muted)" }}>
+              Voce avaliou {detalhe.prestadorNome} com {detalhe.notaAvaliacao} estrela(s).
+            </p>
+          )}
         </section>
       )}
 
@@ -415,6 +607,11 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             <p>
               Obrigado por usar a Servnow. Sua avaliacao ajuda outros clientes a encontrar bons prestadores.
             </p>
+            {detalhe.notaAvaliacaoPrestador != null && (
+              <p style={{ margin: 0, fontSize: 14, color: "var(--workspace-muted)" }}>
+                {detalhe.prestadorNome} avaliou voce com {detalhe.notaAvaliacaoPrestador} estrela(s).
+              </p>
+            )}
             <button
               type="button"
               className="acomp-btn-primary"

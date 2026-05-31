@@ -3,10 +3,13 @@ import type { ChangeEvent } from "react";
 import {
   ArrowLeft,
   Camera,
+  Calendar,
   CheckCircle2,
   Clock,
+  Copy,
   MapPin,
   QrCode,
+  RefreshCw,
   Send,
   Smartphone,
   Star,
@@ -18,12 +21,14 @@ import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/Atualizac
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   avaliarCliente,
+  carregarPixCopiaCola,
   carregarPixQrCode,
   confirmarChegada,
   concluirExecucao,
   iniciarAcompanhamento,
   obterDetalhe,
   registrarAtualizacao,
+  solicitarReagendamento,
   type AcompanhamentoDetalhe,
 } from "../../../../services/acompanhamento";
 import {
@@ -31,9 +36,10 @@ import {
   formatarHorarioAcompanhamento,
 } from "../../../../utils/acompanhamentoLabels";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
+import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
-type PrestadorEtapa = "confirmar-chegada" | "em-execucao" | "aguardando-pagamento" | "aguardando-avaliacao" | "concluido";
+type PrestadorEtapa = "confirmar-chegada" | "em-execucao" | "aguardando-reagendamento" | "visita-reagendada" | "aguardando-pagamento" | "aguardando-avaliacao" | "concluido";
 
 const ETAPAS_INFO: Array<{ id: PrestadorEtapa; label: string; numero: number }> = [
   { id: "confirmar-chegada", label: "Chegada", numero: 1 },
@@ -46,6 +52,10 @@ function etapaBackendParaPrestador(etapa: string): PrestadorEtapa {
   switch (etapa) {
     case "EM_ANDAMENTO":
       return "em-execucao";
+    case "AGUARDANDO_REAGENDAMENTO":
+      return "aguardando-reagendamento";
+    case "VISITA_REAGENDADA":
+      return "visita-reagendada";
     case "AGUARDANDO_PAGAMENTO":
       return "aguardando-pagamento";
     case "AGUARDANDO_AVALIACAO":
@@ -71,10 +81,13 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [pixQrUrl, setPixQrUrl] = useState<string | null>(null);
+  const [pixCopiaCola, setPixCopiaCola] = useState<string | null>(null);
   const [carregandoPixQr, setCarregandoPixQr] = useState(false);
   const [pixQrErro, setPixQrErro] = useState<string | null>(null);
   const [notaCliente, setNotaCliente] = useState(0);
   const [comentarioCliente, setComentarioCliente] = useState("");
+  const [percentualReagendamento, setPercentualReagendamento] = useState(50);
+  const [observacaoReagendamento, setObservacaoReagendamento] = useState("");
 
   const carregar = useCallback(async () => {
     try {
@@ -93,6 +106,14 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   }, [carregar]);
 
   const etapa = detalhe ? etapaBackendParaPrestador(detalhe.etapa) : "confirmar-chegada";
+  const progressoAtual = detalhe?.percentualConcluido ?? 0;
+  const percentualMinimo = Math.min(progressoAtual + 1, 99);
+
+  useEffect(() => {
+    if (percentualReagendamento < percentualMinimo) {
+      setPercentualReagendamento(percentualMinimo);
+    }
+  }, [percentualMinimo, percentualReagendamento]);
 
   useEffect(() => {
     if (etapa !== "aguardando-pagamento") {
@@ -116,17 +137,21 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
         }
         return null;
       });
+      setPixCopiaCola(null);
       setPixQrErro(null);
       return;
     }
 
     let cancelado = false;
 
-    async function carregarQr() {
+    async function carregarPix() {
       setCarregandoPixQr(true);
       setPixQrErro(null);
       try {
-        const url = await carregarPixQrCode(solicitacaoId);
+        const [url, copiaCola] = await Promise.all([
+          carregarPixQrCode(solicitacaoId),
+          carregarPixCopiaCola(solicitacaoId),
+        ]);
         if (cancelado) {
           URL.revokeObjectURL(url);
           return;
@@ -137,6 +162,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
           }
           return url;
         });
+        setPixCopiaCola(copiaCola);
       } catch (error) {
         if (!cancelado) {
           setPixQrUrl((anterior) => {
@@ -145,6 +171,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             }
             return null;
           });
+          setPixCopiaCola(null);
           setPixQrErro(error instanceof Error ? error.message : "Nao foi possivel gerar o QR Code PIX.");
         }
       } finally {
@@ -154,18 +181,24 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       }
     }
 
-    void carregarQr();
-    const intervalo = window.setInterval(() => {
-      if (!cancelado) {
-        void carregarQr();
-      }
-    }, 8000);
+    void carregarPix();
 
     return () => {
       cancelado = true;
-      window.clearInterval(intervalo);
     };
   }, [etapa, solicitacaoId]);
+
+  async function copiarCodigoPix() {
+    if (!pixCopiaCola) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(pixCopiaCola);
+      toast.success("Codigo PIX copiado.");
+    } catch {
+      toast.error("Nao foi possivel copiar o codigo PIX.");
+    }
+  }
 
   useEffect(() => {
     return () => {
@@ -181,7 +214,9 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const tituloServico = detalhe
     ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
     : "";
-  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === etapa);
+  const etapaAtualIndex = ETAPAS_INFO.findIndex((e) => e.id === (
+    etapa === "aguardando-reagendamento" ? "em-execucao" : etapa === "visita-reagendada" ? "confirmar-chegada" : etapa
+  ));
   const valorExibir = detalhe?.valorFinal ?? detalhe?.valorAceito ?? 0;
 
   const iniciaisCliente = useMemo(() => {
@@ -261,14 +296,43 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
     }
   }
 
-  async function handleAvaliarCliente() {
-    if (notaCliente === 0) return;
+  async function handleSolicitarReagendamento() {
+    if (percentualReagendamento <= progressoAtual) {
+      toast.error(`Informe um percentual maior que ${progressoAtual}%.`);
+      return;
+    }
     setEnviando(true);
     try {
-      setDetalhe(await avaliarCliente(solicitacaoId, notaCliente, comentarioCliente || undefined));
+      setDetalhe(await solicitarReagendamento(
+        solicitacaoId,
+        percentualReagendamento,
+        observacaoReagendamento || undefined,
+      ));
+      setObservacaoReagendamento("");
+      toast.success("Reagendamento solicitado. Aguardando o cliente escolher o horario.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao solicitar reagendamento.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  async function handleAvaliarCliente() {
+    if (notaCliente === 0) {
+      toast.error("Selecione uma nota. A avaliacao do cliente e obrigatoria.");
+      return;
+    }
+    setEnviando(true);
+    try {
+      const atualizado = await avaliarCliente(solicitacaoId, notaCliente, comentarioCliente || undefined);
+      setDetalhe(atualizado);
       setNotaCliente(0);
       setComentarioCliente("");
-      toast.success("Avaliacao do cliente enviada.");
+      if (atualizado.etapa === "CONCLUIDA") {
+        toast.success("Avaliacao enviada. Servico finalizado!");
+      } else {
+        toast.success("Avaliacao enviada. Aguardando o cliente avaliar o servico.");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliacao.");
     } finally {
@@ -278,6 +342,8 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
   const prestadorJaAvaliouCliente = detalhe?.notaAvaliacaoPrestador != null;
   const clienteJaAvaliouPrestador = detalhe?.notaAvaliacao != null;
+  const avaliacaoPrestadorPendente =
+    (etapa === "aguardando-avaliacao" || etapa === "concluido") && !prestadorJaAvaliouCliente;
 
   if (isLoading || !detalhe) {
     return (
@@ -289,10 +355,18 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
   return (
     <>
-      <button type="button" className="painel-btn-ghost" onClick={() => navigate("/acompanhamento")} style={{ marginBottom: 12 }}>
-        <ArrowLeft size={16} />
-        Voltar para lista
-      </button>
+      {!avaliacaoPrestadorPendente && (
+        <button type="button" className="painel-btn-ghost" onClick={() => navigate("/acompanhamento")} style={{ marginBottom: 12 }}>
+          <ArrowLeft size={16} />
+          Voltar para lista
+        </button>
+      )}
+
+      {avaliacaoPrestadorPendente && (
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--brand-strong)", fontWeight: 600 }}>
+          Avalie o cliente para concluir o servico. Esta etapa e obrigatoria.
+        </p>
+      )}
 
       <PainelSectionHeader
         eyebrow="Servico em andamento"
@@ -303,7 +377,9 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       {etapa !== "concluido" && (
         <div className="acomp-stepper">
           {ETAPAS_INFO.map((info, index) => {
-            const ativo = etapa === info.id;
+            const ativo = etapa === info.id
+              || (etapa === "aguardando-reagendamento" && info.id === "em-execucao")
+              || (etapa === "visita-reagendada" && info.id === "confirmar-chegada");
             const concluido = index < etapaAtualIndex;
             const classe = ativo ? "ativo" : concluido ? "concluido" : "";
             return (
@@ -336,6 +412,11 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
                 <strong>{detalhe.clienteNome}</strong>
                 <span>{detalhe.endereco}</span>
                 <span style={{ display: "block", marginTop: 6 }}>{tituloServico}</span>
+                {progressoAtual > 0 && (
+                  <span style={{ display: "block", marginTop: 8, color: "var(--brand-strong)", fontWeight: 600 }}>
+                    Progresso do servico: {progressoAtual}%
+                  </span>
+                )}
               </div>
             </div>
 
@@ -385,6 +466,17 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
               <span><Clock size={14} /> Iniciado as {formatarHorarioAcompanhamento(detalhe.iniciadoEm)}</span>
               <span><Clock size={14} /> Previsao: {formatarHorarioAcompanhamento(detalhe.previstoTerminoEm)}</span>
             </div>
+            {progressoAtual > 0 && (
+              <div className="acomp-progresso" style={{ marginTop: 14 }}>
+                <div className="acomp-progresso-cabecalho">
+                  <span>Progresso acumulado</span>
+                  <strong>{progressoAtual}%</strong>
+                </div>
+                <div className="acomp-progresso-barra">
+                  <span style={{ width: `${progressoAtual}%` }} />
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="painel-card">
@@ -444,6 +536,44 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
               </div>
             )}
 
+            <div className="acomp-reagendar-bloco" style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--workspace-border)" }}>
+              <h3 style={{ margin: "0 0 8px", fontSize: 15 }}>Servico nao concluido nesta visita?</h3>
+              <p style={{ margin: "0 0 14px", color: "var(--workspace-muted)", fontSize: 13 }}>
+                Informe o percentual concluido e solicite um reagendamento com o cliente.
+              </p>
+
+              <label className="acomp-codigo-label" htmlFor="percentual-reagendamento">
+                Percentual concluido ({percentualReagendamento}%)
+              </label>
+              <input
+                id="percentual-reagendamento"
+                type="range"
+                min={percentualMinimo}
+                max={99}
+                value={percentualReagendamento}
+                onChange={(event) => setPercentualReagendamento(Number(event.target.value))}
+                style={{ width: "100%", marginBottom: 12 }}
+              />
+
+              <textarea
+                className="acomp-textarea"
+                placeholder="Observacao para o cliente (opcional)..."
+                value={observacaoReagendamento}
+                onChange={(event) => setObservacaoReagendamento(event.target.value)}
+                style={{ marginBottom: 12 }}
+              />
+
+              <button
+                type="button"
+                className="painel-btn-ghost"
+                onClick={() => void handleSolicitarReagendamento()}
+                disabled={enviando}
+              >
+                <RefreshCw size={16} />
+                Solicitar reagendamento
+              </button>
+            </div>
+
             <button
               type="button"
               className="acomp-btn-primary"
@@ -452,10 +582,70 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
               style={{ marginTop: 18 }}
             >
               <CheckCircle2 size={16} />
-              Concluir servico
+              Concluir servico (100%)
             </button>
           </section>
         </>
+      )}
+
+      {etapa === "aguardando-reagendamento" && (
+        <section className="painel-card">
+          <div className="painel-card-cabecalho">
+            <h2>Aguardando reagendamento</h2>
+          </div>
+          <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
+            O cliente precisa escolher um novo horario para continuar o servico.
+          </p>
+          <div className="acomp-progresso">
+            <div className="acomp-progresso-cabecalho">
+              <span>Progresso informado</span>
+              <strong>{progressoAtual}%</strong>
+            </div>
+            <div className="acomp-progresso-barra">
+              <span style={{ width: `${progressoAtual}%` }} />
+            </div>
+          </div>
+          {detalhe.observacaoReagendamento && (
+            <p style={{ marginTop: 14, fontSize: 13 }}>
+              <strong>Sua observacao:</strong> {detalhe.observacaoReagendamento}
+            </p>
+          )}
+        </section>
+      )}
+
+      {etapa === "visita-reagendada" && (
+        <section className="painel-card">
+          <div className="painel-card-cabecalho">
+            <h2>Visita reagendada</h2>
+          </div>
+          <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
+            O cliente confirmou o novo horario. Retorne na data agendada para continuar o servico.
+          </p>
+
+          <div className="acomp-card-servico-meta" style={{ marginBottom: 14 }}>
+            <span><Calendar size={14} /> {detalhe.data ? formatarDataSolicitacao(detalhe.data) : "--"} as {detalhe.horario ?? "--:--"}</span>
+            <span><Clock size={14} /> Cliente: {detalhe.clienteNome}</span>
+          </div>
+
+          <div className="acomp-progresso">
+            <div className="acomp-progresso-cabecalho">
+              <span>Progresso do servico</span>
+              <strong>{progressoAtual}%</strong>
+            </div>
+            <div className="acomp-progresso-barra">
+              <span style={{ width: `${progressoAtual}%` }} />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="painel-btn-ghost"
+            style={{ marginTop: 18 }}
+            onClick={() => navigate("/acompanhamento")}
+          >
+            Voltar para lista
+          </button>
+        </section>
       )}
 
       {etapa === "aguardando-pagamento" && (
@@ -497,6 +687,21 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             Valor: {formatarMoedaBrl(valorExibir)} — recebedor: {detalhe.prestadorNome ?? "Prestador"}
           </p>
 
+          {pixCopiaCola ? (
+            <div style={{ marginTop: 16 }}>
+              <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 8 }}>
+                Se a leitura falhar, use o Pix Copia e Cola:
+              </p>
+              <div className="acomp-pix-copia-cola">
+                <code>{pixCopiaCola}</code>
+              </div>
+              <button type="button" className="painel-btn-ghost" style={{ marginTop: 10 }} onClick={() => void copiarCodigoPix()}>
+                <Copy size={14} />
+                Copiar codigo PIX
+              </button>
+            </div>
+          ) : null}
+
           {!clienteEscolheuPix && (
             <div className="acomp-pagamento-opcao selecionada" style={{ marginTop: 18 }}>
               <span className="acomp-pagamento-opcao-icone">
@@ -512,31 +717,31 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
         </section>
       )}
 
-      {(etapa === "aguardando-avaliacao" || etapa === "concluido") && (
+      {(etapa === "aguardando-avaliacao" || (etapa === "concluido" && !prestadorJaAvaliouCliente)) && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>{prestadorJaAvaliouCliente ? "Avaliacao enviada" : "Avaliar cliente"}</h2>
+            <h2>{prestadorJaAvaliouCliente ? "Avaliacao enviada" : "Avaliar cliente (obrigatorio)"}</h2>
           </div>
 
-          {etapa === "aguardando-avaliacao" && !clienteJaAvaliouPrestador && (
+          {!prestadorJaAvaliouCliente && (
             <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
-              O pagamento foi confirmado. Aguardando o cliente avaliar seu atendimento.
+              O pagamento foi confirmado. Selecione uma nota e envie sua avaliacao do cliente para finalizar o servico.
             </p>
           )}
 
-          {etapa === "concluido" && clienteJaAvaliouPrestador && (
+          {prestadorJaAvaliouCliente && !clienteJaAvaliouPrestador && (
             <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
-              O cliente ja avaliou seu servico. Avalie o cliente para registrar a experiencia.
+              Sua avaliacao foi registrada. Aguardando o cliente avaliar seu atendimento.
             </p>
           )}
 
-          {prestadorJaAvaliouCliente ? (
-            <div className="acomp-final" style={{ padding: "12px 0" }}>
-              <p style={{ margin: 0, color: "var(--workspace-muted)", fontSize: 14 }}>
-                Voce avaliou {detalhe.clienteNome} com {detalhe.notaAvaliacaoPrestador} estrela(s).
-              </p>
-            </div>
-          ) : (
+          {prestadorJaAvaliouCliente && clienteJaAvaliouPrestador && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 16 }}>
+              Avaliacoes concluidas. O servico foi finalizado.
+            </p>
+          )}
+
+          {!prestadorJaAvaliouCliente && (
             <>
               <div className="acomp-cliente-mini" style={{ marginBottom: 16 }}>
                 <div className="acomp-cliente-mini-avatar">{iniciaisCliente}</div>
@@ -583,14 +788,43 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             </>
           )}
 
-          <button
-            type="button"
-            className="acomp-btn-primary"
-            onClick={() => navigate("/acompanhamento")}
-            style={{ maxWidth: 280, marginTop: 16 }}
-          >
-            Voltar para lista
-          </button>
+          {prestadorJaAvaliouCliente && (
+            <>
+              <div className="acomp-final" style={{ padding: "12px 0" }}>
+                <p style={{ margin: 0, color: "var(--workspace-muted)", fontSize: 14 }}>
+                  Voce avaliou {detalhe.clienteNome} com {detalhe.notaAvaliacaoPrestador} estrela(s).
+                </p>
+              </div>
+              <button
+                type="button"
+                className="acomp-btn-primary"
+                onClick={() => navigate("/acompanhamento")}
+                style={{ maxWidth: 280, marginTop: 16 }}
+              >
+                Voltar para lista
+              </button>
+            </>
+          )}
+        </section>
+      )}
+
+      {etapa === "concluido" && prestadorJaAvaliouCliente && (
+        <section className="painel-card">
+          <div className="acomp-final">
+            <div className="acomp-final-icone">
+              <CheckCircle2 size={36} />
+            </div>
+            <h2>Servico finalizado!</h2>
+            <p>As avaliacoes foram registradas. Obrigado por usar a Servnow.</p>
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => navigate("/acompanhamento")}
+              style={{ maxWidth: 280 }}
+            >
+              Voltar para lista
+            </button>
+          </div>
         </section>
       )}
     </>

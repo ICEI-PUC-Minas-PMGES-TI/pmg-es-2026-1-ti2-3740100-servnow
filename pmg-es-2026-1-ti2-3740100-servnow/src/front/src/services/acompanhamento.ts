@@ -43,6 +43,8 @@ export type AcompanhamentoDetalhe = {
   comentarioAvaliacao: string | null;
   notaAvaliacaoPrestador: number | null;
   comentarioAvaliacaoPrestador: string | null;
+  percentualConcluido: number | null;
+  observacaoReagendamento: string | null;
   atualizacoes: AtualizacaoServico[];
 };
 
@@ -139,6 +141,29 @@ export function concluirExecucao(solicitacaoId: number) {
   });
 }
 
+export function solicitarReagendamento(
+  solicitacaoId: number,
+  percentualConcluido: number,
+  observacao?: string,
+) {
+  return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/solicitar-reagendamento`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      percentualConcluido,
+      observacao: observacao?.trim() || null,
+    }),
+  });
+}
+
+export function confirmarReagendamento(solicitacaoId: number, data: string, horario: string) {
+  return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/confirmar-reagendamento`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data, horario }),
+  });
+}
+
 export function selecionarMetodoPagamento(
   solicitacaoId: number,
   metodoPagamento: "PIX" | "CREDITO" | "DEBITO",
@@ -187,6 +212,33 @@ export async function carregarPixQrCode(solicitacaoId: number): Promise<string> 
 
   const blob = await response.blob();
   return URL.createObjectURL(blob);
+}
+
+export async function carregarPixCopiaCola(solicitacaoId: number): Promise<string> {
+  const session = getValidAuthSession();
+  if (!session?.token) {
+    throw new Error("Sessao expirada.");
+  }
+
+  const response = await fetch(`${API_URL}/api/acompanhamento/${solicitacaoId}/pix-copia-cola`, {
+    headers: authHeader(session.token),
+  });
+
+  if (!response.ok) {
+    const texto = await response.text();
+    let mensagem = "Nao foi possivel carregar o codigo PIX.";
+    try {
+      const json = JSON.parse(texto) as { detail?: string; title?: string };
+      mensagem = json.detail ?? json.title ?? mensagem;
+    } catch {
+      if (texto) {
+        mensagem = texto;
+      }
+    }
+    throw new Error(mensagem);
+  }
+
+  return response.text();
 }
 
 export function avaliarServico(solicitacaoId: number, nota: number, comentario?: string) {

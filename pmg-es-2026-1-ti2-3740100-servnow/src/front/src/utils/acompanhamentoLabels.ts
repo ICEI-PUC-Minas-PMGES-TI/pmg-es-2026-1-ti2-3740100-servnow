@@ -4,6 +4,10 @@ export function labelEtapaAcompanhamento(etapa: string | null | undefined): stri
       return "Aguardando chegada";
     case "EM_ANDAMENTO":
       return "Em andamento";
+    case "AGUARDANDO_REAGENDAMENTO":
+      return "Aguardando reagendamento";
+    case "VISITA_REAGENDADA":
+      return "Visita reagendada";
     case "AGUARDANDO_PAGAMENTO":
       return "Aguardando pagamento";
     case "AGUARDANDO_AVALIACAO":

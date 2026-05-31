@@ -3,6 +3,7 @@ package com.servnow.backend.acompanhamento.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +29,19 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
     List<OrdemServico> findAvaliacoesRecebidasPrestador(@Param("prestadorId") Long prestadorId);
 
     @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        JOIN FETCH s.cliente
+        WHERE s.prestador.id = :prestadorId
+          AND o.notaAvaliacao IS NOT NULL
+        ORDER BY o.concluidoEm DESC NULLS LAST, o.criadoEm DESC
+        """)
+    List<OrdemServico> findAvaliacoesRecebidasPrestador(
+        @Param("prestadorId") Long prestadorId,
+        Pageable pageable
+    );
+
+    @Query("""
         SELECT AVG(o.notaAvaliacao), COUNT(o)
         FROM OrdemServico o
         JOIN o.solicitacao s
@@ -45,6 +59,19 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
         ORDER BY o.concluidoEm DESC NULLS LAST, o.criadoEm DESC
         """)
     List<OrdemServico> findAvaliacoesRecebidasCliente(@Param("clienteId") Long clienteId);
+
+    @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        JOIN FETCH s.prestador
+        WHERE s.cliente.id = :clienteId
+          AND o.notaAvaliacaoPrestador IS NOT NULL
+        ORDER BY o.concluidoEm DESC NULLS LAST, o.criadoEm DESC
+        """)
+    List<OrdemServico> findAvaliacoesRecebidasCliente(
+        @Param("clienteId") Long clienteId,
+        Pageable pageable
+    );
 
     @Query("""
         SELECT AVG(o.notaAvaliacaoPrestador), COUNT(o)
