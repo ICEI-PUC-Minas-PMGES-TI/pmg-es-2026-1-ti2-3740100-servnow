@@ -88,10 +88,11 @@ Modelo BPMN do Processo 4
 
 ### Comandos
 
-| Comando                    | Destino              | Tipo    |
-|-------------------------- -|----------------------|---------|
-| Concluir                   | Notificar cliente    | button  |
-| Enviar cobrança ao cliente | Notificar cliente    | button  |
+| Comando                   | Destino                         | Tipo    |
+|---------------------------|---------------------------------|---------|
+|  Concluir                 | Notificar cliente               | button  |
+| Enviar cobrança ao cliente|Notificar cliente                | button  |
+
 
 ---
 
