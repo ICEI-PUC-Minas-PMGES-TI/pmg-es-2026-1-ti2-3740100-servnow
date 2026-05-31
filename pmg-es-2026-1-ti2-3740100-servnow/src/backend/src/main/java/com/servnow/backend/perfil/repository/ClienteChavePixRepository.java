@@ -9,9 +9,9 @@ import com.servnow.backend.perfil.domain.ClienteChavePix;
 
 public interface ClienteChavePixRepository extends JpaRepository<ClienteChavePix, Long> {
 
-    List<ClienteChavePix> findByUsuarioIdOrderByPrincipalDescCriadoEmAsc(Long usuarioId);
+    List<ClienteChavePix> findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(Long usuarioId);
 
-    Optional<ClienteChavePix> findByIdAndUsuarioId(Long id, Long usuarioId);
+    Optional<ClienteChavePix> findByIdAndUsuario_Id(Long id, Long usuarioId);
 
-    long countByUsuarioId(Long usuarioId);
+    long countByUsuario_Id(Long usuarioId);
 }

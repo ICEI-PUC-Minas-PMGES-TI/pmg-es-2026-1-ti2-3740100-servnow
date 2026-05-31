@@ -836,7 +836,62 @@
 
 /* =========================================
    ACOMPANHAMENTO (Processo 4)
+   Paleta verde alinhada ao restante do site
    ========================================= */
+
+.acomp-codigo-input:focus,
+.acomp-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+}
+
+.acomp-codigo-exibir,
+.acomp-pix-qr-container {
+  border-color: rgba(20, 184, 166, 0.45);
+}
+
+.acomp-codigo-exibir {
+  background: rgba(20, 184, 166, 0.06);
+}
+
+.acomp-btn-primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.28);
+}
+
+.acomp-eta-barra-fill {
+  background: linear-gradient(90deg, var(--brand-strong), var(--brand));
+}
+
+.acomp-upload:hover {
+  border-color: rgba(20, 184, 166, 0.5);
+  background: rgba(20, 184, 166, 0.04);
+}
+
+.acomp-avaliar-avatar {
+  background: rgba(20, 184, 166, 0.2);
+  color: var(--brand-strong);
+}
+
+.acomp-cliente-mini-avatar {
+  background: rgba(20, 184, 166, 0.2);
+  color: var(--brand-strong);
+}
+
+.acomp-pagamento-opcao:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+}
+
+.acomp-pagamento-opcao.selecionada {
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.acomp-pagamento-opcao-icone {
+  background: rgba(20, 184, 166, 0.16);
+}
+
+.acomp-pix-qr-container {
+  border: 1px dashed rgba(20, 184, 166, 0.35);
+}
 
 .acomp-stepper {
   display: flex;
@@ -931,6 +986,40 @@
   gap: 6px;
 }
 
+.acomp-progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.acomp-progresso-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--workspace-muted);
+}
+
+.acomp-progresso-cabecalho strong {
+  color: var(--brand-strong);
+  font-size: 15px;
+}
+
+.acomp-progresso-barra {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--workspace-border);
+  overflow: hidden;
+}
+
+.acomp-progresso-barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), var(--brand-strong));
+  transition: width 0.2s ease;
+}
+
 /* CODIGO */
 
 .acomp-codigo-centro {
@@ -980,8 +1069,8 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(168, 85, 247, 0.25);
-  color: #a855f7;
+  background: rgba(20, 184, 166, 0.2);
+  color: var(--brand-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1038,13 +1127,12 @@
 
 .acomp-codigo-input:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
 }
 
 .acomp-codigo-exibir {
   width: 100%;
-  border: 1.5px dashed rgba(56, 189, 248, 0.55);
-  background: rgba(56, 189, 248, 0.06);
+  border: 1.5px dashed rgba(20, 184, 166, 0.45);
+  background: rgba(20, 184, 166, 0.06);
   border-radius: 18px;
   padding: 22px 18px;
   text-align: center;
@@ -1093,9 +1181,9 @@
 }
 
 .acomp-btn-primary {
-  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
   color: #fff;
-  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.28);
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.28);
 }
 
 .acomp-btn-primary:hover:not(:disabled) {
@@ -1171,7 +1259,7 @@
 
 .acomp-eta-barra-fill {
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #14b8a6);
+  background: linear-gradient(90deg, var(--brand-strong), var(--brand));
   border-radius: 999px;
 }
 
@@ -1194,8 +1282,8 @@
 }
 
 .acomp-upload:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  background: rgba(56, 189, 248, 0.04);
+  border-color: rgba(20, 184, 166, 0.5);
+  background: rgba(20, 184, 166, 0.04);
 }
 
 .acomp-upload input[type="file"] {
@@ -1220,7 +1308,6 @@
 
 .acomp-textarea:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
 }
 
 .acomp-form-bloco {
@@ -1327,7 +1414,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(20, 184, 166, 0.2);
   color: var(--brand-strong);
   display: flex;
   align-items: center;
@@ -1390,12 +1477,12 @@
 }
 
 .acomp-pagamento-opcao:hover {
-  border-color: rgba(56, 189, 248, 0.4);
+  border-color: rgba(20, 184, 166, 0.4);
 }
 
 .acomp-pagamento-opcao.selecionada {
   border-color: var(--brand);
-  background: rgba(56, 189, 248, 0.08);
+  background: rgba(20, 184, 166, 0.08);
 }
 
 .acomp-pagamento-opcao input[type="radio"] {
@@ -1410,7 +1497,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(56, 189, 248, 0.16);
+  background: rgba(20, 184, 166, 0.16);
   color: var(--brand-strong);
   flex-shrink: 0;
 }
@@ -1433,7 +1520,7 @@
   justify-content: center;
   padding: 20px;
   border-radius: 14px;
-  border: 1px dashed rgba(56, 189, 248, 0.35);
+  border: 1px dashed rgba(20, 184, 166, 0.35);
   background: rgba(15, 23, 42, 0.35);
   min-height: 280px;
 }
@@ -1457,6 +1544,23 @@
   color: var(--workspace-muted);
   font-size: 12px;
   text-align: center;
+}
+
+.acomp-pix-copia-cola {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface-muted, #f8fafc);
+  overflow-x: auto;
+}
+
+.acomp-pix-copia-cola code {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: var(--workspace-text);
 }
 
 .acomp-final {
