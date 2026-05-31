@@ -1,0 +1,163 @@
+/* Agenda / calendario de servicos agendados */
+.agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.agenda-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agenda-mes-titulo {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--workspace-text);
+}
+
+.agenda-nav {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface-soft);
+  color: var(--workspace-text);
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.agenda-nav:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: var(--workspace-surface);
+}
+
+.agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.agenda-grid-dias {
+  margin-bottom: -4px;
+}
+
+.agenda-dia-semana {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--workspace-muted);
+  padding: 4px 0;
+}
+
+.agenda-celula {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: var(--workspace-surface-soft);
+  color: var(--workspace-text);
+  font-family: 'Plus Jakarta Sans', 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+
+.agenda-celula-vazia {
+  background: transparent;
+  border: none;
+}
+
+.agenda-celula:disabled {
+  color: var(--workspace-muted);
+  opacity: 0.55;
+}
+
+.agenda-celula.tem-servico {
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.16), rgba(20, 184, 166, 0.12));
+  border-color: rgba(56, 189, 248, 0.4);
+  color: var(--brand-strong);
+  opacity: 1;
+}
+
+.agenda-celula.tem-servico:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.7);
+}
+
+.agenda-celula.hoje {
+  border-color: var(--brand-strong);
+}
+
+.agenda-celula.selecionado {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.agenda-celula-marcador {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agenda-celula.selecionado .agenda-celula-marcador {
+  background: #ffffff;
+  color: #0ea5e9;
+}
+
+.agenda-detalhes {
+  border-top: 1px solid var(--workspace-border);
+  padding-top: 16px;
+}
+
+.agenda-detalhes-vazio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--workspace-muted);
+  font-size: 13px;
+}
+
+.agenda-detalhes-titulo {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--workspace-text);
+}
+
+.agenda-servico {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .agenda-servico {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
