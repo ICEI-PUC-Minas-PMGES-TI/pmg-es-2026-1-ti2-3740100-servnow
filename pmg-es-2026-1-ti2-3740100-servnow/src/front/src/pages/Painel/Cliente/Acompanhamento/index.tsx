@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
-import { BotaoRota } from "../../../../Components/Acompanhamento/BotaoRota";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   avaliarServico,
@@ -288,8 +287,6 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
                 )}
               </div>
             </div>
-
-            <BotaoRota endereco={detalhe.endereco} />
 
             {detalhe.codigoVerificacao ? (
               <div className="acomp-codigo-exibir">

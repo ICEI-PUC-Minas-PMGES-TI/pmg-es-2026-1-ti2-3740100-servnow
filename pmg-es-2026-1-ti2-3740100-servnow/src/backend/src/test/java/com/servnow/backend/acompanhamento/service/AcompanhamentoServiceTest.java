@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
@@ -271,6 +272,32 @@ class AcompanhamentoServiceTest {
         assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.CONCLUIDA);
         assertThat(solicitacao.getStatus()).isEqualTo(StatusSolicitacao.CONCLUIDA);
         assertThat(ordem.getConcluidoEm()).isNotNull();
+    }
+
+    @Test
+    void obterDetalheRecuperaOrdemExistenteQuandoCriacaoConcorre() {
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordem(solicitacao, "4823");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(solicitacaoRepository.findByIdForUpdate(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.of(ordem));
+        when(ordemRepository.saveAndFlush(any(OrdemServico.class)))
+            .thenThrow(new DataIntegrityViolationException("duplicate solicitacao_id"));
+
+        var response = acompanhamentoService.obterDetalhe(
+            100L,
+            usuarioAutenticado(1L, TipoUsuario.CLIENTE)
+        );
+
+        assertThat(response.solicitacaoId()).isEqualTo(100L);
+        assertThat(response.etapa()).isEqualTo("AGUARDANDO_CHEGADA");
     }
 
     @Test

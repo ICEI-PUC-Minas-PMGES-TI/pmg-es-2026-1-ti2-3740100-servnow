@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -449,17 +450,37 @@ public class AcompanhamentoService {
     }
 
     private OrdemServico obterOuCriarOrdem(SolicitacaoServico solicitacao) {
+        Long solicitacaoId = solicitacao.getId();
+        return ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
+            .orElseGet(() -> criarOrdemComLock(solicitacao));
+    }
+
+    private OrdemServico criarOrdemComLock(SolicitacaoServico solicitacao) {
+        solicitacaoRepository.findByIdForUpdate(solicitacao.getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada."));
+
         return ordemRepository.findWithDetalhesBySolicitacaoId(solicitacao.getId())
-            .orElseGet(() -> {
-                OrdemServico nova = new OrdemServico();
-                nova.setSolicitacao(solicitacao);
-                nova.setEtapa(EtapaOrdemServico.AGUARDANDO_CHEGADA);
-                if (solicitacao.getValorAceito() != null) {
-                    nova.setValorFinal(solicitacao.getValorAceito());
-                }
-                gerarNovoCodigo(nova);
-                return ordemRepository.save(nova);
-            });
+            .orElseGet(() -> criarOrdemServico(solicitacao));
+    }
+
+    private OrdemServico criarOrdemServico(SolicitacaoServico solicitacao) {
+        OrdemServico nova = new OrdemServico();
+        nova.setSolicitacao(solicitacao);
+        nova.setEtapa(EtapaOrdemServico.AGUARDANDO_CHEGADA);
+        if (solicitacao.getValorAceito() != null) {
+            nova.setValorFinal(solicitacao.getValorAceito());
+        }
+        gerarNovoCodigo(nova);
+        try {
+            return ordemRepository.saveAndFlush(nova);
+        } catch (DataIntegrityViolationException ex) {
+            return ordemRepository.findWithDetalhesBySolicitacaoId(solicitacao.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Nao foi possivel iniciar o acompanhamento desta solicitacao.",
+                    ex
+                ));
+        }
     }
 
     private void gerarNovoCodigo(OrdemServico ordem) {

@@ -853,11 +853,6 @@
   background: rgba(20, 184, 166, 0.06);
 }
 
-.acomp-btn-primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.28);
-}
-
 .acomp-eta-barra-fill {
   background: linear-gradient(90deg, var(--brand-strong), var(--brand));
 }
@@ -1270,32 +1265,32 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 14px 20px;
-  border-radius: 14px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 8px;
   border: none;
-  font-family: 'Plus Jakarta Sans', 'Sora', sans-serif;
-  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: filter 0.18s, transform 0.18s, background 0.18s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .acomp-btn-primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  background: var(--brand-strong);
   color: #fff;
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.28);
+  box-shadow: none;
 }
 
 .acomp-btn-primary:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
+  background: var(--brand);
 }
 
 .acomp-btn-primary:disabled {
+  opacity: 0.7;
   background: var(--workspace-surface-soft);
   color: var(--workspace-muted);
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 .acomp-btn-danger {
