@@ -25,9 +25,13 @@ const defaultStyles = {
 
 type Theme = "light" | "dark";
 
-// Check document class for theme (works with next-themes, etc.)
+// Check document for theme: suporta tanto classe (next-themes) quanto
+// o atributo data-theme usado pelo ServNow (services/theme.ts).
 function getDocumentTheme(): Theme | null {
   if (typeof document === "undefined") return null;
+  const dataTheme = document.documentElement.dataset.theme;
+  if (dataTheme === "dark") return "dark";
+  if (dataTheme === "light") return "light";
   if (document.documentElement.classList.contains("dark")) return "dark";
   if (document.documentElement.classList.contains("light")) return "light";
   return null;
@@ -58,7 +62,7 @@ function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class"],
+      attributeFilter: ["class", "data-theme"],
     });
 
     // Also watch for system preference changes
