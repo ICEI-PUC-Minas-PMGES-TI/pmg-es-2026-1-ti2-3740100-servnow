@@ -7,6 +7,8 @@ import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoRespon
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { formatarDataSolicitacao, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
+import { chaveMesReferencia, dataReferenciaFinanceira } from "../../../../utils/referenciaFinanceira";
+import { calcularProximoServicoAgendado } from "../../../../utils/proximoServicoAgendado";
 
 type InicioProps = {
   onIrParaSolicitacoes: () => void;
@@ -16,6 +18,8 @@ type InicioProps = {
 export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
   const navigate = useNavigate();
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoServicoResponse[]>([]);
+  const [agendadas, setAgendadas] = useState<SolicitacaoServicoResponse[]>([]);
+  const [servicosPagos, setServicosPagos] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,21 +31,30 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/solicitacoes/cliente`, {
-          headers: authHeader(session.token),
-        });
+        const headers = authHeader(session.token);
+        const [responseLista, responsePagas, responseAgendadas] = await Promise.all([
+          fetch(`${API_URL}/api/solicitacoes/cliente`, { headers }),
+          fetch(`${API_URL}/api/solicitacoes/cliente/pagas`, { headers }),
+          fetch(`${API_URL}/api/solicitacoes/cliente/agendadas`, { headers }),
+        ]);
 
-        if (response.status === 401) {
+        if (responseLista.status === 401 || responsePagas.status === 401 || responseAgendadas.status === 401) {
           toast.error("Sessao expirada. Entre novamente.");
           navigate("/login");
           return;
         }
 
-        if (!response.ok) {
+        if (!responseLista.ok) {
           throw new Error("Nao foi possivel carregar as solicitacoes.");
         }
 
-        setSolicitacoes((await response.json()) as SolicitacaoServicoResponse[]);
+        setSolicitacoes((await responseLista.json()) as SolicitacaoServicoResponse[]);
+        setServicosPagos(
+          responsePagas.ok ? ((await responsePagas.json()) as SolicitacaoServicoResponse[]) : [],
+        );
+        setAgendadas(
+          responseAgendadas.ok ? ((await responseAgendadas.json()) as SolicitacaoServicoResponse[]) : [],
+        );
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
       } finally {
@@ -62,17 +75,20 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
     [solicitacoes],
   );
 
-  // Gastos do mes atual: soma dos servicos ja concluidos (pagos) no mes corrente.
+  const proximoServico = useMemo(
+    () => calcularProximoServicoAgendado(agendadas),
+    [agendadas],
+  );
+
   const gastosMes = useMemo(() => {
-    const mesAtual = new Date().toISOString().slice(0, 7); // "YYYY-MM"
-    const concluidasNoMes = solicitacoes.filter((item) => {
-      if (item.status !== "CONCLUIDA") return false;
-      const referencia = (item.data ?? item.aceitoEm ?? item.criadoEm ?? "").slice(0, 7);
-      return referencia === mesAtual;
+    const mesAtual = chaveMesReferencia(new Date());
+    const pagosNoMes = servicosPagos.filter((item) => {
+      const data = dataReferenciaFinanceira(item);
+      return data != null && chaveMesReferencia(data) === mesAtual;
     });
-    const total = concluidasNoMes.reduce((soma, item) => soma + (item.valorAceito ?? 0), 0);
-    return { total, quantidade: concluidasNoMes.length };
-  }, [solicitacoes]);
+    const total = pagosNoMes.reduce((soma, item) => soma + (item.valorAceito ?? 0), 0);
+    return { total, quantidade: pagosNoMes.length };
+  }, [servicosPagos]);
 
   return (
     <>
@@ -82,42 +98,48 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
         description="Acompanhe suas solicitacoes, agendamentos e gastos do mes."
       />
 
-      <section
-        className="painel-card"
-        style={{
-          marginBottom: 18,
-          background: "linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(20, 184, 166, 0.08))",
-          borderColor: "rgba(56, 189, 248, 0.35)",
-        }}
-      >
-        <div className="painel-card-cabecalho" style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: "rgba(56, 189, 248, 0.2)",
-                color: "var(--brand-strong)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+      {!isLoading && proximoServico && (
+        <section
+          className="painel-card"
+          style={{
+            marginBottom: 18,
+            background: "linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(20, 184, 166, 0.08))",
+            borderColor: "rgba(56, 189, 248, 0.35)",
+          }}
+        >
+          <div className="painel-card-cabecalho" style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: "rgba(56, 189, 248, 0.2)",
+                  color: "var(--brand-strong)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Clock size={22} />
+              </div>
+              <div>
+                <h2 style={{ margin: 0 }}>{proximoServico.titulo}</h2>
+                <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--workspace-muted)" }}>
+                  {proximoServico.subtitulo}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => navigate(`/acompanhamento/${proximoServico.item.id}`)}
             >
-              <Clock size={22} />
-            </div>
-            <div>
-              <h2 style={{ margin: 0 }}>Voce tem um servico para comecar hoje</h2>
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--workspace-muted)" }}>
-                Troca de chuveiro eletrico - previsto para 14:00
-              </p>
-            </div>
+              Acompanhar servico <ArrowRight size={14} />
+            </button>
           </div>
-          <button type="button" className="btn-primary" onClick={() => navigate("/acompanhamento")}>
-            Acompanhar servico <ArrowRight size={14} />
-          </button>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="painel-stats-grid">
         <div className="painel-stat-card">

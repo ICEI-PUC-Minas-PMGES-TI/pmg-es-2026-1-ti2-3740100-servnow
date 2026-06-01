@@ -31,6 +31,8 @@ public record SolicitacaoServicoResponse(
     Double latitude,
     Double longitude,
     Double distanciaKm,
-    BigDecimal valorAceito
+    Boolean distanciaLinhaReta,
+    BigDecimal valorAceito,
+    OffsetDateTime concluidoEm
 ) {
 }

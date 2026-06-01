@@ -179,10 +179,10 @@ public class AcompanhamentoController {
         @PathVariable Long solicitacaoId,
         @PathVariable Long atualizacaoId
     ) {
-        byte[] conteudo = acompanhamentoService.obterFotoAtualizacao(solicitacaoId, atualizacaoId, usuario);
+        var foto = acompanhamentoService.obterFotoAtualizacao(solicitacaoId, atualizacaoId, usuario);
         return ResponseEntity.ok()
             .header(HttpHeaders.CACHE_CONTROL, "private, max-age=3600")
-            .contentType(MediaType.IMAGE_JPEG)
-            .body(conteudo);
+            .contentType(MediaType.parseMediaType(foto.contentType()))
+            .body(foto.conteudo());
     }
 }

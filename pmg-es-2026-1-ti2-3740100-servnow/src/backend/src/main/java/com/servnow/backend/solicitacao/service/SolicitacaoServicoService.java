@@ -1,7 +1,10 @@
 package com.servnow.backend.solicitacao.service;
 
+import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.localizacao.DistanciaCalculada;
 import com.servnow.backend.localizacao.DistanceService;
 import com.servnow.backend.localizacao.GeocodingService;
 import com.servnow.backend.security.UsuarioAutenticado;
@@ -17,6 +21,8 @@ import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
 import com.servnow.backend.solicitacao.dto.SolicitacaoServicoCreateRequest;
 import com.servnow.backend.solicitacao.dto.SolicitacaoServicoResponse;
+import com.servnow.backend.acompanhamento.domain.OrdemServico;
+import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
 import com.servnow.backend.solicitacao.repository.SolicitacaoServicoRepository;
 import com.servnow.backend.usuario.domain.TipoUsuario;
 import com.servnow.backend.usuario.domain.Usuario;
@@ -26,6 +32,7 @@ import com.servnow.backend.usuario.repository.UsuarioRepository;
 public class SolicitacaoServicoService {
 
     private final SolicitacaoServicoRepository solicitacaoRepository;
+    private final OrdemServicoRepository ordemServicoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
     private final GeocodingService geocodingService;
@@ -33,12 +40,14 @@ public class SolicitacaoServicoService {
 
     public SolicitacaoServicoService(
         SolicitacaoServicoRepository solicitacaoRepository,
+        OrdemServicoRepository ordemServicoRepository,
         UsuarioRepository usuarioRepository,
         ArquivoStorage arquivoStorage,
         GeocodingService geocodingService,
         DistanceService distanceService
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
+        this.ordemServicoRepository = ordemServicoRepository;
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
         this.geocodingService = geocodingService;
@@ -144,25 +153,33 @@ public class SolicitacaoServicoService {
 
         List<SolicitacaoServico> publicadas =
             solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO);
-        garantirCoordenadasPrestador(prestador);
-        preencherCoordenadasPendentes(publicadas, 2);
+        Usuario prestadorComCoordenadas = garantirCoordenadasPrestador(prestador);
+        Long prestadorId = prestadorComCoordenadas != null ? prestadorComCoordenadas.getId() : prestador.getId();
+        prestadorComCoordenadas = usuarioRepository.findById(prestadorId).orElse(prestadorComCoordenadas != null ? prestadorComCoordenadas : prestador);
+        preencherCoordenadasPendentes(publicadas);
 
+        Usuario prestadorReferencia = prestadorComCoordenadas;
+        Map<Long, DistanciaCalculada> distancias = distanceService.calcularEmLoteParaPrestador(prestadorReferencia, publicadas);
         return publicadas.stream()
-            .map(solicitacao -> toResponse(solicitacao, prestador))
+            .map(solicitacao -> {
+                Long solicitacaoId = solicitacao.getId();
+                DistanciaCalculada distancia = solicitacaoId == null ? null : distancias.get(solicitacaoId);
+                return toResponse(solicitacao, prestadorReferencia, distancia);
+            })
             .toList();
     }
 
-    private void garantirCoordenadasPrestador(Usuario prestador) {
-        if (prestador.getLatitude() != null && prestador.getLongitude() != null) {
-            return;
-        }
+    private static final int MAX_GEOCODIFICACOES_PRECISAS_POR_LISTAGEM = 10;
+
+    private Usuario garantirCoordenadasPrestador(Usuario prestador) {
         if (!temEnderecoCompleto(prestador)) {
-            return;
+            return prestador;
         }
-        aplicarGeocodificacao(prestador);
+        tentarGeocodificacao(prestador);
         if (prestador.getLatitude() != null && prestador.getLongitude() != null) {
-            usuarioRepository.save(prestador);
+            return usuarioRepository.save(prestador);
         }
+        return prestador;
     }
 
     private boolean temEnderecoCompleto(Usuario usuario) {
@@ -175,28 +192,49 @@ public class SolicitacaoServicoService {
     }
 
     private void aplicarGeocodificacao(Usuario usuario) {
+        Double latitudeAnterior = usuario.getLatitude();
+        Double longitudeAnterior = usuario.getLongitude();
+        usuario.setLatitude(null);
+        usuario.setLongitude(null);
+        geocodingService.geocode(usuario).ifPresentOrElse(
+            coords -> {
+                usuario.setLatitude(coords.latitude());
+                usuario.setLongitude(coords.longitude());
+            },
+            () -> {
+                usuario.setLatitude(latitudeAnterior);
+                usuario.setLongitude(longitudeAnterior);
+            }
+        );
+    }
+
+    private void tentarGeocodificacao(Usuario usuario) {
         geocodingService.geocode(usuario).ifPresent(coords -> {
             usuario.setLatitude(coords.latitude());
             usuario.setLongitude(coords.longitude());
         });
     }
 
-    private void preencherCoordenadasPendentes(List<SolicitacaoServico> solicitacoes, int limitePorRequisicao) {
-        int preenchidas = 0;
+    private void tentarGeocodificacao(SolicitacaoServico solicitacao) {
+        geocodingService.geocode(solicitacao).ifPresent(coords -> {
+            solicitacao.setLatitude(coords.latitude());
+            solicitacao.setLongitude(coords.longitude());
+        });
+    }
+
+    private void preencherCoordenadasPendentes(List<SolicitacaoServico> solicitacoes) {
+        int geocodificacoesRealizadas = 0;
         for (SolicitacaoServico solicitacao : solicitacoes) {
-            if (preenchidas >= limitePorRequisicao) {
+            if (geocodificacoesRealizadas >= MAX_GEOCODIFICACOES_PRECISAS_POR_LISTAGEM) {
                 break;
-            }
-            if (solicitacao.getLatitude() != null && solicitacao.getLongitude() != null) {
-                continue;
             }
             if (!temEnderecoCompleto(solicitacao)) {
                 continue;
             }
-            aplicarGeocodificacao(solicitacao);
+            tentarGeocodificacao(solicitacao);
             if (solicitacao.getLatitude() != null && solicitacao.getLongitude() != null) {
                 solicitacaoRepository.save(solicitacao);
-                preenchidas++;
+                geocodificacoesRealizadas++;
             }
         }
     }
@@ -224,9 +262,29 @@ public class SolicitacaoServicoService {
         Usuario prestador = encontrarUsuario(usuarioAutenticado);
         validarTipo(prestador, TipoUsuario.PRESTADOR);
 
-        return solicitacaoRepository.findByPrestadorIdAndStatusOrderByAceitoEmDesc(prestador.getId(), StatusSolicitacao.AGENDADA)
-            .stream()
-            .map(solicitacao -> toResponse(solicitacao, prestador))
+        List<SolicitacaoServico> agendadas =
+            solicitacaoRepository.findByPrestadorIdAndStatusOrderByAceitoEmDesc(prestador.getId(), StatusSolicitacao.AGENDADA);
+        Map<Long, DistanciaCalculada> distancias = distanceService.calcularEmLoteParaPrestador(prestador, agendadas);
+        return agendadas.stream()
+            .map(solicitacao -> toResponse(solicitacao, prestador, distancias.get(solicitacao.getId())))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SolicitacaoServicoResponse> listarPagasDoCliente(UsuarioAutenticado usuarioAutenticado) {
+        Usuario cliente = encontrarUsuario(usuarioAutenticado);
+        validarTipo(cliente, TipoUsuario.CLIENTE);
+        return ordemServicoRepository.findPagasDoCliente(cliente.getId()).stream()
+            .map(this::toResponsePaga)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SolicitacaoServicoResponse> listarPagasDoPrestador(UsuarioAutenticado usuarioAutenticado) {
+        Usuario prestador = encontrarUsuario(usuarioAutenticado);
+        validarTipo(prestador, TipoUsuario.PRESTADOR);
+        return ordemServicoRepository.findPagasDoPrestador(prestador.getId()).stream()
+            .map(this::toResponsePaga)
             .toList();
     }
 
@@ -280,6 +338,8 @@ public class SolicitacaoServicoService {
     }
 
     private void aplicarGeocodificacao(SolicitacaoServico solicitacao) {
+        solicitacao.setLatitude(null);
+        solicitacao.setLongitude(null);
         geocodingService.geocode(solicitacao).ifPresent(coords -> {
             solicitacao.setLatitude(coords.latitude());
             solicitacao.setLongitude(coords.longitude());
@@ -364,24 +424,47 @@ public class SolicitacaoServicoService {
         );
     }
 
-    private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao) {
-        return toResponse(solicitacao, null);
+    private SolicitacaoServicoResponse toResponsePaga(OrdemServico ordem) {
+        SolicitacaoServico solicitacao = ordem.getSolicitacao();
+        BigDecimal valor = ordem.getValorFinal() != null ? ordem.getValorFinal() : solicitacao.getValorAceito();
+        return toResponse(solicitacao, null, null, valor, ordem.getConcluidoEm());
     }
 
-    private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao, Usuario prestadorReferencia) {
+    private SolicitacaoServicoResponse toResponse(SolicitacaoServico solicitacao) {
+        return toResponse(solicitacao, null, null, solicitacao.getValorAceito(), null);
+    }
+
+    private SolicitacaoServicoResponse toResponse(
+        SolicitacaoServico solicitacao,
+        Usuario prestadorReferencia,
+        DistanciaCalculada distanciaCalculada
+    ) {
+        return toResponse(solicitacao, prestadorReferencia, distanciaCalculada, solicitacao.getValorAceito(), null);
+    }
+
+    private SolicitacaoServicoResponse toResponse(
+        SolicitacaoServico solicitacao,
+        Usuario prestadorReferencia,
+        DistanciaCalculada distanciaCalculada,
+        BigDecimal valorExibido,
+        OffsetDateTime concluidoEm
+    ) {
         Usuario prestador = solicitacao.getPrestador();
         String imagemUrl = solicitacao.getImagemArquivoRelativo() == null
             ? null
             : "/api/solicitacoes/" + solicitacao.getId() + "/imagem";
 
         Double distanciaKm = null;
-        if (prestadorReferencia != null) {
-            distanciaKm = distanceService.distanciaKm(
-                prestadorReferencia.getLatitude(),
-                prestadorReferencia.getLongitude(),
-                solicitacao.getLatitude(),
-                solicitacao.getLongitude()
-            );
+        Boolean distanciaLinhaReta = null;
+        if (distanciaCalculada != null) {
+            distanciaKm = distanciaCalculada.distanciaKm();
+            distanciaLinhaReta = distanciaCalculada.linhaReta();
+        } else if (prestadorReferencia != null) {
+            DistanciaCalculada calculada = distanceService.calcularParaPrestador(prestadorReferencia, solicitacao);
+            if (calculada != null) {
+                distanciaKm = calculada.distanciaKm();
+                distanciaLinhaReta = calculada.linhaReta();
+            }
         }
 
         return new SolicitacaoServicoResponse(
@@ -411,7 +494,9 @@ public class SolicitacaoServicoService {
             solicitacao.getLatitude(),
             solicitacao.getLongitude(),
             distanciaKm,
-            solicitacao.getValorAceito()
+            distanciaLinhaReta,
+            valorExibido,
+            concluidoEm
         );
     }
 }

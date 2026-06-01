@@ -1,11 +1,7 @@
 package com.servnow.backend.solicitacao.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -90,6 +86,16 @@ public class SolicitacaoServicoController {
         return solicitacaoService.listarAgendadasDoPrestador(usuario);
     }
 
+    @GetMapping({"/cliente/pagas", "/cliente/pagas/"})
+    public List<SolicitacaoServicoResponse> listarPagasDoCliente(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return solicitacaoService.listarPagasDoCliente(usuario);
+    }
+
+    @GetMapping({"/prestador/pagas", "/prestador/pagas/"})
+    public List<SolicitacaoServicoResponse> listarPagasDoPrestador(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+        return solicitacaoService.listarPagasDoPrestador(usuario);
+    }
+
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public SolicitacaoServicoResponse editar(
         @AuthenticationPrincipal UsuarioAutenticado usuario,
@@ -131,24 +137,6 @@ public class SolicitacaoServicoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Esta solicitacao nao possui imagem.");
         }
 
-        Path arquivo = arquivoStorage.resolverAbsoluto(caminhoRelativo);
-        if (arquivo == null || !Files.isRegularFile(arquivo)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo de imagem nao encontrado.");
-        }
-
-        try {
-            byte[] conteudo = Files.readAllBytes(arquivo);
-            String contentType = Files.probeContentType(arquivo);
-            if (contentType == null) {
-                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-            }
-
-            return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, "private, max-age=3600")
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(conteudo);
-        } catch (IOException exception) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel ler a imagem.");
-        }
+        return arquivoStorage.responderHttp(caminhoRelativo, "Arquivo de imagem nao encontrado.");
     }
 }

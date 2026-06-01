@@ -66,6 +66,8 @@ export type PerfilResponse = {
   chavePix?: string | null;
   avaliacaoMedia: number | null;
   totalAvaliacoes: number;
+  latitude?: number | null;
+  longitude?: number | null;
   enderecos?: ClienteEnderecoResponse[];
   chavesPix?: ClienteChavePixResponse[];
 };
@@ -171,7 +173,9 @@ export type SolicitacaoServicoResponse = {
   latitude: number | null;
   longitude: number | null;
   distanciaKm: number | null;
+  distanciaLinhaReta?: boolean | null;
   valorAceito: number | null;
+  concluidoEm: string | null;
 };
 
 export type SolicitacaoServicoCreateRequest = {

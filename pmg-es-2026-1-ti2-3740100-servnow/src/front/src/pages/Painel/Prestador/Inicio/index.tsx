@@ -1,4 +1,4 @@
-import { ArrowRight, BarChart3, FileText, HandCoins, Star, Wallet } from "lucide-react";
+import { ArrowRight, BarChart3, Clock, FileText, HandCoins, Star, Wallet } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,6 +7,8 @@ import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoRespon
 import { listarAvaliacoesRecebidas } from "../../../../services/perfil";
 import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../../../utils/formatarAvaliacao";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
+import { chaveMesReferencia, dataReferenciaFinanceira } from "../../../../utils/referenciaFinanceira";
+import { calcularProximoServicoAgendado } from "../../../../utils/proximoServicoAgendado";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { getFaixaPrecoLabel, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
 
@@ -23,6 +25,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
   const [avaliacaoMedia, setAvaliacaoMedia] = useState<number | null>(null);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
   const [agendadas, setAgendadas] = useState<SolicitacaoServicoResponse[]>([]);
+  const [servicosPagos, setServicosPagos] = useState<SolicitacaoServicoResponse[]>([]);
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -75,12 +78,23 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
     if (!session?.token) {
       return;
     }
-    void fetch(`${API_URL}/api/solicitacoes/prestador/agendadas`, {
-      headers: authHeader(session.token),
-    })
-      .then((response) => (response.ok ? response.json() : []))
-      .then((dados) => setAgendadas(dados as SolicitacaoServicoResponse[]))
-      .catch(() => setAgendadas([]));
+    const headers = authHeader(session.token);
+    void Promise.all([
+      fetch(`${API_URL}/api/solicitacoes/prestador/pagas`, { headers }),
+      fetch(`${API_URL}/api/solicitacoes/prestador/agendadas`, { headers }),
+    ])
+      .then(([pagas, agendadasResp]) => {
+        if (pagas.ok) {
+          void pagas.json().then((dados) => setServicosPagos(dados as SolicitacaoServicoResponse[]));
+        }
+        if (agendadasResp.ok) {
+          void agendadasResp.json().then((dados) => setAgendadas(dados as SolicitacaoServicoResponse[]));
+        }
+      })
+      .catch(() => {
+        setServicosPagos([]);
+        setAgendadas([]);
+      });
   }, []);
 
   const solicitacoesRecentes = useMemo(() => solicitacoes.slice(0, 3), [solicitacoes]);
@@ -89,14 +103,21 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
     [solicitacoes],
   );
 
-  // Ganhos do mes: soma dos servicos agendados para o mes corrente.
+  const proximoServico = useMemo(
+    () => calcularProximoServicoAgendado(agendadas, "PRESTADOR"),
+    [agendadas],
+  );
+
   const ganhosMes = useMemo(() => {
-    const mesAtual = new Date().toISOString().slice(0, 7);
-    return agendadas.reduce((soma, item) => {
-      const referencia = (item.data ?? item.aceitoEm ?? item.criadoEm ?? "").slice(0, 7);
-      return referencia === mesAtual ? soma + (item.valorAceito ?? 0) : soma;
+    const mesAtual = chaveMesReferencia(new Date());
+    return servicosPagos.reduce((soma, item) => {
+      const data = dataReferenciaFinanceira(item);
+      if (!data || chaveMesReferencia(data) !== mesAtual) {
+        return soma;
+      }
+      return soma + (item.valorAceito ?? 0);
     }, 0);
-  }, [agendadas]);
+  }, [servicosPagos]);
 
   return (
     <>
@@ -105,6 +126,49 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
         title="Inicio"
         description="Acompanhe novas solicitacoes, ganhos e avaliacoes dos seus atendimentos."
       />
+
+      {!isLoading && proximoServico && (
+        <section
+          className="painel-card"
+          style={{
+            marginBottom: 18,
+            background: "linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(20, 184, 166, 0.08))",
+            borderColor: "rgba(56, 189, 248, 0.35)",
+          }}
+        >
+          <div className="painel-card-cabecalho" style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: "rgba(56, 189, 248, 0.2)",
+                  color: "var(--brand-strong)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Clock size={22} />
+              </div>
+              <div>
+                <h2 style={{ margin: 0 }}>{proximoServico.titulo}</h2>
+                <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--workspace-muted)" }}>
+                  {proximoServico.subtitulo}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => navigate(`/acompanhamento/${proximoServico.item.id}`)}
+            >
+              Acompanhar servico <ArrowRight size={14} />
+            </button>
+          </div>
+        </section>
+      )}
 
       <section className="painel-stats-grid">
         <div className="painel-stat-card">
@@ -122,7 +186,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
           </div>
           <span className="painel-stat-label">Ganhos no mes</span>
           <strong className="painel-stat-valor">{formatarMoedaBrl(ganhosMes)}</strong>
-          <span className="painel-stat-detalhe">Servicos agendados para este mes</span>
+          <span className="painel-stat-detalhe">Servicos pagos neste mes</span>
         </div>
 
         <div className="painel-stat-card">

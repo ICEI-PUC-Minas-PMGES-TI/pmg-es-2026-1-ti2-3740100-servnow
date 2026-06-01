@@ -81,4 +81,26 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
           AND o.notaAvaliacaoPrestador IS NOT NULL
         """)
     Object[] estatisticasAvaliacoesCliente(@Param("clienteId") Long clienteId);
+
+    @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        JOIN FETCH s.cliente
+        LEFT JOIN FETCH s.prestador
+        WHERE s.cliente.id = :clienteId
+          AND o.metodoPagamento IS NOT NULL
+        ORDER BY o.concluidoEm DESC NULLS LAST, s.aceitoEm DESC
+        """)
+    List<OrdemServico> findPagasDoCliente(@Param("clienteId") Long clienteId);
+
+    @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        JOIN FETCH s.cliente
+        JOIN FETCH s.prestador
+        WHERE s.prestador.id = :prestadorId
+          AND o.metodoPagamento IS NOT NULL
+        ORDER BY o.concluidoEm DESC NULLS LAST, s.aceitoEm DESC
+        """)
+    List<OrdemServico> findPagasDoPrestador(@Param("prestadorId") Long prestadorId);
 }

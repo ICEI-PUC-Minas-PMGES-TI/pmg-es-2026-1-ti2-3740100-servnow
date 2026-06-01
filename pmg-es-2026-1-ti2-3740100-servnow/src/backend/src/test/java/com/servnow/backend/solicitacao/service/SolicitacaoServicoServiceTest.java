@@ -24,6 +24,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
+import com.servnow.backend.localizacao.DistanciaCalculada;
 import com.servnow.backend.localizacao.DistanceService;
 import com.servnow.backend.localizacao.GeoCoordinates;
 import com.servnow.backend.localizacao.GeocodingService;
@@ -42,6 +44,9 @@ class SolicitacaoServicoServiceTest {
 
     @Mock
     private SolicitacaoServicoRepository solicitacaoRepository;
+
+    @Mock
+    private OrdemServicoRepository ordemServicoRepository;
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -87,6 +92,40 @@ class SolicitacaoServicoServiceTest {
         assertThat(response.longitude()).isEqualTo(-43.9345);
         assertThat(response.clienteNome()).isEqualTo("Cliente Solicitacao");
         assertThat(response.status()).isEqualTo("PUBLICADO");
+    }
+
+    @Test
+    void listarParaPrestadoresCalculaDistanciaQuandoHaCoordenadas() {
+        Usuario prestador = usuario(2L, "Prestador", "prestador@email.com", TipoUsuario.PRESTADOR);
+        prestador.setCep("30140-000");
+        prestador.setRua("Rua B");
+        prestador.setNumero("50");
+        prestador.setBairro("Funcionarios");
+        prestador.setCidade("Belo Horizonte");
+        prestador.setEstado("MG");
+        prestador.setLatitude(-19.94);
+        prestador.setLongitude(-43.94);
+
+        Usuario cliente = usuario(1L, "Cliente", "cliente@email.com", TipoUsuario.CLIENTE);
+        SolicitacaoServico publicada = solicitacao(cliente, "Eletrica", "Trocar tomada");
+        publicada.setStatus(StatusSolicitacao.PUBLICADO);
+        publicada.setLatitude(-19.9167);
+        publicada.setLongitude(-43.9345);
+
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(prestador));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO))
+            .thenReturn(List.of(publicada));
+        when(geocodingService.geocode(any(Usuario.class))).thenReturn(Optional.empty());
+        when(geocodingService.geocode(any(SolicitacaoServico.class))).thenReturn(Optional.empty());
+        when(distanceService.calcularEmLoteParaPrestador(any(Usuario.class), any())).thenReturn(java.util.Map.of());
+        when(distanceService.calcularParaPrestador(any(Usuario.class), any(SolicitacaoServico.class)))
+            .thenReturn(new DistanciaCalculada(3.2, false));
+
+        List<SolicitacaoServicoResponse> response = solicitacaoService.listarParaPrestadores(usuarioAutenticadoPrestador());
+
+        assertThat(response).hasSize(1);
+        assertThat(response.getFirst().distanciaKm()).isEqualTo(3.2);
     }
 
     @Test
@@ -271,5 +310,9 @@ class SolicitacaoServicoServiceTest {
 
     private UsuarioAutenticado usuarioAutenticadoCliente() {
         return new UsuarioAutenticado(1L, "Cliente Solicitacao", "cliente@email.com", "hash", "CLIENTE", List.of());
+    }
+
+    private UsuarioAutenticado usuarioAutenticadoPrestador() {
+        return new UsuarioAutenticado(2L, "Prestador", "prestador@email.com", "hash", "PRESTADOR", List.of());
     }
 }

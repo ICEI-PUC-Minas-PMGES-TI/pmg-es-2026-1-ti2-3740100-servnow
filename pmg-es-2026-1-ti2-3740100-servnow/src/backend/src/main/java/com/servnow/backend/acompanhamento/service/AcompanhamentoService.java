@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.servnow.backend.ArmazenamentoImagens.ArquivoLeitura;
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
 import com.servnow.backend.acompanhamento.domain.AtualizacaoServico;
 import com.servnow.backend.acompanhamento.domain.EtapaOrdemServico;
@@ -424,7 +425,7 @@ public class AcompanhamentoService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] obterFotoAtualizacao(
+    public ArquivoLeitura obterFotoAtualizacao(
         Long solicitacaoId,
         Long atualizacaoId,
         UsuarioAutenticado usuarioAutenticado
@@ -438,18 +439,13 @@ public class AcompanhamentoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Atualizacao nao encontrada.");
         }
         String caminho = atualizacao.getFotoArquivoRelativo();
-        if (caminho == null || caminho.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Esta atualizacao nao possui foto.");
-        }
-        var arquivo = arquivoStorage.resolverAbsoluto(caminho);
-        if (arquivo == null || !java.nio.file.Files.isRegularFile(arquivo)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo de imagem nao encontrado.");
-        }
-        try {
-            return java.nio.file.Files.readAllBytes(arquivo);
-        } catch (java.io.IOException exception) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel ler a imagem.");
-        }
+        return arquivoStorage.ler(caminho)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                caminho == null || caminho.isBlank()
+                    ? "Esta atualizacao nao possui foto."
+                    : "Arquivo de imagem nao encontrado."
+            ));
     }
 
     private OrdemServico obterOuCriarOrdem(SolicitacaoServico solicitacao) {
