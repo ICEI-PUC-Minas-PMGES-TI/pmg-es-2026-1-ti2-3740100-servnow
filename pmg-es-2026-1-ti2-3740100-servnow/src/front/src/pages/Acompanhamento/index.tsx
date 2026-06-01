@@ -1,17 +1,15 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Header } from "../../Components/Header/Header";
 import { clearAuthSession, getAuthSession } from "../../services/auth";
 
-import { AcompanhamentoLista } from "../Painel/Acompanhamento/Lista";
-import { AcompanhamentoClienteDetalhe } from "../Painel/Cliente/Acompanhamento";
-import { AcompanhamentoPrestadorDetalhe } from "../Painel/Prestador/Acompanhamento";
+import { Acompanhamento as AcompanhamentoCliente } from "../Painel/Cliente/Acompanhamento";
+import { Acompanhamento as AcompanhamentoPrestador } from "../Painel/Prestador/Acompanhamento";
 
 import "../../Components/Painel/PainelCliente.css";
 
 export function AcompanhamentoPage() {
   const navigate = useNavigate();
-  const { solicitacaoId } = useParams<{ solicitacaoId?: string }>();
   const session = getAuthSession();
 
   function handleLogout() {
@@ -24,8 +22,6 @@ export function AcompanhamentoPage() {
   }
 
   const isCliente = session.tipoUsuario === "CLIENTE";
-  const idNumerico = solicitacaoId ? Number(solicitacaoId) : NaN;
-  const exibirDetalhe = Number.isFinite(idNumerico) && idNumerico > 0;
 
   return (
     <>
@@ -36,15 +32,7 @@ export function AcompanhamentoPage() {
           className="painel-content"
           style={{ maxWidth: 760, margin: "0 auto", width: "100%" }}
         >
-          {exibirDetalhe ? (
-            isCliente ? (
-              <AcompanhamentoClienteDetalhe solicitacaoId={idNumerico} />
-            ) : (
-              <AcompanhamentoPrestadorDetalhe solicitacaoId={idNumerico} />
-            )
-          ) : (
-            <AcompanhamentoLista />
-          )}
+          {isCliente ? <AcompanhamentoCliente /> : <AcompanhamentoPrestador />}
         </main>
       </div>
     </>
