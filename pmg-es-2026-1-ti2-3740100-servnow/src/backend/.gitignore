@@ -12,7 +12,9 @@ data/servnow-uploads/
 .env.local
 .env.*.local
 application.properties
+application-local.properties
 !application-example.properties
+!application-local.properties.example
 
 ### STS ###
 .apt_generated

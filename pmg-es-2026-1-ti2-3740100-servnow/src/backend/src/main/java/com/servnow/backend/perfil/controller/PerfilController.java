@@ -1,11 +1,5 @@
 package com.servnow.backend.perfil.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -202,28 +196,6 @@ public class PerfilController {
     }
 
     private ResponseEntity<byte[]> responderArquivo(String caminhoRelativo, String mensagemNaoEncontrado) {
-        if (caminhoRelativo == null || caminhoRelativo.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, mensagemNaoEncontrado);
-        }
-
-        Path arquivo = arquivoStorage.resolverAbsoluto(caminhoRelativo);
-        if (arquivo == null || !Files.isRegularFile(arquivo)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, mensagemNaoEncontrado);
-        }
-
-        try {
-            byte[] conteudo = Files.readAllBytes(arquivo);
-            String contentType = Files.probeContentType(arquivo);
-            if (contentType == null) {
-                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-            }
-
-            return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, "private, max-age=3600")
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(conteudo);
-        } catch (IOException exception) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel ler o arquivo.");
-        }
+        return arquivoStorage.responderHttp(caminhoRelativo, mensagemNaoEncontrado);
     }
 }

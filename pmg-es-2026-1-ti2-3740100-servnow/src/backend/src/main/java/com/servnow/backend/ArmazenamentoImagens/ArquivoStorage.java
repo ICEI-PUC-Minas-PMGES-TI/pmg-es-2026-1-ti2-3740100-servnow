@@ -1,15 +1,19 @@
 package com.servnow.backend.ArmazenamentoImagens;
-import com.servnow.backend.ArmazenamentoImagens.StorageProperties;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,10 +44,21 @@ public class ArquivoStorage {
         MediaType.APPLICATION_PDF_VALUE
     );
 
+    private final StorageProperties properties;
     private final Path raizUpload;
+    private final SupabaseStorageClient supabaseStorage;
 
-    public ArquivoStorage(StorageProperties properties) {
+    public ArquivoStorage(StorageProperties properties, ObjectProvider<SupabaseStorageClient> supabaseStorage) {
+        this.properties = properties;
         this.raizUpload = Path.of(properties.getUploadDir()).toAbsolutePath().normalize();
+        this.supabaseStorage = properties.usaSupabase()
+            ? supabaseStorage.getIfAvailable()
+            : null;
+        if (properties.usaSupabase() && this.supabaseStorage == null) {
+            throw new IllegalStateException(
+                "app.storage.provider=supabase, mas o cliente Supabase Storage nao foi configurado."
+            );
+        }
     }
 
     public String salvarImagem(MultipartFile arquivo, String pasta) {
@@ -74,19 +89,50 @@ public class ArquivoStorage {
         );
     }
 
-    public Path resolverAbsoluto(String caminhoRelativo) {
+    public Optional<ArquivoLeitura> ler(String caminhoRelativo) {
         if (caminhoRelativo == null || caminhoRelativo.isBlank()) {
-            return null;
+            return Optional.empty();
         }
-        Path normalizado = raizUpload.resolve(caminhoRelativo).normalize();
-        if (!normalizado.startsWith(raizUpload)) {
-            return null;
+        if (properties.usaSupabase()) {
+            return supabaseStorage.baixar(caminhoRelativo);
         }
-        return normalizado;
+        Path arquivo = resolverAbsolutoLocal(caminhoRelativo);
+        if (arquivo == null || !Files.isRegularFile(arquivo)) {
+            return Optional.empty();
+        }
+        try {
+            byte[] conteudo = Files.readAllBytes(arquivo);
+            String contentType = Files.probeContentType(arquivo);
+            if (contentType == null) {
+                contentType = SupabaseStorageClient.contentTypePorCaminho(caminhoRelativo);
+            }
+            return Optional.of(new ArquivoLeitura(conteudo, contentType));
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel ler o arquivo.");
+        }
+    }
+
+    public ResponseEntity<byte[]> responderHttp(String caminhoRelativo, String mensagemNaoEncontrado) {
+        Optional<ArquivoLeitura> arquivo = ler(caminhoRelativo);
+        if (arquivo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, mensagemNaoEncontrado);
+        }
+        ArquivoLeitura leitura = arquivo.get();
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CACHE_CONTROL, "private, max-age=3600")
+            .contentType(MediaType.parseMediaType(leitura.contentType()))
+            .body(leitura.conteudo());
     }
 
     public void excluirSeExistir(String caminhoRelativo) {
-        Path arquivo = resolverAbsoluto(caminhoRelativo);
+        if (caminhoRelativo == null || caminhoRelativo.isBlank()) {
+            return;
+        }
+        if (properties.usaSupabase()) {
+            supabaseStorage.excluir(caminhoRelativo);
+            return;
+        }
+        Path arquivo = resolverAbsolutoLocal(caminhoRelativo);
         if (arquivo == null) {
             return;
         }
@@ -100,9 +146,30 @@ public class ArquivoStorage {
     private String salvar(MultipartFile arquivo, String pasta, Set<String> tiposPermitidos) {
         String extensao = extensaoParaTipo(arquivo.getContentType(), tiposPermitidos);
         String nomeArquivo = UUID.randomUUID() + extensao;
-        Path relativo = Path.of(pasta, nomeArquivo);
-        Path destinoAbsoluto = raizUpload.resolve(relativo).normalize();
+        String caminhoRelativo = Path.of(pasta, nomeArquivo).toString().replace('\\', '/');
 
+        if (properties.usaSupabase()) {
+            salvarNoSupabase(arquivo, caminhoRelativo);
+            return caminhoRelativo;
+        }
+        return salvarNoDiscoLocal(arquivo, caminhoRelativo);
+    }
+
+    private void salvarNoSupabase(MultipartFile arquivo, String caminhoRelativo) {
+        try {
+            byte[] conteudo = arquivo.getBytes();
+            String contentType = arquivo.getContentType();
+            if (contentType == null) {
+                contentType = SupabaseStorageClient.contentTypePorCaminho(caminhoRelativo);
+            }
+            supabaseStorage.enviar(caminhoRelativo, conteudo, contentType);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel salvar o arquivo.");
+        }
+    }
+
+    private String salvarNoDiscoLocal(MultipartFile arquivo, String caminhoRelativo) {
+        Path destinoAbsoluto = raizUpload.resolve(caminhoRelativo).normalize();
         if (!destinoAbsoluto.startsWith(raizUpload)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Caminho de upload invalido.");
         }
@@ -116,7 +183,15 @@ public class ArquivoStorage {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nao foi possivel salvar o arquivo.");
         }
 
-        return relativo.toString().replace('\\', '/');
+        return caminhoRelativo;
+    }
+
+    private Path resolverAbsolutoLocal(String caminhoRelativo) {
+        Path normalizado = raizUpload.resolve(caminhoRelativo).normalize();
+        if (!normalizado.startsWith(raizUpload)) {
+            return null;
+        }
+        return normalizado;
     }
 
     private void validarArquivo(
