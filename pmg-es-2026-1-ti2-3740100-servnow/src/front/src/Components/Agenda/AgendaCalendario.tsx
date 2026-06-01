@@ -155,6 +155,9 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
                           {formatarMoedaBrl(item.valorAceito)}
                         </span>
                       </div>
+                      {item.descricao && (
+                        <p className="agenda-servico-descricao">{item.descricao}</p>
+                      )}
                       {papel === "PRESTADOR" && (
                         <div style={{ marginTop: 12 }}>
                           <BotaoRota endereco={item.endereco} />
