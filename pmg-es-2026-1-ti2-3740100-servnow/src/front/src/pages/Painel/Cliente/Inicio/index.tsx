@@ -6,6 +6,7 @@ import { PainelSectionHeader } from "../../../../Components/Painel/PainelSection
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { formatarDataSolicitacao, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
+import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 
 type InicioProps = {
   onIrParaSolicitacoes: () => void;
@@ -60,6 +61,18 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
     () => solicitacoes.filter((item) => item.status === "AGENDADA").length,
     [solicitacoes],
   );
+
+  // Gastos do mes atual: soma dos servicos ja concluidos (pagos) no mes corrente.
+  const gastosMes = useMemo(() => {
+    const mesAtual = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+    const concluidasNoMes = solicitacoes.filter((item) => {
+      if (item.status !== "CONCLUIDA") return false;
+      const referencia = (item.data ?? item.aceitoEm ?? item.criadoEm ?? "").slice(0, 7);
+      return referencia === mesAtual;
+    });
+    const total = concluidasNoMes.reduce((soma, item) => soma + (item.valorAceito ?? 0), 0);
+    return { total, quantidade: concluidasNoMes.length };
+  }, [solicitacoes]);
 
   return (
     <>
@@ -130,8 +143,12 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
             <Wallet size={22} />
           </div>
           <span className="painel-stat-label">Gastos no mes</span>
-          <strong className="painel-stat-valor">R$ 480,00</strong>
-          <span className="painel-stat-detalhe">2 servicos pagos em maio</span>
+          <strong className="painel-stat-valor">{formatarMoedaBrl(gastosMes.total)}</strong>
+          <span className="painel-stat-detalhe">
+            {gastosMes.quantidade === 0
+              ? "Nenhum servico pago neste mes"
+              : `${gastosMes.quantidade} servico${gastosMes.quantidade > 1 ? "s" : ""} pago${gastosMes.quantidade > 1 ? "s" : ""} neste mes`}
+          </span>
         </div>
       </section>
 
