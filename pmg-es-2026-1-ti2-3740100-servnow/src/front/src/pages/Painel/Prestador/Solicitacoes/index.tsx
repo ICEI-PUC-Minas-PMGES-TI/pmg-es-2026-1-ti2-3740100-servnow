@@ -359,7 +359,9 @@ export function Solicitacoes() {
                       <span className="painel-lista-item-meta-detalhe">
                         <MapPin size={13} /> {item.endereco}
                       </span>
-                      <span className="painel-lista-item-meta-detalhe">{formatarDistancia(item.distanciaKm)}</span>
+                      <span className="painel-lista-item-meta-detalhe">
+                        {formatarDistancia(item.distanciaKm, item.distanciaLinhaReta)}
+                      </span>
                       {item.data && (
                         <span className="painel-lista-item-meta-detalhe">
                           <Calendar size={13} /> {formatarData(item.data)}
@@ -393,6 +395,7 @@ export function Solicitacoes() {
         onFechar={() => setDetalheAberto(null)}
         mostrarCliente
         distanciaKm={detalheAberto?.distanciaKm}
+        distanciaLinhaReta={detalheAberto?.distanciaLinhaReta}
       />
 
       {propostaAberta && (

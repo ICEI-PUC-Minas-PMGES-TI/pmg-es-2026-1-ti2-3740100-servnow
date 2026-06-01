@@ -106,7 +106,9 @@ export function MapaOportunidades({ oportunidades, onSelecionar, semLocalizacao 
                   <div className="mapa-oportunidades-popup">
                     <strong>{titulo}</strong>
                     <p>{item.endereco}</p>
-                    <p className="mapa-oportunidades-popup-meta">{formatarDistancia(item.distanciaKm)}</p>
+                    <p className="mapa-oportunidades-popup-meta">
+                      {formatarDistancia(item.distanciaKm, item.distanciaLinhaReta)}
+                    </p>
                     {item.data && (
                       <p className="mapa-oportunidades-popup-meta">
                         {formatarData(item.data)}

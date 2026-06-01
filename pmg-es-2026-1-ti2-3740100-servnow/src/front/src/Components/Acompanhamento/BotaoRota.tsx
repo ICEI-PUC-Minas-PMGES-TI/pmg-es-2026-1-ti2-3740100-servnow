@@ -1,12 +1,13 @@
 import { MapPin, Navigation } from "lucide-react";
 
+import { IconeGoogleMaps, IconeWaze } from "./IconesNavegacao";
+
 type BotaoRotaProps = {
   endereco: string;
 };
 
 /**
  * Botoes que abrem a rota ate o endereco informado no Google Maps ou no Waze.
- * Usa os apps/sites de navegacao com o endereco como destino.
  */
 export function BotaoRota({ endereco }: BotaoRotaProps) {
   const enderecoLimpo = endereco?.trim();
@@ -25,17 +26,32 @@ export function BotaoRota({ endereco }: BotaoRotaProps) {
 
   return (
     <div className="acomp-rota">
-      <span className="acomp-rota-label">
-        <MapPin size={14} /> {enderecoLimpo}
-      </span>
+      <p className="acomp-rota-endereco">
+        <MapPin size={15} aria-hidden="true" />
+        <span>{enderecoLimpo}</span>
+      </p>
+
       <div className="acomp-rota-botoes">
-        <button type="button" className="acomp-rota-btn google" onClick={() => abrir(urlGoogleMaps)}>
-          <Navigation size={15} />
-          Rota no Google Maps
+        <button
+          type="button"
+          className="acomp-rota-btn google"
+          onClick={() => abrir(urlGoogleMaps)}
+          aria-label={`Abrir rota no Google Maps para ${enderecoLimpo}`}
+        >
+          <IconeGoogleMaps size={20} />
+          <span>Google Maps</span>
+          <Navigation size={15} className="acomp-rota-btn-seta" aria-hidden="true" />
         </button>
-        <button type="button" className="acomp-rota-btn waze" onClick={() => abrir(urlWaze)}>
-          <Navigation size={15} />
-          Rota no Waze
+
+        <button
+          type="button"
+          className="acomp-rota-btn waze"
+          onClick={() => abrir(urlWaze)}
+          aria-label={`Abrir rota no Waze para ${enderecoLimpo}`}
+        >
+          <IconeWaze size={20} />
+          <span>Waze</span>
+          <Navigation size={15} className="acomp-rota-btn-seta" aria-hidden="true" />
         </button>
       </div>
     </div>

@@ -75,12 +75,7 @@ export function filtrarOportunidades(
   });
 }
 
-export function formatarDistancia(distanciaKm: number | null | undefined) {
-  if (distanciaKm == null || !Number.isFinite(distanciaKm)) {
-    return "Distancia indisponivel";
-  }
-  return `${distanciaKm.toFixed(1)} km`;
-}
+export { formatarDistancia } from "../../../../utils/formatarDistancia";
 
 export function getFaixaPrecoLabel(faixaPreco: string) {
   const labels: Record<string, string> = {

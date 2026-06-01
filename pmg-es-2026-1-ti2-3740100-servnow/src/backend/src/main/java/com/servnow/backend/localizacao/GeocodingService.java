@@ -3,6 +3,7 @@ package com.servnow.backend.localizacao;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,12 +44,38 @@ public class GeocodingService {
             .build();
     }
 
+    /**
+     * Geocodificacao pelo endereco completo (rua, numero, bairro). Mais precisa que usar apenas o CEP.
+     */
+    public Optional<GeoCoordinates> geocodePreciso(SolicitacaoServico solicitacao) {
+        return geocodeEnderecoPreciso(
+            solicitacao.getRua(),
+            solicitacao.getNumero(),
+            solicitacao.getComplemento(),
+            solicitacao.getBairro(),
+            solicitacao.getCidade(),
+            solicitacao.getEstado(),
+            solicitacao.getCep()
+        );
+    }
+
+    public Optional<GeoCoordinates> geocodePreciso(Usuario usuario) {
+        return geocodeEnderecoPreciso(
+            usuario.getRua(),
+            usuario.getNumero(),
+            usuario.getComplemento(),
+            usuario.getBairro(),
+            usuario.getCidade(),
+            usuario.getEstado(),
+            usuario.getCep()
+        );
+    }
+
     public Optional<GeoCoordinates> geocode(SolicitacaoServico solicitacao) {
-        return geocodePorCep(solicitacao.getCep(), solicitacao.getCidade(), solicitacao.getEstado())
-            .or(() -> geocodeEnderecoCompleto(
-                solicitacao.getRua(),
-                solicitacao.getNumero(),
-                solicitacao.getComplemento(),
+        return geocodePreciso(solicitacao)
+            .or(() -> geocodePorCep(solicitacao.getCep(), solicitacao.getCidade(), solicitacao.getEstado()))
+            .or(() -> geocodePorCepAproximado(solicitacao.getCep()))
+            .or(() -> geocodePorLocalidade(
                 solicitacao.getBairro(),
                 solicitacao.getCidade(),
                 solicitacao.getEstado(),
@@ -57,16 +84,127 @@ public class GeocodingService {
     }
 
     public Optional<GeoCoordinates> geocode(Usuario usuario) {
-        return geocodePorCep(usuario.getCep(), usuario.getCidade(), usuario.getEstado())
-            .or(() -> geocodeEnderecoCompleto(
-                usuario.getRua(),
-                usuario.getNumero(),
-                usuario.getComplemento(),
+        return geocodePreciso(usuario)
+            .or(() -> geocodePorCep(usuario.getCep(), usuario.getCidade(), usuario.getEstado()))
+            .or(() -> geocodePorCepAproximado(usuario.getCep()))
+            .or(() -> geocodePorLocalidade(
                 usuario.getBairro(),
                 usuario.getCidade(),
                 usuario.getEstado(),
                 usuario.getCep()
             ));
+    }
+
+    private Optional<GeoCoordinates> geocodeEnderecoPreciso(
+        String rua,
+        String numero,
+        String complemento,
+        String bairro,
+        String cidade,
+        String estado,
+        String cep
+    ) {
+        return geocodeEnderecoEstruturado(rua, numero, bairro, cidade, estado, cep)
+            .or(() -> geocodeEnderecoCompleto(rua, numero, complemento, bairro, cidade, estado, cep));
+    }
+
+    private Optional<GeoCoordinates> geocodeEnderecoEstruturado(
+        String rua,
+        String numero,
+        String bairro,
+        String cidade,
+        String estado,
+        String cep
+    ) {
+        if (rua == null || rua.isBlank() || numero == null || numero.isBlank()
+            || cidade == null || cidade.isBlank() || estado == null || estado.isBlank()) {
+            return Optional.empty();
+        }
+
+        String street = rua.trim() + ", " + numero.trim();
+        StringBuilder path = new StringBuilder(NOMINATIM_SEARCH)
+            .append("?format=json&limit=1&countrycodes=br")
+            .append("&street=").append(URLEncoder.encode(street, StandardCharsets.UTF_8))
+            .append("&city=").append(URLEncoder.encode(cidade.trim(), StandardCharsets.UTF_8))
+            .append("&state=").append(URLEncoder.encode(estado.trim(), StandardCharsets.UTF_8));
+
+        if (bairro != null && !bairro.isBlank()) {
+            path.append("&suburb=").append(URLEncoder.encode(bairro.trim(), StandardCharsets.UTF_8));
+        }
+
+        String cepFormatado = formatarCepConsulta(cep);
+        if (!cepFormatado.isBlank()) {
+            path.append("&postalcode=").append(URLEncoder.encode(cepFormatado, StandardCharsets.UTF_8));
+        }
+
+        String cacheKey = "structured:" + path.toString().toLowerCase();
+        return geocodeViaNominatimUri(URI.create(path.toString()), cacheKey);
+    }
+
+    /**
+     * Coordenadas pelo CEP (sem validar cidade/UF) e, se a Brasil API nao trouxer lat/long,
+     * consulta o Nominatim com bairro/cidade/UF retornados pelo CEP.
+     */
+    private Optional<GeoCoordinates> geocodePorCepAproximado(String cep) {
+        if (cep == null || cep.isBlank()) {
+            return Optional.empty();
+        }
+
+        Optional<GeoCoordinates> coordenadas = cepGeocodingService.buscarCoordenadas(cep);
+        if (coordenadas.isPresent()) {
+            return coordenadas;
+        }
+
+        return cepGeocodingService.buscarEndereco(cep)
+            .flatMap(endereco -> geocodeViaNominatim(montarConsultaLocalidade(
+                endereco.bairro(),
+                endereco.cidade(),
+                endereco.estado(),
+                endereco.cep()
+            )));
+    }
+
+    private Optional<GeoCoordinates> geocodePorLocalidade(
+        String bairro,
+        String cidade,
+        String estado,
+        String cep
+    ) {
+        String consulta = montarConsultaLocalidade(bairro, cidade, estado, cep);
+        if (consulta.isBlank()) {
+            return Optional.empty();
+        }
+        return geocodeViaNominatim(consulta);
+    }
+
+    private String montarConsultaLocalidade(String bairro, String cidade, String estado, String cep) {
+        if (cidade == null || cidade.isBlank() || estado == null || estado.isBlank()) {
+            return "";
+        }
+
+        List<String> partes = new ArrayList<>();
+        if (bairro != null && !bairro.isBlank()) {
+            partes.add(bairro.trim());
+        }
+        String cepFormatado = formatarCepConsulta(cep);
+        if (!cepFormatado.isBlank()) {
+            partes.add(cepFormatado);
+        }
+        partes.add(cidade.trim());
+        partes.add(estado.trim());
+        partes.add("Brasil");
+        return String.join(", ", partes);
+    }
+
+    private String formatarCepConsulta(String cep) {
+        if (cep == null) {
+            return "";
+        }
+        String digits = cep.replaceAll("\\D", "");
+        if (digits.length() != 8) {
+            return "";
+        }
+        return digits.substring(0, 5) + "-" + digits.substring(5);
     }
 
     private Optional<GeoCoordinates> geocodePorCep(String cep, String cidade, String estado) {
@@ -106,47 +244,50 @@ public class GeocodingService {
             return Optional.empty();
         }
 
-        String cacheKey = query.trim().toLowerCase();
+        String encoded = URLEncoder.encode(query.trim(), StandardCharsets.UTF_8);
+        URI uri = URI.create(
+            NOMINATIM_SEARCH + "?format=json&limit=1&countrycodes=br&q=" + encoded
+        );
+        String cacheKey = "q:" + query.trim().toLowerCase();
+        return geocodeViaNominatimUri(uri, cacheKey);
+    }
+
+    private Optional<GeoCoordinates> geocodeViaNominatimUri(URI uri, String cacheKey) {
         Optional<GeoCoordinates> cached = nominatimCache.get(cacheKey);
         if (cached != null) {
             return cached;
         }
 
         if (System.currentTimeMillis() < nominatimBlockedUntilMs) {
-            log.debug("Nominatim em pausa por limite de taxa; consulta adiada: {}", query);
+            log.debug("Nominatim em pausa por limite de taxa; consulta adiada: {}", cacheKey);
             return Optional.empty();
         }
 
-        Optional<GeoCoordinates> result = executarNominatimComRetentativa(query);
+        Optional<GeoCoordinates> result = executarNominatimComRetentativa(uri);
         nominatimCache.put(cacheKey, result);
         return result;
     }
 
-    private Optional<GeoCoordinates> executarNominatimComRetentativa(String query) {
+    private Optional<GeoCoordinates> executarNominatimComRetentativa(URI uri) {
         for (int tentativa = 0; tentativa <= MAX_RETRIES; tentativa++) {
             try {
-                return Optional.ofNullable(buscarCoordenadasNominatim(query));
+                return Optional.ofNullable(buscarCoordenadasNominatim(uri));
             } catch (RateLimitExceededException ex) {
                 if (tentativa == MAX_RETRIES) {
-                    log.warn("Limite de taxa do Nominatim atingido para '{}'.", query);
+                    log.warn("Limite de taxa do Nominatim atingido para '{}'.", uri);
                     return Optional.empty();
                 }
                 aguardarRetentativa(tentativa);
             } catch (RestClientException | NumberFormatException ex) {
-                log.warn("Falha ao geocodificar endereco '{}': {}", query, ex.getMessage());
+                log.warn("Falha ao geocodificar endereco '{}': {}", uri, ex.getMessage());
                 return Optional.empty();
             }
         }
         return Optional.empty();
     }
 
-    private GeoCoordinates buscarCoordenadasNominatim(String query) {
+    private GeoCoordinates buscarCoordenadasNominatim(URI uri) {
         awaitNominatimRateLimit();
-
-        String encoded = URLEncoder.encode(query.trim(), StandardCharsets.UTF_8);
-        URI uri = URI.create(
-            NOMINATIM_SEARCH + "?format=json&limit=1&countrycodes=br&q=" + encoded
-        );
 
         List<NominatimResult> results;
         try {
@@ -166,7 +307,7 @@ public class GeocodingService {
         }
 
         if (results == null || results.isEmpty()) {
-            log.debug("Nominatim sem resultado para: {}", query);
+            log.debug("Nominatim sem resultado para: {}", uri);
             return null;
         }
 
