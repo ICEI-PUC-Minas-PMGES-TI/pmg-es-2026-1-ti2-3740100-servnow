@@ -12,10 +12,17 @@ import "./MapaOportunidades.css";
 
 const CENTRO_PADRAO: [number, number] = [-43.9345, -19.9167];
 
+export type LocalPrestadorMapa = {
+  latitude: number;
+  longitude: number;
+  endereco?: string;
+};
+
 type MapaOportunidadesProps = {
   oportunidades: OportunidadeSolicitacao[];
   onSelecionar: (item: OportunidadeSolicitacao) => void;
   semLocalizacao: number;
+  localPrestador?: LocalPrestadorMapa | null;
 };
 
 function temCoordenadas(item: OportunidadeSolicitacao): item is OportunidadeSolicitacao & {
@@ -48,23 +55,45 @@ function calcularZoom(quantidade: number): number {
   return 11;
 }
 
-export function MapaOportunidades({ oportunidades, onSelecionar, semLocalizacao }: MapaOportunidadesProps) {
-  const comCoordenadas = useMemo(() => oportunidades.filter(temCoordenadas), [oportunidades]);
-
-  const center = useMemo(
-    () =>
-      calcularCentro(
-        comCoordenadas.map((item) => ({
-          longitude: item.longitude,
-          latitude: item.latitude,
-        })),
-      ),
-    [comCoordenadas],
+function temLocalPrestador(
+  local: LocalPrestadorMapa | null | undefined,
+): local is LocalPrestadorMapa {
+  return (
+    local != null &&
+    Number.isFinite(local.latitude) &&
+    Number.isFinite(local.longitude)
   );
+}
 
-  const zoom = calcularZoom(comCoordenadas.length);
+export function MapaOportunidades({
+  oportunidades,
+  onSelecionar,
+  semLocalizacao,
+  localPrestador,
+}: MapaOportunidadesProps) {
+  const comCoordenadas = useMemo(() => oportunidades.filter(temCoordenadas), [oportunidades]);
+  const prestadorNoMapa = temLocalPrestador(localPrestador);
 
-  if (comCoordenadas.length === 0) {
+  const pontosCentro = useMemo(() => {
+    const pontos = comCoordenadas.map((item) => ({
+      longitude: item.longitude,
+      latitude: item.latitude,
+    }));
+    if (prestadorNoMapa) {
+      pontos.push({
+        longitude: localPrestador.longitude,
+        latitude: localPrestador.latitude,
+      });
+    }
+    return pontos;
+  }, [comCoordenadas, prestadorNoMapa, localPrestador]);
+
+  const center = useMemo(() => calcularCentro(pontosCentro), [pontosCentro]);
+
+  const totalMarcadores = comCoordenadas.length + (prestadorNoMapa ? 1 : 0);
+  const zoom = calcularZoom(totalMarcadores);
+
+  if (comCoordenadas.length === 0 && !prestadorNoMapa) {
     return (
       <div className="mapa-oportunidades mapa-oportunidades--vazio">
         <MapPin size={28} />
@@ -80,14 +109,47 @@ export function MapaOportunidades({ oportunidades, onSelecionar, semLocalizacao 
 
   return (
     <div className="mapa-oportunidades">
+      {prestadorNoMapa && (
+        <p className="mapa-oportunidades-legenda">
+          <span className="mapa-oportunidades-legenda-item mapa-oportunidades-legenda-prestador" />
+          Sua localizacao (perfil)
+          <span className="mapa-oportunidades-legenda-item mapa-oportunidades-legenda-oportunidade" />
+          Oportunidades
+        </p>
+      )}
       {semLocalizacao > 0 && (
         <p className="mapa-oportunidades-aviso">
           {semLocalizacao} solicitacao(oes) nao aparecem no mapa por falta de coordenadas.
         </p>
       )}
+      {comCoordenadas.length === 0 && prestadorNoMapa && (
+        <p className="mapa-oportunidades-aviso">
+          Nenhuma oportunidade com coordenadas no momento. O mapa mostra apenas sua localizacao de referencia.
+        </p>
+      )}
       <div className="mapa-oportunidades-container">
         <Map center={center} zoom={zoom} className="mapa-oportunidades-map">
           <MapControls showZoom showLocate />
+          {prestadorNoMapa && (
+            <MapMarker
+              longitude={localPrestador.longitude}
+              latitude={localPrestador.latitude}
+            >
+              <MarkerContent className="mapa-oportunidades-marker mapa-oportunidades-marker-prestador">
+                <span className="mapa-oportunidades-marker-dot mapa-oportunidades-marker-dot-prestador" />
+              </MarkerContent>
+              <MarkerPopup closeButton>
+                <div className="mapa-oportunidades-popup">
+                  <strong>Sua localizacao</strong>
+                  {localPrestador.endereco ? (
+                    <p>{localPrestador.endereco}</p>
+                  ) : (
+                    <p className="mapa-oportunidades-popup-meta">Base cadastrada no seu perfil</p>
+                  )}
+                </div>
+              </MarkerPopup>
+            </MapMarker>
+          )}
           {comCoordenadas.map((item) => {
             const tipoServico = TIPOS_SERVICO_MAP[item.tipoServico];
             const titulo = tipoServico?.nome ?? item.tipoServico;

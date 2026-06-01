@@ -10,9 +10,11 @@ import {
   buscarPerfilPublico,
   getValidAuthSession,
   type PerfilPublicoResponse,
+  type PerfilResponse,
   type PropostaCreateRequest,
   type SolicitacaoServicoResponse,
 } from "../../../../services/auth";
+import type { LocalPrestadorMapa } from "../../../../Components/Mapa/MapaOportunidades";
 import { PerfilPublicoConteudo } from "../../../../Components/Perfil/PerfilPublicoModal";
 import { SolicitacaoDetalhesModal } from "../../../../Components/Solicitacao/SolicitacaoDetalhesModal";
 import { SolicitacaoImagemThumb } from "../../../../Components/Solicitacao/SolicitacaoImagemThumb";
@@ -45,6 +47,50 @@ export function Solicitacoes() {
   const [perfilCliente, setPerfilCliente] = useState<PerfilPublicoResponse | null>(null);
   const [carregandoPerfilCliente, setCarregandoPerfilCliente] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
+  const [localPrestador, setLocalPrestador] = useState<LocalPrestadorMapa | null>(null);
+
+  useEffect(() => {
+    async function carregarLocalPrestador() {
+      const session = getValidAuthSession();
+      if (!session?.token) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/perfil/prestador`, {
+          headers: authHeader(session.token),
+        });
+        if (!response.ok) {
+          return;
+        }
+
+        const perfil = (await response.json()) as PerfilResponse;
+        if (
+          perfil.latitude == null ||
+          perfil.longitude == null ||
+          !Number.isFinite(perfil.latitude) ||
+          !Number.isFinite(perfil.longitude)
+        ) {
+          return;
+        }
+
+        const endereco = [perfil.rua, perfil.numero, perfil.bairro, perfil.cidade, perfil.estado]
+          .filter(Boolean)
+          .join(", ");
+
+        setLocalPrestador({
+          latitude: perfil.latitude,
+          longitude: perfil.longitude,
+          endereco: endereco || undefined,
+        });
+      } catch {
+        // Local do prestador e opcional no mapa.
+      }
+    }
+
+    void carregarLocalPrestador();
+  }, [navigate]);
+
   useEffect(() => {
     async function carregarSolicitacoes() {
       const session = getValidAuthSession();
@@ -300,11 +346,19 @@ export function Solicitacoes() {
         </div>
 
         {visualizacao === "mapa" && !isLoading && lista.length > 0 && (
-          <MapaOportunidades
-            oportunidades={lista}
-            semLocalizacao={semLocalizacaoNoMapa}
-            onSelecionar={(item: OportunidadeSolicitacao) => setDetalheAberto(item)}
-          />
+          <>
+            {!localPrestador && (
+              <p className="painel-filtro-aviso">
+                Cadastre seu endereco completo em Configurar perfil para ver sua localizacao como referencia no mapa.
+              </p>
+            )}
+            <MapaOportunidades
+              oportunidades={lista}
+              semLocalizacao={semLocalizacaoNoMapa}
+              localPrestador={localPrestador}
+              onSelecionar={(item: OportunidadeSolicitacao) => setDetalheAberto(item)}
+            />
+          </>
         )}
 
         {isLoading ? (
