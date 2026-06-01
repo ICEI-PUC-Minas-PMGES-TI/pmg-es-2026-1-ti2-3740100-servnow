@@ -1094,63 +1094,99 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border-radius: 14px;
-  background: var(--workspace-surface-soft);
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--workspace-surface);
   border: 1px solid var(--workspace-border);
 }
 
-.acomp-rota-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.acomp-rota-endereco {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  color: var(--workspace-text);
+  line-height: 1.5;
+  color: var(--workspace-muted);
 }
 
-.acomp-rota-label svg {
-  color: var(--brand-strong);
+.acomp-rota-endereco svg {
   flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--brand-strong);
 }
 
 .acomp-rota-botoes {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .acomp-rota-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
   flex: 1;
-  min-width: 150px;
-  padding: 11px 16px;
-  border-radius: 12px;
-  border: none;
+  min-width: 140px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-surface-soft);
   font-family: 'Plus Jakarta Sans', 'Sora', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--workspace-text);
   cursor: pointer;
-  transition: filter 0.18s, transform 0.18s;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+}
+
+.acomp-rota-btn-seta {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--workspace-muted);
+  transition: color 0.18s, transform 0.18s;
 }
 
 .acomp-rota-btn:hover {
-  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
-.acomp-rota-btn.google {
-  background: #1a73e8;
+.acomp-rota-btn:hover .acomp-rota-btn-seta {
+  transform: translateX(2px);
 }
 
-.acomp-rota-btn.waze {
-  background: #33ccff;
-  color: #0a2540;
+.acomp-rota-btn.google:hover {
+  border-color: rgba(26, 115, 232, 0.45);
+  background: rgba(26, 115, 232, 0.08);
+  color: #1a73e8;
+}
+
+.acomp-rota-btn.google:hover .acomp-rota-btn-seta {
+  color: #1a73e8;
+}
+
+.acomp-rota-btn.waze:hover {
+  border-color: rgba(0, 168, 232, 0.5);
+  background: rgba(51, 204, 255, 0.1);
+  color: #0096c7;
+}
+
+.acomp-rota-btn.waze:hover .acomp-rota-btn-seta {
+  color: #0096c7;
+}
+
+:root[data-theme="dark"] .acomp-rota-btn {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme="dark"] .acomp-rota-btn.google:hover {
+  background: rgba(26, 115, 232, 0.14);
+}
+
+:root[data-theme="dark"] .acomp-rota-btn.waze:hover {
+  background: rgba(51, 204, 255, 0.12);
 }
 
 .acomp-codigo-input-grupo {

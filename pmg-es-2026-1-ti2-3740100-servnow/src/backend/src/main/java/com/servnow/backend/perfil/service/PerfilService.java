@@ -182,10 +182,20 @@ public class PerfilService {
     }
 
     private void aplicarGeocodificacao(Usuario usuario) {
-        geocodingService.geocode(usuario).ifPresent(coords -> {
-            usuario.setLatitude(coords.latitude());
-            usuario.setLongitude(coords.longitude());
-        });
+        Double latitudeAnterior = usuario.getLatitude();
+        Double longitudeAnterior = usuario.getLongitude();
+        usuario.setLatitude(null);
+        usuario.setLongitude(null);
+        geocodingService.geocode(usuario).ifPresentOrElse(
+            coords -> {
+                usuario.setLatitude(coords.latitude());
+                usuario.setLongitude(coords.longitude());
+            },
+            () -> {
+                usuario.setLatitude(latitudeAnterior);
+                usuario.setLongitude(longitudeAnterior);
+            }
+        );
     }
 
     private Usuario garantirCoordenadasSePossivel(Usuario usuario) {
@@ -426,6 +436,8 @@ public class PerfilService {
             usuario.getChavePix(),
             resumoAvaliacoes.media(),
             resumoAvaliacoes.total(),
+            usuario.getLatitude(),
+            usuario.getLongitude(),
             enderecos,
             chavesPix
         );

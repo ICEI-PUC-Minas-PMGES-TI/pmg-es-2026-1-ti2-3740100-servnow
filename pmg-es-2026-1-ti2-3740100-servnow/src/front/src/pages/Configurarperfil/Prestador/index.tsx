@@ -89,7 +89,7 @@ export function PrestadorPerfil({
               <button
                 type="button"
                 key={tipo.value}
-                className={`perfil-tag ${ativo ? "ativo" : ""}`}
+                className={`perfil-btn ${ativo ? "perfil-btn-primary" : "perfil-btn-secondary"}`}
                 onClick={() => toggleEspecialidade(tipo.value)}
               >
                 {tipo.label}
@@ -110,7 +110,7 @@ export function PrestadorPerfil({
               <button
                 type="button"
                 key={dia.value}
-                className={`perfil-tag ${ativo ? "ativo" : ""}`}
+                className={`perfil-btn ${ativo ? "perfil-btn-primary" : "perfil-btn-secondary"}`}
                 onClick={() => toggleDiaDisponivel(dia.value)}
               >
                 {dia.label}

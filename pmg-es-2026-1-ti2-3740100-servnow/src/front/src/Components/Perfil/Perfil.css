@@ -265,32 +265,6 @@
   font-size: 16px;
 }
 
-.perfil-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 9px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--workspace-border);
-  background: var(--workspace-surface-soft);
-  color: var(--workspace-text);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
-}
-
-.perfil-tag:hover {
-  border-color: var(--perfil-accent-border);
-  transform: translateY(-1px);
-}
-
-.perfil-tag.ativo {
-  background: linear-gradient(135deg, var(--perfil-accent), var(--perfil-accent-strong));
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 6px 16px var(--perfil-accent-shadow);
-}
-
 .perfil-foto-preview {
   display: flex;
   flex-direction: column;

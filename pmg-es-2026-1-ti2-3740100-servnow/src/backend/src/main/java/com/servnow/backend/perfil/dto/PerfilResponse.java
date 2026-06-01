@@ -29,6 +29,8 @@ public record PerfilResponse(
     String chavePix,
     Double avaliacaoMedia,
     Long totalAvaliacoes,
+    Double latitude,
+    Double longitude,
     List<ClienteEnderecoResponse> enderecos,
     List<ClienteChavePixResponse> chavesPix
 ) {
