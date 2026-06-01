@@ -6,6 +6,7 @@ import { PainelSectionHeader } from "../../../../Components/Painel/PainelSection
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
 import { listarAvaliacoesRecebidas } from "../../../../services/perfil";
 import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../../../utils/formatarAvaliacao";
+import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 import { getFaixaPrecoLabel, getStatusClass, getStatusLabel } from "../../../../utils/solicitacaoLabels";
 
@@ -21,6 +22,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
   const [isLoading, setIsLoading] = useState(true);
   const [avaliacaoMedia, setAvaliacaoMedia] = useState<number | null>(null);
   const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
+  const [agendadas, setAgendadas] = useState<SolicitacaoServicoResponse[]>([]);
 
   useEffect(() => {
     async function carregarSolicitacoes() {
@@ -68,11 +70,33 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
       });
   }, []);
 
+  useEffect(() => {
+    const session = getValidAuthSession();
+    if (!session?.token) {
+      return;
+    }
+    void fetch(`${API_URL}/api/solicitacoes/prestador/agendadas`, {
+      headers: authHeader(session.token),
+    })
+      .then((response) => (response.ok ? response.json() : []))
+      .then((dados) => setAgendadas(dados as SolicitacaoServicoResponse[]))
+      .catch(() => setAgendadas([]));
+  }, []);
+
   const solicitacoesRecentes = useMemo(() => solicitacoes.slice(0, 3), [solicitacoes]);
   const oportunidadesNovas = useMemo(
     () => solicitacoes.filter((item) => item.status === "PUBLICADO" || item.status === "AGUARDANDO_PROPOSTAS").length,
     [solicitacoes],
   );
+
+  // Ganhos do mes: soma dos servicos agendados para o mes corrente.
+  const ganhosMes = useMemo(() => {
+    const mesAtual = new Date().toISOString().slice(0, 7);
+    return agendadas.reduce((soma, item) => {
+      const referencia = (item.data ?? item.aceitoEm ?? item.criadoEm ?? "").slice(0, 7);
+      return referencia === mesAtual ? soma + (item.valorAceito ?? 0) : soma;
+    }, 0);
+  }, [agendadas]);
 
   return (
     <>
@@ -97,8 +121,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
             <Wallet size={22} />
           </div>
           <span className="painel-stat-label">Ganhos no mes</span>
-          <strong className="painel-stat-valor">R$ 3.840</strong>
-          <span className="painel-stat-detalhe">+18% vs. mes anterior</span>
+          <strong className="painel-stat-valor">{formatarMoedaBrl(ganhosMes)}</strong>
+          <span className="painel-stat-detalhe">Servicos agendados para este mes</span>
         </div>
 
         <div className="painel-stat-card">
