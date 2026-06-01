@@ -155,6 +155,17 @@
   align-items: stretch;
 }
 
+.agenda-servico-descricao {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--workspace-surface-soft);
+  border: 1px solid var(--workspace-border);
+  color: var(--workspace-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 @media (min-width: 640px) {
   .agenda-servico {
     flex-direction: row;

@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ChangeEvent } from "react";
 import {
   ArrowLeft,
-  Camera,
   Calendar,
+  Camera,
   CheckCircle2,
   Clock,
   Copy,
@@ -14,6 +12,8 @@ import {
   Smartphone,
   Star,
 } from "lucide-react";
+import type { ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -24,13 +24,12 @@ import {
   avaliarCliente,
   carregarPixCopiaCola,
   carregarPixQrCode,
-  confirmarChegada,
   concluirExecucao,
-  iniciarAcompanhamento,
+  confirmarChegada,
   obterDetalhe,
   registrarAtualizacao,
   solicitarReagendamento,
-  type AcompanhamentoDetalhe,
+  type AcompanhamentoDetalhe
 } from "../../../../services/acompanhamento";
 import {
   formatarDataHoraAcompanhamento,
@@ -92,7 +91,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
   const carregar = useCallback(async () => {
     try {
-      const dados = await iniciarAcompanhamento(solicitacaoId);
+      const dados = await obterDetalhe(solicitacaoId);
       setDetalhe(dados);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao carregar acompanhamento.");

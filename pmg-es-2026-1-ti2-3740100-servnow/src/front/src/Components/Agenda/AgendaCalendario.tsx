@@ -5,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, Clock, DollarSign, MapPin, User } 
 import type { SolicitacaoServicoResponse } from "../../services/auth";
 import { formatarMoedaBrl } from "../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../utils/tiposServico";
+import { BotaoRota } from "../Acompanhamento/BotaoRota";
 import "./Agenda.css";
 
 type AgendaCalendarioProps = {
@@ -154,6 +155,14 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
                           {formatarMoedaBrl(item.valorAceito)}
                         </span>
                       </div>
+                      {item.descricao && (
+                        <p className="agenda-servico-descricao">{item.descricao}</p>
+                      )}
+                      {papel === "PRESTADOR" && (
+                        <div style={{ marginTop: 12 }}>
+                          <BotaoRota endereco={item.endereco} />
+                        </div>
+                      )}
                     </div>
                     <div className="painel-lista-item-acoes">
                       <span className="painel-status agendado">Agendado</span>

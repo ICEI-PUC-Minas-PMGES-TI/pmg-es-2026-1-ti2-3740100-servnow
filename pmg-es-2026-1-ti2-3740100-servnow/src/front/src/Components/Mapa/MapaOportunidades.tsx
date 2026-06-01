@@ -86,7 +86,7 @@ export function MapaOportunidades({ oportunidades, onSelecionar, semLocalizacao 
         </p>
       )}
       <div className="mapa-oportunidades-container">
-        <Map center={center} zoom={zoom} theme="light" className="mapa-oportunidades-map">
+        <Map center={center} zoom={zoom} className="mapa-oportunidades-map">
           <MapControls showZoom showLocate />
           {comCoordenadas.map((item) => {
             const tipoServico = TIPOS_SERVICO_MAP[item.tipoServico];
