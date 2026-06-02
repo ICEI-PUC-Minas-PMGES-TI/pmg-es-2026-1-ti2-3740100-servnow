@@ -95,11 +95,17 @@ public class AcompanhamentoService {
             .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AcompanhamentoDetalheResponse obterDetalhe(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
         SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
-        validarPodeAcompanhar(solicitacao);
-        OrdemServico ordem = obterOuCriarOrdem(solicitacao);
+        validarPodeConsultarDetalhe(solicitacao);
+        OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                solicitacao.getStatus() == StatusSolicitacao.AGENDADA
+                    ? "Ordem de servico ainda nao iniciada."
+                    : "Ordem de servico nao encontrada."
+            ));
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
 
@@ -544,6 +550,16 @@ public class AcompanhamentoService {
     private void validarPodeAcompanhar(SolicitacaoServico solicitacao) {
         if (solicitacao.getStatus() != StatusSolicitacao.AGENDADA) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta solicitacao nao esta disponivel para acompanhamento.");
+        }
+        if (solicitacao.getPrestador() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta solicitacao ainda nao possui prestador vinculado.");
+        }
+    }
+
+    private void validarPodeConsultarDetalhe(SolicitacaoServico solicitacao) {
+        if (solicitacao.getStatus() != StatusSolicitacao.AGENDADA
+            && solicitacao.getStatus() != StatusSolicitacao.CONCLUIDA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Detalhes indisponiveis para esta solicitacao.");
         }
         if (solicitacao.getPrestador() == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta solicitacao ainda nao possui prestador vinculado.");
