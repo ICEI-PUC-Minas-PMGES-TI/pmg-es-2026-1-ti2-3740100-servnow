@@ -1,20 +1,19 @@
 ## 5. Indicadores de desempenho
 
-_Apresente aqui os principais indicadores de desempenho e algumas metas para o processo. Atenção: as informações necessárias para gerar os indicadores devem estar contempladas no modelo relacional. Defina no mínimo 3 indicadores de desempenho._
-
-_Usar o seguinte modelo:_
-
 | **Indicador** | **Objetivos** | **Descrição** | **Fonte de dados** | **Fórmula de cálculo** |
 | ---           | ---           | ---           | ---             | ---             |
 | Avaliação média| Medir a reputação de clientes e prestadores na plataforma |Média das notas de 1 a 5 estrelas, considerando apenas serviços concluídos e pagos. | Tabela AVALIACAO E  USUARIO | somadasavaliações / número totaldeavaliacoes |
-| Serviços concluídos | Medir o volume de serviços finalizados com sucesso na plataforma| Contagem de ordens de serviço encerradas somente após a confirmação de pagamento | Tabela ORDEM_SERVICO| Numero de ordens de serviço concluidas |
-| Gastos mensais (cliente) / Ganhos mensais (prestador)| Acompanhar o fluxo financeiro mensal dos usuários na plataforma | Cliente: total pago em serviços no ano/mês/semana Prestador: total recebido por serviços prestados no mesmo período| Tabela ORDEM_SERVICO e PAGAMENTO | totalrecebido/mes/ano/semana
+| Percentual de efetividade |Medir a taxa de sucesso dos serviços realizados pelo prestador|Representa a porcentagem de serviços concluídos em relação ao total de serviços recebidos pelo prestador em um determinado período.| Tabela ORDEM_SERVICO e SOLICITAÇÃO| (Número de serviços concluídos ÷ Número total de serviços recebidos) × 100  |
+| Participação nos Ganhos Totais da Plataforma| Medir a representatividade financeira do prestador dentro da plataforma | exibe o percentual do faturamento do prestador em relação ao faturamento total gerado por todos os prestadores da plataforma| Tabela ORDEM_SERVICO e PAGAMENTO | (Total recebido pelo prestador ÷ Total faturado pela plataforma) × 100|
+| Participação nos Ganhos Totais  por tipo de serviço| Medir a representatividade financeira do prestador dentro da plataforma | exibe o percentual do faturamento do prestador em relação ao faturamento total por categorias de serviço gerado por todos os prestadores da plataforma| Tabela ORDEM_SERVICO e PAGAMENTO | (Total recebido pelo prestador na categoria ÷ Total faturado pela plataforma na categoria) × 100|
 
 ### Metas 
 
 | **Indicador** | Meta  |
 | --- | --- |
 | Avaliação média | Manter média ≥ 4,0 estrelas (escala 1–5) para prestadores e clientes ativos |
-| Serviços concluídos | Aumentar o número de serviços concluídos e pagos por mês (5/mês por prestador ativo) |
-| Gastos / ganhos mensais | Cliente: controle de orçamento mensal  Prestador: meta de receita mensal conforme perfil profissional |
+| Percentual de Efetividade                        | ≥ 85%                                                   |
+| Participação nos Ganhos Totais da Plataforma     | Crescimento mensal ≥ 5%                                 |
+| Participação nos Ganhos por Categoria de Serviço | Crescimento trimestral ≥ 10% em cada categoria atendida |
+
 
