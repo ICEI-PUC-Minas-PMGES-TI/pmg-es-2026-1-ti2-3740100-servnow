@@ -1,0 +1,30 @@
+# Sobe o front e o back em containers.
+# Banco de dados NAO entra aqui: o backend ja conecta no Supabase hospedado
+# (config em src/backend/src/main/resources/application.properties).
+#
+# Uso local:
+#   docker compose up --build
+#   front: http://localhost:5173   |   back: http://localhost:8080
+
+services:
+  backend:
+    build:
+      context: ./src/backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Libera o front (local e hospedado) no CORS. Separe por virgula.
+      APP_CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:5174"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./src/front
+      args:
+        # URL do backend que o navegador vai chamar.
+        VITE_API_URL: "http://localhost:8080"
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
