@@ -55,6 +55,7 @@ Base URL local: `http://localhost:8080`
 | `GET` | `/api/solicitacoes/prestador/agendadas` | Lista solicitações **AGENDADA** do prestador logado. |
 | `GET` | `/api/solicitacoes/cliente/pagas` | Lista serviços do cliente com **pagamento confirmado** (ganhos/gastos no painel). |
 | `GET` | `/api/solicitacoes/prestador/pagas` | Lista serviços do prestador com **pagamento confirmado** (gráfico de ganhos). |
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=mes\|semana` | Métricas do prestador: receita, efetividade, participação na plataforma e por tipo de serviço. |
 | `PUT` | `/api/solicitacoes/{id}` | Cliente edita solicitação (JSON ou `multipart`; parâmetro `removerImagem`). |
 | `DELETE` | `/api/solicitacoes/{id}` | Cliente exclui solicitação (se permitido pelo status). |
 | `GET` | `/api/solicitacoes/{id}/imagem` | Baixa a imagem anexada à solicitação. |
@@ -100,6 +101,15 @@ Quando cliente e prestador avaliam, a solicitação passa para status **CONCLUID
 
 ---
 
+## Métricas do prestador — `/api/solicitacoes/prestador/indicadores`
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=mes` | Receita, efetividade, participação na plataforma e por tipo de serviço (últimos 6 meses). |
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=semana` | Mesmas métricas para a semana atual (por dia). |
+
+---
+
 ## Notificações — `/api/notificacoes`
 
 | Método | Rota | Descrição |
@@ -119,7 +129,7 @@ Quando cliente e prestador avaliam, a solicitação passa para status **CONCLUID
 | Início cliente — gastos do mês | `GET /api/solicitacoes/cliente/pagas` |
 | Início cliente — próximo serviço | `GET /api/solicitacoes/cliente/agendadas` |
 | Início prestador — ganhos do mês | `GET /api/solicitacoes/prestador/pagas` |
-| Gráfico de ganhos | `GET /api/solicitacoes/prestador/pagas` |
+| Métricas do prestador | `GET /api/solicitacoes/prestador/indicadores?periodo=mes` ou `semana` |
 | Agenda | `GET /api/solicitacoes/cliente/agendadas` ou `/prestador/agendadas` |
 | Fotos de perfil/solicitação | `GET /api/perfil/...`, `GET /api/solicitacoes/{id}/imagem` |
 

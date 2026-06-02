@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.servnow.backend.acompanhamento.domain.OrdemServico;
+import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
 
 public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long> {
 
@@ -103,4 +104,21 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
         ORDER BY o.concluidoEm DESC NULLS LAST, s.aceitoEm DESC
         """)
     List<OrdemServico> findPagasDoPrestador(@Param("prestadorId") Long prestadorId);
+
+    @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        JOIN FETCH s.prestador
+        WHERE o.metodoPagamento IS NOT NULL
+        """)
+    List<OrdemServico> findAllPagas();
+
+    @Query("""
+        SELECT o FROM OrdemServico o
+        JOIN FETCH o.solicitacao s
+        LEFT JOIN FETCH s.prestador
+        WHERE s.status = :status
+        ORDER BY o.concluidoEm DESC NULLS LAST, s.aceitoEm DESC
+        """)
+    List<OrdemServico> findBySolicitacaoStatus(@Param("status") StatusSolicitacao status);
 }

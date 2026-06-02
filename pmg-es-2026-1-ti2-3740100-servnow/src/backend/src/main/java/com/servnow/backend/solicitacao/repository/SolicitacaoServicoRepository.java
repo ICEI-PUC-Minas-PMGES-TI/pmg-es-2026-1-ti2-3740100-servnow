@@ -24,5 +24,6 @@ public interface SolicitacaoServicoRepository extends JpaRepository<SolicitacaoS
     long deleteByIdAndClienteId(Long id, Long clienteId);
     List<SolicitacaoServico> findByClienteIdAndStatusOrderByAceitoEmDesc(Long clienteId, StatusSolicitacao status);
     List<SolicitacaoServico> findByPrestadorIdAndStatusOrderByAceitoEmDesc(Long prestadorId, StatusSolicitacao status);
+    List<SolicitacaoServico> findByPrestadorIdOrderByAceitoEmDesc(Long prestadorId);
     Optional<SolicitacaoServico> findFirstByLatitudeIsNullAndCepIsNotNullOrderByIdAsc();
 }

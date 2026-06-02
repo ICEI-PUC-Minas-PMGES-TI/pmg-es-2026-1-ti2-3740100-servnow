@@ -21,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.servnow.backend.ArmazenamentoImagens.ArquivoStorage;
+import com.servnow.backend.indicadores.dto.IndicadorPrestadorResponse;
+import com.servnow.backend.indicadores.service.IndicadorPrestadorService;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.dto.SolicitacaoServicoCreateRequest;
@@ -34,13 +36,16 @@ import jakarta.validation.Valid;
 public class SolicitacaoServicoController {
 
     private final SolicitacaoServicoService solicitacaoService;
+    private final IndicadorPrestadorService indicadorPrestadorService;
     private final ArquivoStorage arquivoStorage;
 
     public SolicitacaoServicoController(
         SolicitacaoServicoService solicitacaoService,
+        IndicadorPrestadorService indicadorPrestadorService,
         ArquivoStorage arquivoStorage
     ) {
         this.solicitacaoService = solicitacaoService;
+        this.indicadorPrestadorService = indicadorPrestadorService;
         this.arquivoStorage = arquivoStorage;
     }
 
@@ -94,6 +99,14 @@ public class SolicitacaoServicoController {
     @GetMapping({"/prestador/pagas", "/prestador/pagas/"})
     public List<SolicitacaoServicoResponse> listarPagasDoPrestador(@AuthenticationPrincipal UsuarioAutenticado usuario) {
         return solicitacaoService.listarPagasDoPrestador(usuario);
+    }
+
+    @GetMapping({"/prestador/indicadores", "/prestador/indicadores/"})
+    public IndicadorPrestadorResponse indicadoresDoPrestador(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @RequestParam(defaultValue = "mes") String periodo
+    ) {
+        return indicadorPrestadorService.obterIndicadores(usuario, periodo);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)

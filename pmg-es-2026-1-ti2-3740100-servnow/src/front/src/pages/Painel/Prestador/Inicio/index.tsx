@@ -15,10 +15,10 @@ import { getFaixaPrecoLabel, getStatusClass, getStatusLabel } from "../../../../
 type InicioProps = {
   onIrParaSolicitacoes: () => void;
   onIrParaPropostas: () => void;
-  onIrParaGanhos: () => void;
+  onIrParaMetricas: () => void;
 };
 
-export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos }: InicioProps) {
+export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaMetricas }: InicioProps) {
   const navigate = useNavigate();
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,7 +124,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
       <PainelSectionHeader
         eyebrow="Painel do prestador"
         title="Inicio"
-        description="Acompanhe novas solicitacoes, ganhos e avaliacoes dos seus atendimentos."
+        description="Acompanhe novas solicitacoes, metricas e avaliacoes dos seus atendimentos."
       />
 
       {!isLoading && proximoServico && (
@@ -184,7 +184,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
           <div className="painel-stat-icone">
             <Wallet size={22} />
           </div>
-          <span className="painel-stat-label">Ganhos no mes</span>
+          <span className="painel-stat-label">Receita no mes</span>
           <strong className="painel-stat-valor">{formatarMoedaBrl(ganhosMes)}</strong>
           <span className="painel-stat-detalhe">Servicos pagos neste mes</span>
         </div>
@@ -259,9 +259,9 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaGanhos
             <HandCoins size={20} />
             <span>Minhas propostas</span>
           </button>
-          <button type="button" className="painel-atalho-card" onClick={onIrParaGanhos}>
+          <button type="button" className="painel-atalho-card" onClick={onIrParaMetricas}>
             <BarChart3 size={20} />
-            <span>Ver ganhos</span>
+            <span>Ver metricas</span>
           </button>
         </div>
       </section>

@@ -19,7 +19,7 @@ import { Inicio } from "../../../pages/Painel/Prestador/Inicio";
 import { Solicitacoes } from "../../../pages/Painel/Prestador/Solicitacoes";
 import { Propostas } from "../../../pages/Painel/Prestador/Propostas";
 import { Agendamentos } from "../../../pages/Painel/Prestador/Agendamentos";
-import { Ganhos } from "../../../pages/Painel/Prestador/Ganhos";
+import { Metricas } from "../../../pages/Painel/Prestador/Metricas";
 import { Historico } from "../../../pages/Painel/Prestador/Historico";
 import { PerfilPrestador } from "../../../pages/Painel/Prestador/Perfil";
 
@@ -30,7 +30,7 @@ type Secao =
   | "solicitacoes"
   | "propostas"
   | "agendamentos"
-  | "ganhos"
+  | "metricas"
   | "historico"
   | "perfil";
 
@@ -45,13 +45,23 @@ const ITENS_MENU: ItemMenu[] = [
   { id: "solicitacoes", label: "Solicitacoes", icone: FileText },
   { id: "propostas", label: "Propostas", icone: HandCoins },
   { id: "agendamentos", label: "Agendamentos", icone: Calendar },
-  { id: "ganhos", label: "Ganhos", icone: BarChart3 },
+  { id: "metricas", label: "Metricas", icone: BarChart3 },
   { id: "historico", label: "Historico", icone: HistoryIcon },
   { id: "perfil", label: "Perfil", icone: User },
 ];
 
 function isSecao(value: string | null): value is Secao {
+  if (value === "ganhos") {
+    return true;
+  }
   return ITENS_MENU.some((item) => item.id === value);
+}
+
+function normalizarSecao(value: string | null): Secao {
+  if (value === "ganhos") {
+    return "metricas";
+  }
+  return isSecao(value) ? value : "inicio";
 }
 
 export function PainelPrestador() {
@@ -59,8 +69,7 @@ export function PainelPrestador() {
   const [searchParams, setSearchParams] = useSearchParams();
   const session = getAuthSession();
   const [secaoAtiva, setSecaoAtiva] = useState<Secao>(() => {
-    const secao = searchParams.get("secao");
-    return isSecao(secao) ? secao : "inicio";
+    return normalizarSecao(searchParams.get("secao"));
   });
 
   function handleLogout() {
@@ -69,10 +78,7 @@ export function PainelPrestador() {
   }
 
   useEffect(() => {
-    const secao = searchParams.get("secao");
-    if (isSecao(secao)) {
-      setSecaoAtiva(secao);
-    }
+    setSecaoAtiva(normalizarSecao(searchParams.get("secao")));
   }, [searchParams]);
 
   function handleSelecionarSecao(secao: Secao) {
@@ -116,13 +122,13 @@ export function PainelPrestador() {
             <Inicio
               onIrParaSolicitacoes={() => handleSelecionarSecao("solicitacoes")}
               onIrParaPropostas={() => handleSelecionarSecao("propostas")}
-              onIrParaGanhos={() => handleSelecionarSecao("ganhos")}
+              onIrParaMetricas={() => handleSelecionarSecao("metricas")}
             />
           )}
           {secaoAtiva === "solicitacoes" && <Solicitacoes />}
           {secaoAtiva === "propostas" && <Propostas />}
           {secaoAtiva === "agendamentos" && <Agendamentos />}
-          {secaoAtiva === "ganhos" && <Ganhos />}
+          {secaoAtiva === "metricas" && <Metricas />}
           {secaoAtiva === "historico" && <Historico />}
           {secaoAtiva === "perfil" && <PerfilPrestador />}
         </main>
