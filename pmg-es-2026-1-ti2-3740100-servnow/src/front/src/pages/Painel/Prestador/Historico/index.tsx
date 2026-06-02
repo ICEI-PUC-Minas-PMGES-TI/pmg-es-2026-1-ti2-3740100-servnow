@@ -181,7 +181,7 @@ export function Historico() {
                     </div>
                   </div>
                   <div className="painel-lista-item-acoes">
-                    <span className="painel-status concluído">Concluido</span>
+                    <span className="painel-status concluido">Concluido</span>
                     <button
                       type="button"
                       className="painel-btn-ghost"

@@ -45,7 +45,7 @@ export function DetalheOrdemHistorico({
               {contraparteLabel}: {contraparteNome}
             </p>
           </div>
-          <span className="painel-status concluído">Concluído</span>
+          <span className="painel-status concluido">Concluído</span>
         </div>
         <div className="acomp-card-servico-meta">
           {detalhe.data && (
