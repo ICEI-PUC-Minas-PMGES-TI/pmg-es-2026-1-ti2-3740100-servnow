@@ -4,6 +4,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Copy,
   CreditCard,
   MapPin,
   QrCode,
@@ -18,7 +19,8 @@ import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/Atualizac
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   avaliarServico,
-  confirmarPagamento,
+  carregarPixCopiaCola,
+  carregarPixQrCode,
   confirmarReagendamento,
   iniciarAcompanhamento,
   obterDetalhe,
@@ -78,7 +80,11 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
   const navigate = useNavigate();
   const [detalhe, setDetalhe] = useState<AcompanhamentoDetalhe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [metodoPagamento, setMetodoPagamento] = useState<MetodoPagamento>("PIX");
+  const [metodoPagamento, setMetodoPagamento] = useState<MetodoPagamento | null>(null);
+  const [pixQrUrl, setPixQrUrl] = useState<string | null>(null);
+  const [pixCopiaCola, setPixCopiaCola] = useState<string | null>(null);
+  const [carregandoPixQr, setCarregandoPixQr] = useState(false);
+  const [pixQrErro, setPixQrErro] = useState<string | null>(null);
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -102,18 +108,11 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
   }, [carregar]);
 
   useEffect(() => {
-    if (!detalhe || etapaBackendParaCliente(detalhe.etapa) !== "pagamento") {
+    if (!detalhe?.metodoPagamentoSelecionado) {
       return;
     }
-    if (detalhe.metodoPagamentoSelecionado === metodoPagamento) {
-      return;
-    }
-    void selecionarMetodoPagamento(solicitacaoId, metodoPagamento)
-      .then(setDetalhe)
-      .catch((error) => {
-        toast.error(error instanceof Error ? error.message : "Erro ao sincronizar metodo de pagamento.");
-      });
-  }, [detalhe, metodoPagamento, solicitacaoId]);
+    setMetodoPagamento(detalhe.metodoPagamentoSelecionado as MetodoPagamento);
+  }, [detalhe?.metodoPagamentoSelecionado]);
 
   const etapa = detalhe ? etapaBackendParaCliente(detalhe.etapa) : "aguardando-chegada";
   const progressoAtual = detalhe?.percentualConcluido ?? 0;
@@ -178,15 +177,85 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     }
   }
 
-  async function handleConfirmarPagamento() {
-    setEnviando(true);
+  useEffect(() => {
+    if (etapa !== "pagamento" || metodoPagamento !== "PIX" || detalhe?.metodoPagamentoSelecionado !== "PIX") {
+      setPixQrUrl((anterior) => {
+        if (anterior) {
+          URL.revokeObjectURL(anterior);
+        }
+        return null;
+      });
+      setPixCopiaCola(null);
+      setPixQrErro(null);
+      return;
+    }
+
+    let cancelado = false;
+
+    async function carregarPix() {
+      setCarregandoPixQr(true);
+      setPixQrErro(null);
+      try {
+        const [url, copiaCola] = await Promise.all([
+          carregarPixQrCode(solicitacaoId),
+          carregarPixCopiaCola(solicitacaoId),
+        ]);
+        if (cancelado) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        setPixQrUrl((anterior) => {
+          if (anterior) {
+            URL.revokeObjectURL(anterior);
+          }
+          return url;
+        });
+        setPixCopiaCola(copiaCola);
+      } catch (error) {
+        if (!cancelado) {
+          setPixQrUrl((anterior) => {
+            if (anterior) {
+              URL.revokeObjectURL(anterior);
+            }
+            return null;
+          });
+          setPixCopiaCola(null);
+          setPixQrErro(error instanceof Error ? error.message : "Nao foi possivel gerar o QR Code PIX.");
+        }
+      } finally {
+        if (!cancelado) {
+          setCarregandoPixQr(false);
+        }
+      }
+    }
+
+    void carregarPix();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [detalhe?.metodoPagamentoSelecionado, etapa, metodoPagamento, solicitacaoId]);
+
+  useEffect(() => {
+    return () => {
+      setPixQrUrl((anterior) => {
+        if (anterior) {
+          URL.revokeObjectURL(anterior);
+        }
+        return null;
+      });
+    };
+  }, []);
+
+  async function copiarCodigoPix() {
+    if (!pixCopiaCola) {
+      return;
+    }
     try {
-      setDetalhe(await confirmarPagamento(solicitacaoId, metodoPagamento));
-      toast.success("Pagamento confirmado.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao confirmar pagamento.");
-    } finally {
-      setEnviando(false);
+      await navigator.clipboard.writeText(pixCopiaCola);
+      toast.success("Codigo PIX copiado.");
+    } catch {
+      toast.error("Nao foi possivel copiar o codigo PIX.");
     }
   }
 
@@ -511,14 +580,58 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             })}
           </div>
 
-          <button
-            type="button"
-            className="acomp-btn-primary"
-            onClick={() => void handleConfirmarPagamento()}
-            disabled={enviando}
-          >
-            Confirmar pagamento
-          </button>
+          {metodoPagamento === "PIX" && detalhe.metodoPagamentoSelecionado === "PIX" && (
+            <div className="acomp-pix-qr-container" style={{ marginTop: 20 }}>
+              {carregandoPixQr && !pixQrUrl && (
+                <p className="acomp-pix-qr-status">Gerando QR Code PIX...</p>
+              )}
+              {pixQrUrl && (
+                <img
+                  src={pixQrUrl}
+                  alt="QR Code PIX para pagamento do servico"
+                  className="acomp-pix-qr-imagem"
+                />
+              )}
+              {!carregandoPixQr && !pixQrUrl && (
+                <p className="acomp-pix-qr-status">{pixQrErro ?? "Nao foi possivel carregar o QR Code."}</p>
+              )}
+              <p className="acomp-pix-qr-legenda">
+                Valor: {formatarMoedaBrl(valorExibir)} — pague para {detalhe.prestadorNome ?? "o prestador"}
+              </p>
+              {pixCopiaCola ? (
+                <div style={{ marginTop: 16, width: "100%" }}>
+                  <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 8 }}>
+                    Ou use o Pix Copia e Cola:
+                  </p>
+                  <div className="acomp-pix-copia-cola">
+                    <code>{pixCopiaCola}</code>
+                  </div>
+                  <button type="button" className="painel-btn-ghost" style={{ marginTop: 10 }} onClick={() => void copiarCodigoPix()}>
+                    <Copy size={14} />
+                    Copiar codigo PIX
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {metodoPagamento && metodoPagamento !== "PIX" && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginTop: 18 }}>
+              Aguarde o prestador confirmar o recebimento do pagamento para seguir com a avaliacao.
+            </p>
+          )}
+
+          {metodoPagamento === "PIX" && detalhe.metodoPagamentoSelecionado === "PIX" && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginTop: 18 }}>
+              Apos pagar, o prestador confirmara o recebimento para liberar a avaliacao.
+            </p>
+          )}
+
+          {!metodoPagamento && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginTop: 18 }}>
+              Escolha uma forma de pagamento para continuar.
+            </p>
+          )}
         </section>
       )}
 

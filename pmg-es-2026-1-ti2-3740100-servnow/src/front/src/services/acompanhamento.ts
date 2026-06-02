@@ -45,7 +45,17 @@ export type AcompanhamentoDetalhe = {
   comentarioAvaliacaoPrestador: string | null;
   percentualConcluido: number | null;
   observacaoReagendamento: string | null;
+  identidadeVerificadaEm: string | null;
+  identidadeSimilaridade: number | null;
+  verificacaoFacialObrigatoria: boolean;
   atualizacoes: AtualizacaoServico[];
+};
+
+export type VerificacaoFacialResultado = {
+  aprovado: boolean;
+  similaridade: number;
+  mensagem: string;
+  verificadoEm: string;
 };
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -100,6 +110,17 @@ export function renovarCodigo(solicitacaoId: number) {
   return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/renovar-codigo`, {
     method: "POST",
   });
+}
+
+export function verificarIdentidadeFacial(solicitacaoId: number, similaridade: number) {
+  return requestJson<VerificacaoFacialResultado>(
+    `/api/acompanhamento/${solicitacaoId}/verificar-identidade`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ similaridade }),
+    },
+  );
 }
 
 export function confirmarChegada(solicitacaoId: number, codigo: string) {

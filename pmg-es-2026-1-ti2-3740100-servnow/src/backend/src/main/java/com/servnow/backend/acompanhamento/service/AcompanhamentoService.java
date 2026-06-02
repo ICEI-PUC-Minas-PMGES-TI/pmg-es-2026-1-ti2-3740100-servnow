@@ -37,6 +37,8 @@ import com.servnow.backend.solicitacao.repository.SolicitacaoServicoRepository;
 import com.servnow.backend.usuario.domain.TipoUsuario;
 import com.servnow.backend.usuario.domain.Usuario;
 import com.servnow.backend.usuario.repository.UsuarioRepository;
+import com.servnow.backend.verificacaofacial.FaceVerificationProperties;
+import com.servnow.backend.verificacaofacial.service.VerificacaoFacialService;
 
 @Service
 public class AcompanhamentoService {
@@ -49,6 +51,8 @@ public class AcompanhamentoService {
     private final UsuarioRepository usuarioRepository;
     private final ArquivoStorage arquivoStorage;
     private final PixQrCodeService pixQrCodeService;
+    private final VerificacaoFacialService verificacaoFacialService;
+    private final FaceVerificationProperties faceVerificationProperties;
     private final SecureRandom random = new SecureRandom();
 
     public AcompanhamentoService(
@@ -57,7 +61,9 @@ public class AcompanhamentoService {
         AtualizacaoServicoRepository atualizacaoRepository,
         UsuarioRepository usuarioRepository,
         ArquivoStorage arquivoStorage,
-        PixQrCodeService pixQrCodeService
+        PixQrCodeService pixQrCodeService,
+        VerificacaoFacialService verificacaoFacialService,
+        FaceVerificationProperties faceVerificationProperties
     ) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.ordemRepository = ordemRepository;
@@ -65,6 +71,8 @@ public class AcompanhamentoService {
         this.usuarioRepository = usuarioRepository;
         this.arquivoStorage = arquivoStorage;
         this.pixQrCodeService = pixQrCodeService;
+        this.verificacaoFacialService = verificacaoFacialService;
+        this.faceVerificationProperties = faceVerificationProperties;
     }
 
     @Transactional(readOnly = true)
@@ -137,6 +145,7 @@ public class AcompanhamentoService {
         if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_CHEGADA) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "A chegada ja foi confirmada.");
         }
+        verificacaoFacialService.exigirVerificacaoFacial(ordem);
         if (codigoExpirado(ordem)) {
             throw new ResponseStatusException(HttpStatus.GONE, "Codigo expirado. Solicite um novo codigo ao cliente.");
         }
@@ -270,6 +279,7 @@ public class AcompanhamentoService {
         ordem.setObservacaoReagendamento(null);
         ordem.setCodigoVerificacao(null);
         ordem.setCodigoExpiraEm(null);
+        verificacaoFacialService.limparVerificacao(ordem);
         ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
@@ -282,15 +292,19 @@ public class AcompanhamentoService {
     ) {
         SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
-        if (usuario.getTipoUsuario() != TipoUsuario.CLIENTE) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o cliente pode confirmar o pagamento.");
+        if (usuario.getTipoUsuario() != TipoUsuario.PRESTADOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode confirmar o pagamento.");
         }
         validarPodeAcompanhar(solicitacao);
         OrdemServico ordem = obterOuCriarOrdem(solicitacao);
         if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_PAGAMENTO) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando pagamento.");
         }
-        ordem.setMetodoPagamento(request.metodoPagamento());
+        String metodoSelecionado = ordem.getMetodoPagamentoSelecionado();
+        if (metodoSelecionado == null || metodoSelecionado.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O cliente ainda nao escolheu a forma de pagamento.");
+        }
+        ordem.setMetodoPagamento(metodoSelecionado);
         ordem.setMetodoPagamentoSelecionado(null);
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_AVALIACAO);
         ordemRepository.save(ordem);
@@ -321,9 +335,6 @@ public class AcompanhamentoService {
     @Transactional(readOnly = true)
     public byte[] gerarQrCodePix(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
         PixPagamentoContexto contexto = prepararPagamentoPix(solicitacaoId, usuarioAutenticado);
-        if (contexto.usuario().getTipoUsuario() != TipoUsuario.PRESTADOR) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente o prestador pode visualizar o QR Code PIX.");
-        }
         try {
             return pixQrCodeService.gerarImagemPng(contexto.prestador(), contexto.valor(), contexto.txid());
         } catch (IllegalStateException exception) {
@@ -350,6 +361,7 @@ public class AcompanhamentoService {
         if (ordem.getEtapa() != EtapaOrdemServico.AGUARDANDO_PAGAMENTO) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta aguardando pagamento.");
         }
+        validarAcessoPix(usuario, ordem);
         Usuario prestador = solicitacao.getPrestador();
         if (prestador == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Prestador nao vinculado a esta solicitacao.");
@@ -359,6 +371,22 @@ public class AcompanhamentoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Valor do servico nao definido.");
         }
         return new PixPagamentoContexto(usuario, prestador, valor, "SN" + solicitacao.getId());
+    }
+
+    private void validarAcessoPix(Usuario usuario, OrdemServico ordem) {
+        if (usuario.getTipoUsuario() == TipoUsuario.PRESTADOR) {
+            return;
+        }
+        if (usuario.getTipoUsuario() == TipoUsuario.CLIENTE) {
+            if (!"PIX".equals(ordem.getMetodoPagamentoSelecionado())) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Selecione PIX como forma de pagamento para gerar o QR Code."
+                );
+            }
+            return;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado ao QR Code PIX.");
     }
 
     private record PixPagamentoContexto(Usuario usuario, Usuario prestador, BigDecimal valor, String txid) {
@@ -496,6 +524,7 @@ public class AcompanhamentoService {
                 return;
             }
             ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_CHEGADA);
+            verificacaoFacialService.limparVerificacao(ordem);
             alterado = true;
         }
         if (ordem.getEtapa() == EtapaOrdemServico.AGUARDANDO_CHEGADA
@@ -654,6 +683,9 @@ public class AcompanhamentoService {
             ordem.getComentarioAvaliacaoPrestador(),
             ordem.getPercentualConcluido(),
             ordem.getObservacaoReagendamento(),
+            ordem.getIdentidadeVerificadaEm(),
+            ordem.getIdentidadeSimilaridade(),
+            faceVerificationProperties.enabled(),
             atualizacoes
         );
     }

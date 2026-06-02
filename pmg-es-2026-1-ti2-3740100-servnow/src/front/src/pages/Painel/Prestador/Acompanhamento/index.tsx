@@ -4,12 +4,10 @@ import {
   Camera,
   CheckCircle2,
   Clock,
-  Copy,
   MapPin,
-  QrCode,
   RefreshCw,
+  ScanFace,
   Send,
-  Smartphone,
   Star,
 } from "lucide-react";
 import type { ChangeEvent } from "react";
@@ -19,18 +17,20 @@ import { toast } from "react-toastify";
 
 import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
 import { BotaoRota } from "../../../../Components/Acompanhamento/BotaoRota";
+import { VerificacaoFacialModal } from "../../../../Components/Acompanhamento/VerificacaoFacialModal";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   avaliarCliente,
-  carregarPixCopiaCola,
-  carregarPixQrCode,
+  confirmarPagamento,
   concluirExecucao,
   confirmarChegada,
   obterDetalhe,
   registrarAtualizacao,
   solicitarReagendamento,
+  verificarIdentidadeFacial,
   type AcompanhamentoDetalhe
 } from "../../../../services/acompanhamento";
+import { getValidAuthSession } from "../../../../services/auth";
 import {
   formatarDataHoraAcompanhamento,
   formatarHorarioAcompanhamento,
@@ -80,14 +80,11 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const [novaFoto, setNovaFoto] = useState<File | null>(null);
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
-  const [pixQrUrl, setPixQrUrl] = useState<string | null>(null);
-  const [pixCopiaCola, setPixCopiaCola] = useState<string | null>(null);
-  const [carregandoPixQr, setCarregandoPixQr] = useState(false);
-  const [pixQrErro, setPixQrErro] = useState<string | null>(null);
   const [notaCliente, setNotaCliente] = useState(0);
   const [comentarioCliente, setComentarioCliente] = useState("");
   const [percentualReagendamento, setPercentualReagendamento] = useState(50);
   const [observacaoReagendamento, setObservacaoReagendamento] = useState("");
+  const [modalVerificacaoAberto, setModalVerificacaoAberto] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
@@ -127,89 +124,23 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
     return () => window.clearInterval(intervalo);
   }, [etapa, solicitacaoId]);
 
-  const clienteEscolheuPix = detalhe?.metodoPagamentoSelecionado === "PIX";
+  const metodoPagamentoCliente = detalhe?.metodoPagamentoSelecionado;
 
-  useEffect(() => {
-    if (etapa !== "aguardando-pagamento") {
-      setPixQrUrl((anterior) => {
-        if (anterior) {
-          URL.revokeObjectURL(anterior);
-        }
-        return null;
-      });
-      setPixCopiaCola(null);
-      setPixQrErro(null);
+  async function handleConfirmarPagamento() {
+    if (!metodoPagamentoCliente) {
+      toast.error("Aguarde o cliente escolher a forma de pagamento.");
       return;
     }
-
-    let cancelado = false;
-
-    async function carregarPix() {
-      setCarregandoPixQr(true);
-      setPixQrErro(null);
-      try {
-        const [url, copiaCola] = await Promise.all([
-          carregarPixQrCode(solicitacaoId),
-          carregarPixCopiaCola(solicitacaoId),
-        ]);
-        if (cancelado) {
-          URL.revokeObjectURL(url);
-          return;
-        }
-        setPixQrUrl((anterior) => {
-          if (anterior) {
-            URL.revokeObjectURL(anterior);
-          }
-          return url;
-        });
-        setPixCopiaCola(copiaCola);
-      } catch (error) {
-        if (!cancelado) {
-          setPixQrUrl((anterior) => {
-            if (anterior) {
-              URL.revokeObjectURL(anterior);
-            }
-            return null;
-          });
-          setPixCopiaCola(null);
-          setPixQrErro(error instanceof Error ? error.message : "Nao foi possivel gerar o QR Code PIX.");
-        }
-      } finally {
-        if (!cancelado) {
-          setCarregandoPixQr(false);
-        }
-      }
-    }
-
-    void carregarPix();
-
-    return () => {
-      cancelado = true;
-    };
-  }, [etapa, solicitacaoId]);
-
-  async function copiarCodigoPix() {
-    if (!pixCopiaCola) {
-      return;
-    }
+    setEnviando(true);
     try {
-      await navigator.clipboard.writeText(pixCopiaCola);
-      toast.success("Codigo PIX copiado.");
-    } catch {
-      toast.error("Nao foi possivel copiar o codigo PIX.");
+      setDetalhe(await confirmarPagamento(solicitacaoId, metodoPagamentoCliente as "PIX" | "CREDITO" | "DEBITO"));
+      toast.success("Pagamento confirmado.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao confirmar pagamento.");
+    } finally {
+      setEnviando(false);
     }
   }
-
-  useEffect(() => {
-    return () => {
-      setPixQrUrl((anterior) => {
-        if (anterior) {
-          URL.revokeObjectURL(anterior);
-        }
-        return null;
-      });
-    };
-  }, []);
 
   const tituloServico = detalhe
     ? (TIPOS_SERVICO_MAP[detalhe.tipoServico]?.nome ?? detalhe.tipoServico)
@@ -345,6 +276,23 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const avaliacaoPrestadorPendente =
     (etapa === "aguardando-avaliacao" || etapa === "concluido") && !prestadorJaAvaliouCliente;
 
+  const identidadeVerificada = Boolean(detalhe?.identidadeVerificadaEm);
+  const exigeVerificacaoFacial = detalhe?.verificacaoFacialObrigatoria ?? false;
+  const session = getValidAuthSession();
+  const fotoPerfilUrl = session?.fotoPerfilUrl;
+
+  async function handleVerificacaoFacialSucesso(similaridade: number) {
+    try {
+      await verificarIdentidadeFacial(solicitacaoId, similaridade);
+      setDetalhe(await obterDetalhe(solicitacaoId));
+      setModalVerificacaoAberto(false);
+      toast.success("Identidade verificada. Agora informe o codigo do cliente.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao registrar verificacao.");
+      throw error;
+    }
+  }
+
   if (isLoading || !detalhe) {
     return (
       <div className="painel-vazio">
@@ -422,6 +370,40 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
             <BotaoRota endereco={detalhe.endereco} />
 
+            {exigeVerificacaoFacial && (
+              <div style={{ width: "100%", maxWidth: 360, margin: "0 auto 16px" }}>
+                {identidadeVerificada ? (
+                  <p className="verif-facial-status-ok">
+                    <CheckCircle2 size={18} />
+                    Identidade verificada
+                    {detalhe.identidadeSimilaridade != null
+                      ? ` (${detalhe.identidadeSimilaridade.toFixed(1)}% de similaridade)`
+                      : ""}
+                  </p>
+                ) : (
+                  <>
+                    <p className="acomp-codigo-sub" style={{ marginBottom: 10 }}>
+                      Antes do codigo, confirme seu rosto com a foto de perfil cadastrada.
+                    </p>
+                    <button
+                      type="button"
+                      className="acomp-btn-primary"
+                      onClick={() => setModalVerificacaoAberto(true)}
+                      disabled={enviando || !fotoPerfilUrl}
+                    >
+                      <ScanFace size={16} />
+                      Verificar identidade
+                    </button>
+                    {!fotoPerfilUrl && (
+                      <p className="verif-facial-erro" style={{ marginTop: 8 }}>
+                        Cadastre uma foto de perfil com o rosto visivel no seu perfil.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
             <div className="acomp-codigo-input-grupo">
               <span className="acomp-codigo-label">Codigo do cliente</span>
               <div className="acomp-codigo-inputs">
@@ -444,13 +426,20 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
               type="button"
               className="acomp-btn-primary"
               onClick={() => void handleConfirmarChegada()}
-              disabled={enviando}
+              disabled={enviando || (exigeVerificacaoFacial && !identidadeVerificada)}
             >
               Confirmar chegada
             </button>
           </div>
         </section>
       )}
+
+      <VerificacaoFacialModal
+        aberto={modalVerificacaoAberto}
+        fotoPerfilUrl={fotoPerfilUrl}
+        onFechar={() => setModalVerificacaoAberto(false)}
+        onSucesso={handleVerificacaoFacialSucesso}
+      />
 
       {etapa === "em-execucao" && (
         <>
@@ -662,61 +651,26 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             <strong>{formatarMoedaBrl(valorExibir)}</strong>
           </div>
 
-          <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            {clienteEscolheuPix
-              ? "O cliente escolheu PIX. Mostre o QR Code abaixo para receber o pagamento."
-              : "QR Code PIX disponivel abaixo. O cliente ainda pode alterar a forma de pagamento no app."}
+          <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 18 }}>
+            {metodoPagamentoCliente
+              ? `Forma escolhida pelo cliente: ${metodoPagamentoCliente}. Confirme apos receber o pagamento.`
+              : "Aguardando o cliente escolher a forma de pagamento no app."}
           </p>
 
-          <div className="acomp-pix-qr-container">
-            {carregandoPixQr && !pixQrUrl && (
-              <p className="acomp-pix-qr-status">Gerando QR Code PIX...</p>
-            )}
-            {pixQrUrl && (
-              <img
-                src={pixQrUrl}
-                alt="QR Code PIX para pagamento do servico"
-                className="acomp-pix-qr-imagem"
-              />
-            )}
-            {!carregandoPixQr && !pixQrUrl && (
-              <p className="acomp-pix-qr-status">
-                {pixQrErro ?? "Nao foi possivel carregar o QR Code. Tentando novamente..."}
-              </p>
-            )}
-          </div>
-
-          <p className="acomp-pix-qr-legenda">
-            Valor: {formatarMoedaBrl(valorExibir)} — recebedor: {detalhe.prestadorNome ?? "Prestador"}
-          </p>
-
-          {pixCopiaCola ? (
-            <div style={{ marginTop: 16 }}>
-              <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 8 }}>
-                Se a leitura falhar, use o Pix Copia e Cola:
-              </p>
-              <div className="acomp-pix-copia-cola">
-                <code>{pixCopiaCola}</code>
-              </div>
-              <button type="button" className="painel-btn-ghost" style={{ marginTop: 10 }} onClick={() => void copiarCodigoPix()}>
-                <Copy size={14} />
-                Copiar codigo PIX
-              </button>
-            </div>
-          ) : null}
-
-          {!clienteEscolheuPix && (
-            <div className="acomp-pagamento-opcao selecionada" style={{ marginTop: 18 }}>
-              <span className="acomp-pagamento-opcao-icone">
-                <Smartphone size={18} />
-              </span>
-              <span className="acomp-pagamento-opcao-info">
-                <strong>Aguardando confirmacao do cliente</strong>
-                <span>Selecao de pagamento no app do cliente</span>
-              </span>
-              <QrCode size={20} style={{ marginLeft: "auto", color: "var(--brand-strong)" }} />
-            </div>
+          {metodoPagamentoCliente === "PIX" && (
+            <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 18 }}>
+              O QR Code PIX e exibido no app do cliente apos ele selecionar PIX.
+            </p>
           )}
+
+          <button
+            type="button"
+            className="acomp-btn-primary"
+            onClick={() => void handleConfirmarPagamento()}
+            disabled={enviando || !metodoPagamentoCliente}
+          >
+            Confirmar pagamento recebido
+          </button>
         </section>
       )}
 

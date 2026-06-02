@@ -33,6 +33,9 @@ public record AcompanhamentoDetalheResponse(
     String comentarioAvaliacaoPrestador,
     Integer percentualConcluido,
     String observacaoReagendamento,
+    OffsetDateTime identidadeVerificadaEm,
+    Double identidadeSimilaridade,
+    boolean verificacaoFacialObrigatoria,
     List<AtualizacaoServicoResponse> atualizacoes
 ) {
 }

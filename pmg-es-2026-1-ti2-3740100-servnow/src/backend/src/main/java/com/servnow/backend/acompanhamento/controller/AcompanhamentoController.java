@@ -24,6 +24,9 @@ import com.servnow.backend.acompanhamento.dto.ConfirmarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.dto.SolicitarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.service.AcompanhamentoService;
 import com.servnow.backend.security.UsuarioAutenticado;
+import com.servnow.backend.verificacaofacial.dto.RegistrarVerificacaoFacialRequest;
+import com.servnow.backend.verificacaofacial.dto.VerificacaoFacialResponse;
+import com.servnow.backend.verificacaofacial.service.VerificacaoFacialService;
 
 import jakarta.validation.Valid;
 
@@ -32,9 +35,14 @@ import jakarta.validation.Valid;
 public class AcompanhamentoController {
 
     private final AcompanhamentoService acompanhamentoService;
+    private final VerificacaoFacialService verificacaoFacialService;
 
-    public AcompanhamentoController(AcompanhamentoService acompanhamentoService) {
+    public AcompanhamentoController(
+        AcompanhamentoService acompanhamentoService,
+        VerificacaoFacialService verificacaoFacialService
+    ) {
         this.acompanhamentoService = acompanhamentoService;
+        this.verificacaoFacialService = verificacaoFacialService;
     }
 
     @GetMapping({"/disponiveis", "/disponiveis/"})
@@ -66,6 +74,15 @@ public class AcompanhamentoController {
         @PathVariable Long solicitacaoId
     ) {
         return acompanhamentoService.renovarCodigo(solicitacaoId, usuario);
+    }
+
+    @PostMapping("/{solicitacaoId}/verificar-identidade")
+    public VerificacaoFacialResponse verificarIdentidade(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody RegistrarVerificacaoFacialRequest request
+    ) {
+        return verificacaoFacialService.verificarIdentidade(solicitacaoId, usuario, request);
     }
 
     @PostMapping("/{solicitacaoId}/confirmar-chegada")

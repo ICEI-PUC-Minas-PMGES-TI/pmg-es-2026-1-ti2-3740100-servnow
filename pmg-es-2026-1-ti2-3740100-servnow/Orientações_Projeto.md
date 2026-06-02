@@ -1,15 +1,14 @@
 Passo a passo completo para quem abre o projeto pela primeira vez: **`src/InstruçõesparaRodar.md`**
 
-Resumo rápido (dois terminais):
+
 
 ```
-cd pmg-es-2026-1-ti2-3740100-servnow\src\backend
+cd pmg-es-2026-1-ti2-3740100-servnow-1\pmg-es-2026-1-ti2-3740100-servnow\src\backend
 .\mvnw spring-boot:run
 ```
 
 ```
-cd pmg-es-2026-1-ti2-3740100-servnow\src\front
-npm install
+cd pmg-es-2026-1-ti2-3740100-servnow-1\pmg-es-2026-1-ti2-3740100-servnow\src\front
 npm run dev
 ```
 ## Logins para testes/desenvolvimento

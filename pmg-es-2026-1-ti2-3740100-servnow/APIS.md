@@ -84,7 +84,8 @@ Fluxo após a solicitação estar agendada: ordem de serviço, código de chegad
 | `GET` | `/api/acompanhamento/{solicitacaoId}` | Detalhe da ordem de serviço (etapa, código, atualizações, valores). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/iniciar` | Prestador inicia o serviço e gera código de verificação de chegada. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/renovar-codigo` | Renova o código de chegada (expiração). |
-| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-chegada` | Cliente informa o código → confirma chegada do prestador. |
+| `POST` | `/api/acompanhamento/{solicitacaoId}/verificar-identidade` | Prestador registra verificação facial (`similaridade` 0–100, calculada no navegador). |
+| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-chegada` | Prestador informa o código do cliente → confirma chegada (exige verificação facial se habilitada). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/atualizacoes` | Prestador registra atualização do serviço (`descricao` + `foto` opcional). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/concluir-execucao` | Prestador marca execução como concluída → etapa de pagamento. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/solicitar-reagendamento` | Solicita reagendamento (nova data/observação). |

@@ -90,9 +90,9 @@ Fluxo após a solicitação estar agendada: ordem de serviço, código de chegad
 | `POST` | `/api/acompanhamento/{solicitacaoId}/solicitar-reagendamento` | Solicita reagendamento (nova data/observação). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-reagendamento` | Confirma reagendamento acordado. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/selecionar-metodo-pagamento` | Cliente escolhe método (Pix, cartão, dinheiro) antes de confirmar. |
-| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-pagamento` | Cliente confirma pagamento → libera avaliações; entra no resumo financeiro (`/pagas`). |
-| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-qrcode` | Gera imagem PNG do QR Code Pix (prestador). |
-| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-copia-cola` | Retorna payload Pix copia e cola (texto). |
+| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-pagamento` | Prestador confirma pagamento recebido → libera avaliações; entra no resumo financeiro (`/pagas`). |
+| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-qrcode` | Gera imagem PNG do QR Code Pix (cliente, após escolher PIX). |
+| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-copia-cola` | Retorna payload Pix copia e cola (cliente, após escolher PIX). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/avaliar` | Cliente avalia o prestador (nota e comentário). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/avaliar-cliente` | Prestador avalia o cliente. |
 | `GET` | `/api/acompanhamento/{solicitacaoId}/atualizacoes/{atualizacaoId}/foto` | Baixa foto de uma atualização do acompanhamento. |

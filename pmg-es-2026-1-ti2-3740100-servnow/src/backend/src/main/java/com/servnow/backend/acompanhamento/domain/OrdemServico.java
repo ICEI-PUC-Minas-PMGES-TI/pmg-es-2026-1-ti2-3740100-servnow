@@ -80,6 +80,12 @@ public class OrdemServico {
     @Column(name = "observacao_reagendamento", length = 300)
     private String observacaoReagendamento;
 
+    @Column(name = "identidade_verificada_em")
+    private OffsetDateTime identidadeVerificadaEm;
+
+    @Column(name = "identidade_similaridade")
+    private Double identidadeSimilaridade;
+
     @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;
 
@@ -226,6 +232,22 @@ public class OrdemServico {
 
     public void setObservacaoReagendamento(String observacaoReagendamento) {
         this.observacaoReagendamento = observacaoReagendamento;
+    }
+
+    public OffsetDateTime getIdentidadeVerificadaEm() {
+        return identidadeVerificadaEm;
+    }
+
+    public void setIdentidadeVerificadaEm(OffsetDateTime identidadeVerificadaEm) {
+        this.identidadeVerificadaEm = identidadeVerificadaEm;
+    }
+
+    public Double getIdentidadeSimilaridade() {
+        return identidadeSimilaridade;
+    }
+
+    public void setIdentidadeSimilaridade(Double identidadeSimilaridade) {
+        this.identidadeSimilaridade = identidadeSimilaridade;
     }
 
     public OffsetDateTime getCriadoEm() {

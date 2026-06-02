@@ -36,6 +36,8 @@ import com.servnow.backend.solicitacao.repository.SolicitacaoServicoRepository;
 import com.servnow.backend.usuario.domain.TipoUsuario;
 import com.servnow.backend.usuario.domain.Usuario;
 import com.servnow.backend.usuario.repository.UsuarioRepository;
+import com.servnow.backend.verificacaofacial.FaceVerificationProperties;
+import com.servnow.backend.verificacaofacial.service.VerificacaoFacialService;
 
 @ExtendWith(MockitoExtension.class)
 class AcompanhamentoServiceTest {
@@ -57,6 +59,12 @@ class AcompanhamentoServiceTest {
 
     @Mock
     private PixQrCodeService pixQrCodeService;
+
+    @Mock
+    private VerificacaoFacialService verificacaoFacialService;
+
+    @Mock
+    private FaceVerificationProperties faceVerificationProperties;
 
     @InjectMocks
     private AcompanhamentoService acompanhamentoService;
@@ -93,6 +101,7 @@ class AcompanhamentoServiceTest {
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
         when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
         when(ordemRepository.save(any(OrdemServico.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(faceVerificationProperties.enabled()).thenReturn(false);
 
         var response = acompanhamentoService.confirmarChegada(
             100L,
@@ -103,6 +112,31 @@ class AcompanhamentoServiceTest {
         assertThat(response.etapa()).isEqualTo("EM_ANDAMENTO");
         assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.EM_ANDAMENTO);
         assertThat(ordem.getIniciadoEm()).isNotNull();
+    }
+
+    @Test
+    void confirmarChegadaExigeVerificacaoFacialQuandoHabilitada() {
+        Usuario prestador = usuario(10L, TipoUsuario.PRESTADOR);
+        Usuario cliente = usuario(1L, TipoUsuario.CLIENTE);
+        SolicitacaoServico solicitacao = solicitacaoAgendada(cliente, prestador, 100L);
+        OrdemServico ordem = ordem(solicitacao, "4823");
+
+        when(usuarioRepository.findById(10L)).thenReturn(Optional.of(prestador));
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+        when(ordemRepository.findWithDetalhesBySolicitacaoId(100L)).thenReturn(Optional.of(ordem));
+        org.mockito.Mockito.doThrow(new ResponseStatusException(
+            org.springframework.http.HttpStatus.CONFLICT,
+            "Confirme sua identidade com a verificacao facial antes de informar o codigo de chegada."
+        )).when(verificacaoFacialService).exigirVerificacaoFacial(ordem);
+
+        assertThatThrownBy(() -> acompanhamentoService.confirmarChegada(
+            100L,
+            usuarioAutenticado(10L, TipoUsuario.PRESTADOR),
+            new ConfirmarChegadaRequest("4823")
+        ))
+            .isInstanceOf(ResponseStatusException.class)
+            .satisfies(ex -> assertThat(((ResponseStatusException) ex).getReason())
+                .contains("verificacao facial"));
     }
 
     @Test

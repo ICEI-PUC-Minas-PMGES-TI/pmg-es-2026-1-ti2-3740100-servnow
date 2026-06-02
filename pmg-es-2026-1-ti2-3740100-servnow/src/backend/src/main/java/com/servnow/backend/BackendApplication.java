@@ -6,10 +6,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.servnow.backend.ArmazenamentoImagens.StorageProperties;
+import com.servnow.backend.verificacaofacial.FaceVerificationProperties;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties(StorageProperties.class)
+@EnableConfigurationProperties({ StorageProperties.class, FaceVerificationProperties.class })
 public class BackendApplication {
 
 	public static void main(String[] args) {
