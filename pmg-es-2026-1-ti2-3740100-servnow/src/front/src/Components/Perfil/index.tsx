@@ -126,13 +126,13 @@ export function Perfil() {
 
         if (response.status === 401) {
           clearAuthSession();
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
 
         if (!response.ok) {
-          throw new Error(await getResponseError(response, "Nao foi possivel carregar o perfil."));
+          throw new Error(await getResponseError(response, "Não foi possível carregar o perfil."));
         }
 
         const data = (await response.json()) as PerfilResponse;
@@ -429,7 +429,7 @@ export function Perfil() {
     }
 
     if (!form.nome.trim()) {
-      toast.error("O nome e obrigatorio.");
+      toast.error("O nome e obrigatório.");
       return;
     }
 
@@ -497,13 +497,13 @@ export function Perfil() {
 
       if (response.status === 401) {
         clearAuthSession();
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
 
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel salvar o perfil."));
+        throw new Error(await getResponseError(response, "Não foi possível salvar o perfil."));
       }
 
       let perfilAtualizado = (await response.json()) as PerfilResponse;
@@ -587,8 +587,8 @@ export function Perfil() {
             <h1 className="workspace-title">{isCliente ? "Meu perfil de cliente" : "Meu perfil de prestador"}</h1>
             <p className="workspace-description">
               {isCliente
-                ? "Atualize seus dados e o endereço onde você costuma solicitar serviços."
-                : "Atualize seu perfil profissional e o endereço da sua base para calcular distâncias até as solicitações."}
+                ? "Atualize seus dados e o Endereço onde você costuma solicitar serviços."
+                : "Atualize seu perfil profissional e o Endereço da sua base para calcular distâncias até as solicitações."}
             </p>
           </header>
 
@@ -733,24 +733,24 @@ async function getResponseError(response: Response, fallback: string) {
 
 function validarCadastrosCliente(form: FormState) {
   if (form.enderecos.length === 0) {
-    toast.error("Cadastre pelo menos um endereço.");
+    toast.error("Cadastre pelo menos um Endereço.");
     return false;
   }
 
   const principaisEndereco = form.enderecos.filter((item) => item.principal).length;
   if (principaisEndereco !== 1) {
-    toast.error("Selecione exatamente um endereço principal.");
+    toast.error("Selecione exatamente um Endereço principal.");
     return false;
   }
 
   for (const [indice, item] of form.enderecos.entries()) {
     const cep = item.cep.replace(/\D/g, "");
     if (cep.length !== 8) {
-      toast.error(`Endereço ${indice + 1}: informe um CEP válido.`);
+      toast.error(`Endereco ${indice + 1}: informe um CEP válido.`);
       return false;
     }
     if (!item.rua.trim() || !item.numero.trim() || !item.bairro.trim() || !item.cidade.trim() || !item.estado.trim()) {
-      toast.error(`Endereço ${indice + 1}: preencha rua, número, bairro, cidade e estado.`);
+      toast.error(`Endereco ${indice + 1}: preencha rua, número, bairro, cidade e estado.`);
       return false;
     }
   }
@@ -788,7 +788,7 @@ function validarPerfilPrestador(form: FormState) {
   }
 
   if (!form.horarioInicio || !form.horarioFim || form.horarioInicio >= form.horarioFim) {
-    toast.error("Informe um horário de início anterior ao horário de fim.");
+    toast.error("Informe um horário de Início anterior ao horário de fim.");
     return false;
   }
 

@@ -16,7 +16,7 @@ export async function carregarArquivoAutenticado(
   });
 
   if (!response.ok) {
-    throw new Error("Nao foi possivel carregar o arquivo.");
+    throw new Error("Não foi possível carregar o arquivo.");
   }
 
   const blob = await response.blob();

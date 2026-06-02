@@ -1,4 +1,4 @@
-export function labelEtapaAcompanhamento(etapa: string | null | undefined): string {
+﻿export function labelEtapaAcompanhamento(etapa: string | null | undefined): string {
   switch (etapa) {
     case "AGUARDANDO_CHEGADA":
       return "Aguardando chegada";
@@ -11,11 +11,11 @@ export function labelEtapaAcompanhamento(etapa: string | null | undefined): stri
     case "AGUARDANDO_PAGAMENTO":
       return "Aguardando pagamento";
     case "AGUARDANDO_AVALIACAO":
-      return "Aguardando avaliacao";
+      return "Aguardando Avaliação";
     case "CONCLUIDA":
-      return "Concluido";
+      return "concluido";
     default:
-      return "Nao iniciado";
+      return "Não iniciado";
   }
 }
 

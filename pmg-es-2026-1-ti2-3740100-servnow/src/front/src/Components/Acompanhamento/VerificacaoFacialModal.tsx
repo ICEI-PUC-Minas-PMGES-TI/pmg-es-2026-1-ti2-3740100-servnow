@@ -26,19 +26,19 @@ type EtapaCamera = "solicitar" | "ativa" | "processando" | "negada";
 function mensagemErroCamera(erro: unknown): string {
   if (erro instanceof DOMException) {
     if (erro.name === "NotAllowedError" || erro.name === "PermissionDeniedError") {
-      return "Acesso a camera negado. Toque em \"Permitir camera\" para o navegador exibir o pedido de permissao.";
+      return "Acesso a câmera negado. Toque em \"Permitir câmera\" para o navegador exibir o pedido de permissao.";
     }
     if (erro.name === "NotFoundError" || erro.name === "DevicesNotFoundError") {
-      return "Nenhuma camera encontrada neste dispositivo.";
+      return "Nenhuma câmera encontrada neste dispositivo.";
     }
     if (erro.name === "NotReadableError" || erro.name === "TrackStartError") {
-      return "A camera esta em uso por outro aplicativo. Feche-o e tente novamente.";
+      return "A câmera esta em uso por outro aplicativo. Feche-o e tente novamente.";
     }
   }
   if (erro instanceof Error && erro.message) {
     return erro.message;
   }
-  return "Nao foi possivel acessar a camera. Tente novamente.";
+  return "Não foi possível acessar a câmera. Tente novamente.";
 }
 
 export function VerificacaoFacialModal({
@@ -68,7 +68,7 @@ export function VerificacaoFacialModal({
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setEtapa("negada");
-      setMensagem("Seu navegador nao suporta acesso a camera.");
+      setMensagem("Seu navegador não suporta acesso a câmera.");
       return;
     }
 
@@ -143,7 +143,7 @@ export function VerificacaoFacialModal({
         return;
       }
       try {
-        const status = await navigator.permissions.query({ name: "camera" as PermissionName });
+        const status = await navigator.permissions.query({ name: "câmera" as PermissionName });
         if (cancelado) {
           return;
         }
@@ -172,7 +172,7 @@ export function VerificacaoFacialModal({
 
     const session = getValidAuthSession();
     if (!session?.token) {
-      setMensagem("Sessao expirada. Faca login novamente.");
+      setMensagem("Sessão expirada. Faca login novamente.");
       setEtapa("negada");
       return;
     }
@@ -189,7 +189,7 @@ export function VerificacaoFacialModal({
       } else {
         const arquivoPerfil = await carregarArquivoAutenticado(fotoPerfilUrl, session.token);
         if (!arquivoPerfil?.url) {
-          throw new Error("Nao foi possivel carregar a foto de perfil.");
+          throw new Error("Não foi possível carregar a foto de perfil.");
         }
         const referencia = await imagemParaElemento(arquivoPerfil.url);
         await prepararReferenciaFacial(referencia, fotoPerfilUrl);
@@ -208,11 +208,11 @@ export function VerificacaoFacialModal({
         pararCamera();
       } catch (error) {
         setEtapa("ativa");
-        setMensagem(error instanceof Error ? error.message : "Nao foi possivel registrar a verificacao no servidor.");
+        setMensagem(error instanceof Error ? error.message : "Não foi possível registrar a verificação no servidor.");
       }
     } catch (error) {
       setEtapa("ativa");
-      setMensagem(error instanceof Error ? error.message : "Falha na verificacao facial.");
+      setMensagem(error instanceof Error ? error.message : "Falha na verificação facial.");
     }
   }
 
@@ -254,7 +254,7 @@ export function VerificacaoFacialModal({
               <Camera size={40} strokeWidth={1.5} />
               <p>
                 {etapa === "solicitar"
-                  ? "Toque no botao abaixo. O navegador vai abrir um pedido para usar a camera."
+                  ? "Toque no botao abaixo. O navegador vai abrir um pedido para usar a câmera."
                   : "Permissao necessaria para continuar."}
               </p>
               <button type="button" className="acomp-btn-primary" onClick={() => void solicitarCamera()}>

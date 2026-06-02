@@ -76,33 +76,33 @@ export function NotificacoesMenu() {
   const badge = totalNaoLidas > 99 ? "99+" : String(totalNaoLidas);
 
   return (
-    <div className="notificacoes-menu" ref={containerRef}>
+    <div className="notificações-menu" ref={containerRef}>
       <button
         type="button"
-        className="header-notificacoes-icon"
+        className="header-notificações-icon"
         aria-label={`Notificacoes${totalNaoLidas > 0 ? `, ${totalNaoLidas} nao lidas` : ""}`}
         title="Notificacoes"
         onClick={() => void handleAbrir()}
       >
         <Bell size={22} />
-        {totalNaoLidas > 0 ? <span className="notificacoes-badge">{badge}</span> : null}
+        {totalNaoLidas > 0 ? <span className="notificações-badge">{badge}</span> : null}
       </button>
 
       {aberto ? (
-        <div className="notificacoes-painel" role="dialog" aria-label="Lista de notificacoes">
-          <div className="notificacoes-painel-cabecalho">
+        <div className="notificações-painel" role="dialog" aria-label="Lista de notificações">
+          <div className="notificações-painel-cabecalho">
             <h3>Notificacoes</h3>
             {totalNaoLidas > 0 ? (
-              <button type="button" className="notificacoes-marcar-todas" onClick={() => void handleMarcarTodas()}>
+              <button type="button" className="notificações-marcar-todas" onClick={() => void handleMarcarTodas()}>
                 Marcar todas como lidas
               </button>
             ) : null}
           </div>
 
           {notificacoes.length === 0 ? (
-            <p className="notificacoes-vazio">Nenhuma notificacao no momento.</p>
+            <p className="notificações-vazio">Nenhuma notificacao no momento.</p>
           ) : (
-            <ul className="notificacoes-lista">
+            <ul className="notificações-lista">
               {notificacoes.map((notificacao) => (
                 <li key={notificacao.id}>
                   <button

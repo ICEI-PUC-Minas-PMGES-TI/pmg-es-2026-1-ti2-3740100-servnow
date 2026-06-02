@@ -41,12 +41,12 @@ type ItemMenu = {
 };
 
 const ITENS_MENU: ItemMenu[] = [
-  { id: "inicio", label: "Inicio", icone: LayoutDashboard },
-  { id: "solicitacoes", label: "Solicitacoes", icone: FileText },
+  { id: "inicio", label: "Início", icone: LayoutDashboard },
+  { id: "solicitacoes", label: "Solicitações", icone: FileText },
   { id: "propostas", label: "Propostas", icone: HandCoins },
   { id: "agendamentos", label: "Agendamentos", icone: Calendar },
-  { id: "metricas", label: "Metricas", icone: BarChart3 },
-  { id: "historico", label: "Historico", icone: HistoryIcon },
+  { id: "metricas", label: "Métricas", icone: BarChart3 },
+  { id: "historico", label: "Histórico", icone: HistoryIcon },
   { id: "perfil", label: "Perfil", icone: User },
 ];
 

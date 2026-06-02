@@ -46,7 +46,7 @@ export function EnderecoPerfilSection({ form, updateField, hint }: EnderecoPerfi
         });
 
         if (!response.ok) {
-          throw new Error("Nao foi possivel consultar o CEP.");
+          throw new Error("Não foi possível consultar o CEP.");
         }
 
         const data = (await response.json()) as ViaCepResponse;
@@ -80,7 +80,7 @@ export function EnderecoPerfilSection({ form, updateField, hint }: EnderecoPerfi
 
   return (
     <section className="workspace-card workspace-section">
-      <h2>Endereço</h2>
+      <h2>Endereco</h2>
       {hint && <p className="workspace-hint">{hint}</p>}
 
       <div className="perfil-grid">

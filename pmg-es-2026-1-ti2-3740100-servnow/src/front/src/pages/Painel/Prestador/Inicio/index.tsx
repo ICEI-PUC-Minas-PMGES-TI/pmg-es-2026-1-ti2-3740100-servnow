@@ -41,18 +41,18 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaMetric
         });
 
         if (response.status === 401) {
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
 
         if (!response.ok) {
-          throw new Error("Nao foi possivel carregar as solicitacoes.");
+          throw new Error("Não foi possível carregar as solicitações.");
         }
 
         setSolicitacoes((await response.json()) as SolicitacaoServicoResponse[]);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitações.");
       } finally {
         setIsLoading(false);
       }
@@ -123,8 +123,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaMetric
     <>
       <PainelSectionHeader
         eyebrow="Painel do prestador"
-        title="Inicio"
-        description="Acompanhe novas solicitacoes, metricas e avaliacoes dos seus atendimentos."
+        title="Início"
+        description="Acompanhe novas solicitações, Métricas e Avaliações dos seus atendimentos."
       />
 
       {!isLoading && proximoServico && (
@@ -198,7 +198,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaPropostas, onIrParaMetric
             {avaliacaoMedia != null ? formatarNotaAvaliacao(avaliacaoMedia) : "—"}
           </strong>
           <span className="painel-stat-detalhe">
-            {totalAvaliacoes > 0 ? formatarQuantidadeAvaliacoes(totalAvaliacoes) : "Sem avaliacoes ainda"}
+            {totalAvaliacoes > 0 ? formatarQuantidadeAvaliacoes(totalAvaliacoes) : "Sem Avaliações ainda"}
           </span>
         </div>
       </section>

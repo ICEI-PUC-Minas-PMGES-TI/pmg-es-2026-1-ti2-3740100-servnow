@@ -2,29 +2,60 @@
 .agenda {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+}
+
+.agenda-layout {
+  display: grid;
   gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .agenda-layout {
+    grid-template-columns: minmax(360px, 480px) minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .agenda-calendario {
+    max-width: 480px;
+  }
+
+  .agenda-detalhes {
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid var(--workspace-border);
+    padding-left: 24px;
+    min-height: 100%;
+  }
+}
+
+.agenda-calendario {
+  width: 100%;
+  max-width: 100%;
 }
 
 .agenda-cabecalho {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .agenda-mes-titulo {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--workspace-text);
 }
 
 .agenda-nav {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 9px;
   border: 1px solid var(--workspace-border);
   background: var(--workspace-surface-soft);
   color: var(--workspace-text);
@@ -40,11 +71,11 @@
 .agenda-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 5px;
 }
 
 .agenda-grid-dias {
-  margin-bottom: -4px;
+  margin-bottom: 4px;
 }
 
 .agenda-dia-semana {
@@ -59,24 +90,27 @@
 
 .agenda-celula {
   position: relative;
-  aspect-ratio: 1 / 1;
+  min-height: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 9px;
   border: 1px solid transparent;
   background: var(--workspace-surface-soft);
   color: var(--workspace-text);
   font-family: 'Plus Jakarta Sans', 'Sora', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: default;
-  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+  transition: background 0.18s, border-color 0.18s;
 }
 
 .agenda-celula-vazia {
   background: transparent;
   border: none;
+  min-height: 38px;
+  height: 38px;
 }
 
 .agenda-celula:disabled {
@@ -93,7 +127,6 @@
 }
 
 .agenda-celula.tem-servico:hover {
-  transform: translateY(-1px);
   border-color: rgba(56, 189, 248, 0.7);
 }
 
@@ -109,15 +142,15 @@
 
 .agenda-celula-marcador {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  min-width: 16px;
-  height: 16px;
+  top: 3px;
+  right: 3px;
+  min-width: 15px;
+  height: 15px;
   padding: 0 4px;
   border-radius: 999px;
   background: #ef4444;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -132,6 +165,7 @@
 .agenda-detalhes {
   border-top: 1px solid var(--workspace-border);
   padding-top: 16px;
+  min-width: 0;
 }
 
 .agenda-detalhes-vazio {
@@ -140,7 +174,7 @@
   gap: 8px;
   margin: 0;
   color: var(--workspace-muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .agenda-detalhes-titulo {
@@ -158,12 +192,57 @@
 .agenda-servico-descricao {
   margin: 10px 0 0;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--workspace-surface-soft);
   border: 1px solid var(--workspace-border);
   color: var(--workspace-text);
   font-size: 13px;
   line-height: 1.5;
+}
+
+@media (min-width: 1024px) {
+  .agenda-calendario {
+    max-width: 560px;
+  }
+
+  .agenda-layout {
+    grid-template-columns: minmax(440px, 560px) minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .agenda-celula,
+  .agenda-celula-vazia {
+    min-height: 52px;
+    height: 52px;
+    font-size: 15px;
+    border-radius: 11px;
+  }
+
+  .agenda-mes-titulo {
+    font-size: 20px;
+  }
+
+  .agenda-nav {
+    width: 42px;
+    height: 42px;
+  }
+
+  .agenda-cabecalho {
+    margin-bottom: 16px;
+  }
+
+  .agenda-grid {
+    gap: 7px;
+  }
+
+  .agenda-dia-semana {
+    font-size: 13px;
+    padding: 6px 0;
+  }
+
+  .agenda-detalhes-titulo {
+    font-size: 17px;
+  }
 }
 
 @media (min-width: 640px) {

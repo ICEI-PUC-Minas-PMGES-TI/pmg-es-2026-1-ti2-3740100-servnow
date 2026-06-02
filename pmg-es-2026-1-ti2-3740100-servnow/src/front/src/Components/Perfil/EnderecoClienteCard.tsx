@@ -86,16 +86,16 @@ export function EnderecoClienteCard({
   }
 
   return (
-    <article className={`perfil-endereco-card${endereco.principal ? " perfil-endereco-card--principal" : ""}`}>
-      <div className="perfil-endereco-card-topo">
-        <label className="perfil-endereco-principal">
+    <article className={`perfil-endereco-card${endereco.principal ? " perfil-Endereço-card--principal" : ""}`}>
+      <div className="perfil-Endereço-card-topo">
+        <label className="perfil-Endereço-principal">
           <input
             type="radio"
-            name="endereco-principal"
+            name="Endereço-principal"
             checked={endereco.principal}
             onChange={onSelecionarPrincipal}
           />
-          <span>Usar este endereço</span>
+          <span>Usar este Endereco</span>
         </label>
         {podeRemover && (
           <PerfilBotaoRemover onClick={onRemover}>
@@ -104,7 +104,7 @@ export function EnderecoClienteCard({
         )}
       </div>
 
-      <p className="perfil-endereco-indice">Endereço {indice + 1}</p>
+      <p className="perfil-Endereço-indice">Endereco {indice + 1}</p>
 
       <div className="perfil-grid">
         <label className="form-field perfil-field-wide">
@@ -210,9 +210,9 @@ export function EnderecoClienteCard({
         </label>
       </div>
 
-      <div className="perfil-endereco-foto">
+      <div className="perfil-Endereço-foto">
         <h3>Foto do local</h3>
-        <p className="workspace-hint">Ajuda o prestador a encontrar o imóvel neste endereço.</p>
+        <p className="workspace-hint">Ajuda o prestador a encontrar o imóvel neste Endereco.</p>
         <PerfilBotaoUpload
           icone={<ImageIcon size={18} />}
           texto={endereco.fotoPreview ? "Trocar foto" : "Selecionar foto"}

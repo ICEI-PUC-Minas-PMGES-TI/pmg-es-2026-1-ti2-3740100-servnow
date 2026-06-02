@@ -73,8 +73,8 @@ export function PagamentosClienteSection({
           key={chave.clientKey}
           className={`perfil-pix-card${chave.principal ? " perfil-pix-card--principal" : ""}`}
         >
-          <div className="perfil-endereco-card-topo">
-            <label className="perfil-endereco-principal">
+          <div className="perfil-Endereço-card-topo">
+            <label className="perfil-Endereço-principal">
               <input
                 type="radio"
                 name="pix-principal"
@@ -88,7 +88,7 @@ export function PagamentosClienteSection({
             </PerfilBotaoRemover>
           </div>
 
-          <p className="perfil-endereco-indice">Chave {indice + 1}</p>
+          <p className="perfil-Endereço-indice">Chave {indice + 1}</p>
 
           <div className="perfil-grid">
             <label className="form-field">

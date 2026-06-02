@@ -30,7 +30,7 @@ import { TIPOS_SERVICO, TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico
 import { otimizarImagemParaUpload } from "../../../../utils/otimizarImagemArquivo";
 
 const FAIXAS_PRECO = [
-  { value: "ATE_150", label: "Ate R$ 150" },
+  { value: "ATE_150", label: "Até R$ 150" },
   { value: "DE_150_A_300", label: "R$ 150 a R$ 300" },
   { value: "DE_300_A_600", label: "R$ 300 a R$ 600" },
   { value: "DE_600_A_1000", label: "R$ 600 a R$ 1.000" },
@@ -89,7 +89,7 @@ export function CriarSolicitacao() {
         });
 
         if (!response.ok) {
-          throw new Error("Nao foi possivel consultar o CEP.");
+          throw new Error("Não foi possível consultar o CEP.");
         }
 
         const data = (await response.json()) as ViaCepResponse;
@@ -150,7 +150,7 @@ export function CriarSolicitacao() {
       setImagemArquivo(otimizada);
       setImagemPreviewUrl(URL.createObjectURL(otimizada));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel processar a imagem.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível processar a imagem.");
     }
   }
 
@@ -167,7 +167,7 @@ export function CriarSolicitacao() {
     const session = getValidAuthSession();
 
     if (!session?.token) {
-      toast.error("Sessao expirada. Entre novamente.");
+      toast.error("Sessão expirada. Entre novamente.");
       navigate("/login");
       return;
     }
@@ -206,7 +206,7 @@ export function CriarSolicitacao() {
       });
 
       if (authCheck.status === 401) {
-        const detalhe = await getResponseError(authCheck, "Authorization Bearer nao informado ou nao aceito.");
+        const detalhe = await getResponseError(authCheck, "Authorization Bearer não informado ou não aceito.");
         clearAuthSession();
         toast.error(`Sessao nao aceita pelo backend. ${detalhe}`);
         navigate("/login");
@@ -214,7 +214,7 @@ export function CriarSolicitacao() {
       }
 
       if (!authCheck.ok) {
-        throw new Error(await getResponseError(authCheck, "Nao foi possivel validar sua sessao."));
+        throw new Error(await getResponseError(authCheck, "Não foi possível validar sua sessao."));
       }
 
       const response = await fetch(`${API_URL}/api/solicitacoes`, {
@@ -233,13 +233,13 @@ export function CriarSolicitacao() {
       }
 
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel salvar a solicitacao."));
+        throw new Error(await getResponseError(response, "Não foi possível salvar a solicitação."));
       }
 
-      toast.success("Solicitacao criada com sucesso.");
+      toast.success("solicitação criada com sucesso.");
       navigate("/painel/cliente?secao=solicitacoes");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar solicitacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao salvar solicitação.");
     } finally {
       setIsSaving(false);
     }
@@ -248,9 +248,9 @@ export function CriarSolicitacao() {
   return (
     <>
       <PainelSectionHeader
-        eyebrow="Nova solicitacao"
-        title="Criar solicitacao"
-        description="Preencha os dados do servico que voce precisa para receber propostas de prestadores."
+        eyebrow="Nova solicitação"
+        title="Criar solicitação"
+        description="Preencha os dados do serviço que você precisa para receber propostas de prestadores."
       />
 
       <section className="painel-card">
@@ -428,8 +428,8 @@ export function CriarSolicitacao() {
 
             <label className="form-field form-field-full">
               <span className="form-label">Foto do local ou do problema (opcional)</span>
-              <div className="solicitacao-foto-upload">
-                <label className="btn-secondary solicitacao-foto-btn">
+              <div className="solicitação-foto-upload">
+                <label className="btn-secondary solicitação-foto-btn">
                   <ImageIcon size={16} />
                   <span>{imagemArquivo ? "Trocar foto" : "Selecionar foto"}</span>
                   <input
@@ -440,9 +440,9 @@ export function CriarSolicitacao() {
                   />
                 </label>
                 {imagemPreviewUrl && (
-                  <div className="solicitacao-foto-preview">
+                  <div className="solicitação-foto-preview">
                     <img src={imagemPreviewUrl} alt="Pre-visualizacao da foto" />
-                    <button type="button" className="solicitacao-foto-remover" onClick={removerImagem} aria-label="Remover foto">
+                    <button type="button" className="solicitação-foto-remover" onClick={removerImagem} aria-label="Remover foto">
                       <X size={16} />
                     </button>
                   </div>
@@ -458,7 +458,7 @@ export function CriarSolicitacao() {
                 <textarea
                   value={descricao}
                   onChange={(event) => setDescricao(event.target.value)}
-                  placeholder="Descreva com detalhes o que voce precisa para os prestadores enviarem propostas mais precisas."
+                  placeholder="Descreva com detalhes o que você precisa para os prestadores enviarem propostas mais precisas."
                   maxLength={600}
                   required
                 />
@@ -469,7 +469,7 @@ export function CriarSolicitacao() {
 
           <div className="form-actions">
             <button type="submit" className="btn-primary" disabled={isSaving}>
-              <PlusCircle size={16} /> {isSaving ? "Enviando..." : "Enviar solicitacao"}
+              <PlusCircle size={16} /> {isSaving ? "Enviando..." : "Enviar solicitação"}
             </button>
           </div>
         </form>

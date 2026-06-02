@@ -23,7 +23,7 @@ export type NotificacaoResumoResponse = {
   totalNaoLidas: number;
 };
 
-export const NOTIFICACOES_ATUALIZAR_EVENTO = "servnow:notificacoes-atualizar";
+export const NOTIFICACOES_ATUALIZAR_EVENTO = "servnow:notificações-atualizar";
 
 export function dispararAtualizacaoNotificacoes() {
   window.dispatchEvent(new Event(NOTIFICACOES_ATUALIZAR_EVENTO));
@@ -42,7 +42,7 @@ export async function listarNotificacoes(): Promise<NotificacaoResponse[]> {
   if (isSupabaseConfigured()) {
     const supabase = createSupabaseClient(session.token);
     const { data, error } = await supabase
-      .from("notificacoes")
+      .from("notificações")
       .select("id, tipo, titulo, mensagem, proposta_id, solicitacao_id, lida, criado_em")
       .order("criado_em", { ascending: false });
 
@@ -58,7 +58,7 @@ export async function listarNotificacoes(): Promise<NotificacaoResponse[]> {
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel carregar as notificacoes."));
+    throw new Error(await getResponseError(response, "Não foi possível carregar as notificações."));
   }
 
   return (await response.json()) as NotificacaoResponse[];
@@ -73,7 +73,7 @@ export async function resumoNotificacoes(): Promise<NotificacaoResumoResponse> {
   if (isSupabaseConfigured()) {
     const supabase = createSupabaseClient(session.token);
     const { count, error } = await supabase
-      .from("notificacoes")
+      .from("notificações")
       .select("id", { count: "exact", head: true })
       .eq("lida", false);
 
@@ -89,7 +89,7 @@ export async function resumoNotificacoes(): Promise<NotificacaoResumoResponse> {
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel carregar o resumo de notificacoes."));
+    throw new Error(await getResponseError(response, "Não foi possível carregar o resumo de notificações."));
   }
 
   return (await response.json()) as NotificacaoResumoResponse;
@@ -104,7 +104,7 @@ export async function marcarNotificacaoComoLida(notificacaoId: number): Promise<
   if (isSupabaseConfigured()) {
     const supabase = createSupabaseClient(session.token);
     const { error } = await supabase
-      .from("notificacoes")
+      .from("notificações")
       .update({ lida: true })
       .eq("id", notificacaoId);
 
@@ -120,7 +120,7 @@ export async function marcarNotificacaoComoLida(notificacaoId: number): Promise<
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel marcar a notificacao como lida."));
+    throw new Error(await getResponseError(response, "Não foi possível marcar a notificação como lida."));
   }
 }
 
@@ -132,7 +132,7 @@ export async function marcarTodasNotificacoesComoLidas(): Promise<void> {
 
   if (isSupabaseConfigured()) {
     const supabase = createSupabaseClient(session.token);
-    const { error } = await supabase.from("notificacoes").update({ lida: true }).eq("lida", false);
+    const { error } = await supabase.from("notificações").update({ lida: true }).eq("lida", false);
 
     if (error) {
       throw new Error(supabaseErrorMessage(error));
@@ -146,7 +146,7 @@ export async function marcarTodasNotificacoesComoLidas(): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel marcar as notificacoes como lidas."));
+    throw new Error(await getResponseError(response, "Não foi possível marcar as notificações como lidas."));
   }
 }
 

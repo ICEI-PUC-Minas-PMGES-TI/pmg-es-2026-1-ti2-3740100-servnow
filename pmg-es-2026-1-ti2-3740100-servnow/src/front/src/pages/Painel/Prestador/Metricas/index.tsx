@@ -19,9 +19,9 @@ const CORES_CATEGORIA = ["#38bdf8", "#14b8a6", "#f59e0b", "#a78bfa", "#f472b6", 
 
 const INDICADORES: Array<{ id: TipoIndicador; label: string }> = [
   { id: "ganhos", label: "Receita propria" },
-  { id: "efetividade", label: "Servicos na plataforma" },
+  { id: "efetividade", label: "Serviços na plataforma" },
   { id: "participacao_plataforma", label: "Participacao na plataforma" },
-  { id: "participacao_categoria", label: "Por tipo de servico" },
+  { id: "participacao_categoria", label: "Por tipo de serviço" },
 ];
 
 function formatarPercentual(valor: number): string {
@@ -92,7 +92,7 @@ function GraficoBarras({
   }, [dados, modo]);
 
   return (
-    <div className="painel-grafico" aria-label={ariaLabel}>
+    <div className="painel-gráfico" aria-label={ariaLabel}>
       {dados.map((item, indice) => {
         const valorExibido = valorBarra(item, modo);
         const rotuloValor = rotuloBarra(item, modo);
@@ -101,18 +101,18 @@ function GraficoBarras({
         return (
           <div
             key={`${item.label}-${indice}`}
-            className="painel-grafico-coluna"
+            className="painel-gráfico-coluna"
             style={{ minHeight: ALTURA_AREA_BARRAS + ESPACO_ROTULO_VALOR + 28 }}
           >
-            <span className="painel-grafico-valor">{rotuloValor}</span>
-            <div className="painel-grafico-area" style={{ height: ALTURA_AREA_BARRAS }}>
+            <span className="painel-gráfico-valor">{rotuloValor}</span>
+            <div className="painel-gráfico-area" style={{ height: ALTURA_AREA_BARRAS }}>
               <div
-                className="painel-grafico-barra"
+                className="painel-gráfico-barra"
                 style={{ height: alturaPx }}
                 title={`${item.label}: ${rotuloValor}`}
               />
             </div>
-            <span className="painel-grafico-label">{item.label}</span>
+            <span className="painel-gráfico-label">{item.label}</span>
           </div>
         );
       })}
@@ -163,19 +163,19 @@ function GraficoComparativoDuplo({
   }, [pontos]);
 
   return (
-    <div className="painel-grafico-participacao">
-      <div className="painel-grafico-comparacao">
-        <div className="painel-grafico-comparacao-item painel-grafico-comparacao-voce">
-          <span className="painel-grafico-comparacao-rotulo">{rotuloVoce}</span>
+    <div className="painel-gráfico-participacao">
+      <div className="painel-gráfico-comparacao">
+        <div className="painel-gráfico-comparacao-item painel-gráfico-comparacao-voce">
+          <span className="painel-gráfico-comparacao-rótulo">{rotuloVoce}</span>
           <strong>{formatarValor(valorVocePeriodo)}</strong>
         </div>
-        <div className="painel-grafico-comparacao-item painel-grafico-comparacao-plataforma">
-          <span className="painel-grafico-comparacao-rotulo">{rotuloPlataforma}</span>
+        <div className="painel-gráfico-comparacao-item painel-gráfico-comparacao-plataforma">
+          <span className="painel-gráfico-comparacao-rótulo">{rotuloPlataforma}</span>
           <strong>{formatarValor(valorPlataformaPeriodo)}</strong>
         </div>
       </div>
 
-      <div className="painel-grafico painel-grafico-duplo" aria-label={ariaLabel}>
+      <div className="painel-gráfico painel-gráfico-duplo" aria-label={ariaLabel}>
         {pontos.map((item, indice) => {
           const alturaVoce = alturaBarraPx(item.valor, maxValor);
           const alturaPlataforma = alturaBarraPx(item.totalPlataforma, maxValor);
@@ -183,50 +183,50 @@ function GraficoComparativoDuplo({
           return (
             <div
               key={`${item.label}-${indice}`}
-              className="painel-grafico-coluna painel-grafico-coluna-dupla"
+              className="painel-gráfico-coluna painel-gráfico-coluna-dupla"
               style={{ minHeight: ALTURA_AREA_BARRAS + ESPACO_ROTULO_VALOR + 32 }}
             >
-              <div className="painel-grafico-valores-duplos">
-                <span className="painel-grafico-valor">
+              <div className="painel-gráfico-valores-duplos">
+                <span className="painel-gráfico-valor">
                   {item.valor > 0 ? formatarValor(item.valor) : "-"}
                 </span>
-                <span className="painel-grafico-valor">
+                <span className="painel-gráfico-valor">
                   {item.totalPlataforma > 0 ? formatarValor(item.totalPlataforma) : "-"}
                 </span>
               </div>
-              <div className="painel-grafico-area-dupla" style={{ height: ALTURA_AREA_BARRAS }}>
-                <div className="painel-grafico-par">
-                  <div className="painel-grafico-area painel-grafico-area-interna">
+              <div className="painel-gráfico-area-dupla" style={{ height: ALTURA_AREA_BARRAS }}>
+                <div className="painel-gráfico-par">
+                  <div className="painel-gráfico-area painel-gráfico-area-interna">
                     <div
-                      className="painel-grafico-barra painel-grafico-barra-voce"
+                      className="painel-gráfico-barra painel-gráfico-barra-voce"
                       style={{ height: alturaVoce }}
                       title={`${tituloVoce}: ${formatarValor(item.valor)}`}
                     />
                   </div>
                 </div>
-                <div className="painel-grafico-par">
-                  <div className="painel-grafico-area painel-grafico-area-interna">
+                <div className="painel-gráfico-par">
+                  <div className="painel-gráfico-area painel-gráfico-area-interna">
                     <div
-                      className="painel-grafico-barra painel-grafico-barra-plataforma"
+                      className="painel-gráfico-barra painel-gráfico-barra-plataforma"
                       style={{ height: alturaPlataforma }}
                       title={`${tituloPlataforma}: ${formatarValor(item.totalPlataforma)}`}
                     />
                   </div>
                 </div>
               </div>
-              <span className="painel-grafico-label">{item.label}</span>
+              <span className="painel-gráfico-label">{item.label}</span>
             </div>
           );
         })}
       </div>
 
-      <div className="painel-grafico-legenda" aria-hidden>
-        <span className="painel-grafico-legenda-item">
-          <i className="painel-grafico-legenda-cor painel-grafico-barra-voce" />
+      <div className="painel-gráfico-legenda" aria-hidden>
+        <span className="painel-gráfico-legenda-item">
+          <i className="painel-gráfico-legenda-cor painel-gráfico-barra-voce" />
           {legendaVoce}
         </span>
-        <span className="painel-grafico-legenda-item">
-          <i className="painel-grafico-legenda-cor painel-grafico-barra-plataforma" />
+        <span className="painel-gráfico-legenda-item">
+          <i className="painel-gráfico-legenda-cor painel-gráfico-barra-plataforma" />
           {legendaPlataforma}
         </span>
       </div>
@@ -265,7 +265,7 @@ function GraficoCategorias({
           className="painel-indicadores-rosca"
           style={{ background: `conic-gradient(${fatiasRosca.join(", ")})` }}
           role="img"
-          aria-label="Distribuicao da sua receita por tipo de servico"
+          aria-label="Distribuicao da sua receita por tipo de serviço"
         />
       )}
       <ul className="painel-indicadores-categoria-lista">
@@ -319,7 +319,7 @@ export function Metricas() {
         const resposta = await buscarIndicadoresPrestador(periodo);
         setDados(resposta);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar metricas.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar Métricas.");
         setDados(null);
       } finally {
         setIsLoading(false);
@@ -340,7 +340,7 @@ export function Metricas() {
     switch (indicador) {
       case "efetividade":
         return {
-          titulo: "Participacao nos servicos concluidos",
+          titulo: "Participacao nos serviços concluídos",
           valor: formatarPercentual(dados.efetividadePercentual),
           detalhe: `${dados.servicosConcluidos} seus servicos de ${dados.servicosConcluidosPlataforma} na plataforma`,
           icone: Target,
@@ -354,7 +354,7 @@ export function Metricas() {
         };
       case "participacao_categoria":
         return {
-          titulo: "Participacao por tipo de servico",
+          titulo: "Participacao por tipo de serviço",
           valor: dados.participacaoPorCategoria.length > 0
             ? formatarPercentual(
               dados.participacaoPorCategoria.reduce((maior, item) => (
@@ -364,12 +364,12 @@ export function Metricas() {
             : "—",
           detalhe: dados.participacaoPorCategoria.length > 0
             ? `Maior fatia: ${nomeTipoServico(dados.participacaoPorCategoria[0].tipoServico)}`
-            : "Sem dados no periodo atual",
+            : "Sem dados no período atual",
           icone: PieChart,
         };
       default:
         return {
-          titulo: "Receita propria no periodo atual",
+          titulo: "Receita propria no período atual",
           valor: formatarMoedaBrl(dados.ganhosPropriosTotal),
           detalhe: periodo === "mes" ? "Mes corrente (pagos)" : "Dia corrente (pagos)",
           icone: Wallet,
@@ -383,7 +383,7 @@ export function Metricas() {
     <>
       <PainelSectionHeader
         eyebrow="Desempenho"
-        title="Metricas"
+        title="Métricas"
         description="Compare sua receita, efetividade e participacao na plataforma por mes ou por semana."
       />
 
@@ -474,9 +474,9 @@ export function Metricas() {
                 formatarValor={formatarQuantidade}
                 rotuloVoce="Voce"
                 rotuloPlataforma="Plataforma (total)"
-                legendaVoce="Seus servicos concluidos"
-                legendaPlataforma="Servicos concluidos na plataforma"
-                ariaLabel="Grafico comparativo de servicos concluidos"
+                legendaVoce="Seus serviços concluídos"
+                legendaPlataforma="Serviços concluídos na plataforma"
+                ariaLabel="Grafico comparativo de serviços concluídos"
                 tituloVoce="Voce"
                 tituloPlataforma="Plataforma"
               />

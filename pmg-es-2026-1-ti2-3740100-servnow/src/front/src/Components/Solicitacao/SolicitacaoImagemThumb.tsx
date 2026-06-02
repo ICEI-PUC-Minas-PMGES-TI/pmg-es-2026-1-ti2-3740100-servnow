@@ -35,8 +35,8 @@ export function SolicitacaoImagemThumb({ solicitacaoId, imagemUrl, alt, classNam
   return (
     <img
       src={src}
-      alt={alt ?? "Foto da solicitacao"}
-      className={`${className ?? "solicitacao-imagem-thumb"}${onClick ? " solicitacao-imagem-clicavel" : ""}`}
+      alt={alt ?? "Foto da solicitação"}
+      className={`${className ?? "solicitação-imagem-thumb"}${onClick ? " solicitação-imagem-clicavel" : ""}`}
       onClick={onClick}
     />
   );

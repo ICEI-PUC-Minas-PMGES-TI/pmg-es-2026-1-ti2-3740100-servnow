@@ -39,13 +39,13 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
         ]);
 
         if (responseLista.status === 401 || responsePagas.status === 401 || responseAgendadas.status === 401) {
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
 
         if (!responseLista.ok) {
-          throw new Error("Nao foi possivel carregar as solicitacoes.");
+          throw new Error("Não foi possível carregar as solicitações.");
         }
 
         setSolicitacoes((await responseLista.json()) as SolicitacaoServicoResponse[]);
@@ -56,7 +56,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
           responseAgendadas.ok ? ((await responseAgendadas.json()) as SolicitacaoServicoResponse[]) : [],
         );
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitações.");
       } finally {
         setIsLoading(false);
       }
@@ -94,8 +94,8 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
     <>
       <PainelSectionHeader
         eyebrow="Painel do cliente"
-        title="Inicio"
-        description="Acompanhe suas solicitacoes, agendamentos e gastos do mes."
+        title="Início"
+        description="Acompanhe suas solicitações, agendamentos e gastos do mês."
       />
 
       {!isLoading && proximoServico && (
@@ -168,7 +168,7 @@ export function Inicio({ onIrParaSolicitacoes, onIrParaCriar }: InicioProps) {
           <strong className="painel-stat-valor">{formatarMoedaBrl(gastosMes.total)}</strong>
           <span className="painel-stat-detalhe">
             {gastosMes.quantidade === 0
-              ? "Nenhum servico pago neste mes"
+              ? "Nenhum serviço pago neste mes"
               : `${gastosMes.quantidade} servico${gastosMes.quantidade > 1 ? "s" : ""} pago${gastosMes.quantidade > 1 ? "s" : ""} neste mes`}
           </span>
         </div>

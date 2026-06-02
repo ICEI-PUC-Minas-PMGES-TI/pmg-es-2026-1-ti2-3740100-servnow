@@ -59,12 +59,12 @@ export function Propostas() {
         headers: authHeader(session.token),
       });
       if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel carregar suas propostas."));
+        throw new Error(await getResponseError(response, "Não foi possível carregar suas propostas."));
       }
       setPropostas((await response.json()) as PropostaServicoResponse[]);
     } catch (error) {
@@ -90,9 +90,9 @@ export function Propostas() {
   return (
     <>
       <PainelSectionHeader
-        eyebrow="Historico de propostas"
+        eyebrow="Histórico de propostas"
         title="Propostas"
-        description="Acompanhe todas as propostas que voce enviou e o status de cada uma."
+        description="Acompanhe todas as propostas que você enviou e o status de cada uma."
       />
 
       <section className="painel-card">
@@ -126,7 +126,7 @@ export function Propostas() {
             </div>
             <p>
               {propostas.length === 0
-                ? "Voce ainda nao enviou propostas. Acesse Solicitacoes para encontrar oportunidades."
+                ? "Você ainda não enviou propostas. Acesse Solicitações para encontrar oportunidades."
                 : "Nenhuma proposta encontrada para esse filtro."}
             </p>
           </div>
@@ -156,7 +156,7 @@ export function Propostas() {
                     </span>
                   </div>
                   {proposta.mensagem && (
-                    <p className="painel-lista-item-descricao">{proposta.mensagem}</p>
+                    <p className="painel-lista-item-descrição">{proposta.mensagem}</p>
                   )}
                 </div>
                 <div className="painel-lista-item-acoes">

@@ -44,15 +44,15 @@ export function ClientePerfil({
           <div>
             <h2>
               <MapPin size={20} style={{ display: "inline", verticalAlign: "middle", marginRight: 8 }} />
-              Endereços
+              Enderecos
             </h2>
             <p className="workspace-hint">
-              Cadastre os locais onde você solicita serviços. A foto fica em cada endereço.
+              Cadastre os locais onde você solicita serviços. A foto fica em cada Endereco.
             </p>
           </div>
           <PerfilBotaoAdicionar onClick={adicionarEndereco}>
             <Plus size={16} />
-            Novo endereço
+            Novo Endereco
           </PerfilBotaoAdicionar>
         </div>
 

@@ -23,7 +23,7 @@ import {
   getStatusLabel,
 } from "../../../../utils/solicitacaoLabels";
 
-type FiltroSolicitacao = "todas" | "aguardando" | "agendadas" | "concluidas";
+type FiltroSolicitacao = "todas" | "aguardando" | "agendadas" | "concluídas";
 type EditForm = {
   tipoServico: string;
   faixaPreco: string;
@@ -43,11 +43,11 @@ const FILTROS: Array<{ id: FiltroSolicitacao; label: string }> = [
   { id: "todas", label: "Todas" },
   { id: "aguardando", label: "Aguardando propostas" },
   { id: "agendadas", label: "Agendadas" },
-  { id: "concluidas", label: "Concluidas" },
+  { id: "concluídas", label: "Concluídas" },
 ];
 
 const FAIXAS_PRECO = [
-  { value: "ATE_150", label: "Ate R$ 150" },
+  { value: "ATE_150", label: "Até R$ 150" },
   { value: "DE_150_A_300", label: "R$ 150 a R$ 300" },
   { value: "DE_300_A_600", label: "R$ 300 a R$ 600" },
   { value: "DE_600_A_1000", label: "R$ 600 a R$ 1.000" },
@@ -84,7 +84,7 @@ export function Solicitacoes() {
       const session = getValidAuthSession();
 
       if (!session?.token) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
@@ -95,17 +95,17 @@ export function Solicitacoes() {
         });
 
         if (response.status === 401) {
-          toast.error("Nao foi possivel autenticar suas solicitacoes. Entre novamente e tente de novo.");
+          toast.error("Não foi possível autenticar suas solicitações. Entre novamente e tente de novo.");
           return;
         }
 
         if (!response.ok) {
-          throw new Error(await getResponseError(response, "Nao foi possivel carregar suas solicitacoes."));
+          throw new Error(await getResponseError(response, "Não foi possível carregar suas solicitações."));
         }
 
         setSolicitacoes(await response.json() as SolicitacaoServicoResponse[]);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitações.");
       } finally {
         setIsLoading(false);
       }
@@ -129,7 +129,7 @@ export function Solicitacoes() {
 
   function abrirEdicao(item: SolicitacaoServicoResponse) {
     if (!podeEditarSolicitacao(item.status)) {
-      toast.error("Nao e possivel editar uma solicitacao agendada.");
+      toast.error("Não e possível editar uma solicitação agendada.");
       return;
     }
     if (editImagemPreviewUrl) {
@@ -186,7 +186,7 @@ export function Solicitacoes() {
       setEditImagemPreviewUrl(URL.createObjectURL(otimizada));
       setEditRemoverImagem(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel processar a imagem.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível processar a imagem.");
     }
   }
 
@@ -202,13 +202,13 @@ export function Solicitacoes() {
   async function salvarEdicao() {
     if (!editando || !editForm) return;
     if (!podeEditarSolicitacao(editando.status)) {
-      toast.error("Nao e possivel editar uma solicitacao agendada.");
+      toast.error("Não e possível editar uma solicitação agendada.");
       return;
     }
     const session = getValidAuthSession();
 
     if (!session?.token) {
-      toast.error("Sessao expirada. Entre novamente.");
+      toast.error("Sessão expirada. Entre novamente.");
       navigate("/login");
       return;
     }
@@ -234,22 +234,22 @@ export function Solicitacoes() {
       });
 
       if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
 
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel editar a solicitacao."));
+        throw new Error(await getResponseError(response, "Não foi possível editar a solicitação."));
       }
 
       const atualizado = (await response.json()) as SolicitacaoServicoResponse;
       setSolicitacoes((atual) => atual.map((item) => (item.id === atualizado.id ? atualizado : item)));
       setDetalheAberto((atual) => (atual?.id === atualizado.id ? atualizado : atual));
-      toast.success("Solicitacao editada e publicada novamente.");
+      toast.success("solicitação editada e públicada novamente.");
       fecharEdicao();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao editar solicitacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao editar solicitação.");
     } finally {
       setSalvandoEdicao(false);
     }
@@ -258,7 +258,7 @@ export function Solicitacoes() {
   async function excluirSolicitacao(item: SolicitacaoServicoResponse) {
     const session = getValidAuthSession();
     if (!session?.token) {
-      toast.error("Sessao expirada. Entre novamente.");
+      toast.error("Sessão expirada. Entre novamente.");
       navigate("/login");
       return;
     }
@@ -271,26 +271,26 @@ export function Solicitacoes() {
       });
 
       if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
 
       if (response.status === 404) {
-        toast.error("Solicitacao nao encontrada no backend. Atualize a lista e tente novamente.");
+        toast.error("solicitação não encontrada no backend. Atualize a lista e tente novamente.");
         return;
       }
 
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel excluir a solicitacao."));
+        throw new Error(await getResponseError(response, "Não foi possível excluir a solicitação."));
       }
 
       setSolicitacoes((atual) => atual.filter((s) => s.id !== item.id));
       setDetalheAberto((atual) => (atual?.id === item.id ? null : atual));
-      toast.success("Solicitacao excluida com sucesso.");
+      toast.success("solicitação excluida com sucesso.");
       setConfirmarExclusao(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao excluir solicitacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao excluir solicitação.");
     } finally {
       setExcluindoId(null);
     }
@@ -299,9 +299,9 @@ export function Solicitacoes() {
   return (
     <>
       <PainelSectionHeader
-        eyebrow="Suas solicitacoes"
-        title="Solicitacoes"
-        description="Veja todas as solicitacoes que voce ja criou."
+        eyebrow="Suas solicitações"
+        title="Solicitações"
+        description="Veja todas as solicitações que você já criou."
       />
 
       <section className="painel-card">
@@ -346,7 +346,7 @@ export function Solicitacoes() {
                     <SolicitacaoImagemThumb
                       solicitacaoId={item.id}
                       imagemUrl={item.imagemUrl}
-                      className="solicitacao-imagem-thumb"
+                      className="solicitação-imagem-thumb"
                       onClick={() => setDetalheAberto(item)}
                     />
                   )}
@@ -411,14 +411,14 @@ export function Solicitacoes() {
       />
 
       {editando && editForm && (
-        <div className="solicitacao-modal-overlay" role="presentation" onClick={fecharEdicao}>
-          <div className="solicitacao-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <header className="solicitacao-modal-cabecalho">
-              <div className="solicitacao-modal-titulo-grupo">
+        <div className="solicitação-modal-overlay" role="presentation" onClick={fecharEdicao}>
+          <div className="solicitação-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <header className="solicitação-modal-cabecalho">
+              <div className="solicitação-modal-titulo-grupo">
                 <h3>Editar solicitacao</h3>
               </div>
             </header>
-            <div className="solicitacao-modal-corpo">
+            <div className="solicitação-modal-corpo">
               <div className="workspace-form">
                 <div className="painel-form-grid">
                   <label className="form-field">
@@ -529,17 +529,17 @@ export function Solicitacoes() {
                       {editImagemPreviewUrl ? (
                         <img
                           src={editImagemPreviewUrl}
-                          alt="Nova foto da solicitacao"
+                          alt="Nova foto da solicitação"
                           style={{ width: 120, height: 90, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(148, 163, 184, 0.3)" }}
                         />
                       ) : !editRemoverImagem && editando?.imagemUrl ? (
                         <SolicitacaoImagemThumb
                           solicitacaoId={editando.id}
                           imagemUrl={editando.imagemUrl}
-                          className="solicitacao-imagem-thumb"
+                          className="solicitação-imagem-thumb"
                         />
                       ) : (
-                        <div className="solicitacao-imagem-placeholder" style={{ width: 120, height: 90 }}>
+                        <div className="solicitação-imagem-placeholder" style={{ width: 120, height: 90 }}>
                           <ImageIcon size={20} />
                         </div>
                       )}
@@ -548,12 +548,12 @@ export function Solicitacoes() {
                 </div>
               </div>
             </div>
-            <footer className="solicitacao-modal-rodape">
+            <footer className="solicitação-modal-rodape">
               <button type="button" className="btn-secondary" onClick={fecharEdicao} disabled={salvandoEdicao}>
                 Cancelar
               </button>
               <button type="button" className="btn-primary" onClick={salvarEdicao} disabled={salvandoEdicao}>
-                {salvandoEdicao ? "Salvando..." : "Salvar e republicar"}
+                {salvandoEdicao ? "Salvando..." : "Salvar e repúblicar"}
               </button>
             </footer>
           </div>
@@ -561,29 +561,29 @@ export function Solicitacoes() {
       )}
 
       {confirmarExclusao && (
-        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarExclusao(null)}>
+        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setConfirmarExclusao(null)}>
           <div
-            className="solicitacao-modal"
+            className="solicitação-modal"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: 460 }}
           >
-            <header className="solicitacao-modal-cabecalho">
-              <div className="solicitacao-modal-titulo-grupo">
+            <header className="solicitação-modal-cabecalho">
+              <div className="solicitação-modal-titulo-grupo">
                 <Trash2 size={20} />
                 <h3>Excluir solicitacao</h3>
               </div>
               <button
                 type="button"
-                className="solicitacao-modal-fechar"
+                className="solicitação-modal-fechar"
                 onClick={() => setConfirmarExclusao(null)}
                 aria-label="Fechar"
               >
                 <X size={18} />
               </button>
             </header>
-            <div className="solicitacao-modal-corpo">
+            <div className="solicitação-modal-corpo">
               <p style={{ marginTop: 0, fontWeight: 600, color: "var(--workspace-text)" }}>
                 Deseja excluir esta solicitacao?
               </p>
@@ -591,7 +591,7 @@ export function Solicitacoes() {
                 As propostas vinculadas tambem serao removidas. Essa acao nao pode ser desfeita.
               </p>
             </div>
-            <footer className="solicitacao-modal-rodape">
+            <footer className="solicitação-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setConfirmarExclusao(null)}>
                 Cancelar
               </button>

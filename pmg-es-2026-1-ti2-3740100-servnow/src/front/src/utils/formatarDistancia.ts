@@ -3,7 +3,7 @@ export function formatarDistancia(
   distanciaLinhaReta?: boolean | null,
 ) {
   if (distanciaKm == null || !Number.isFinite(distanciaKm)) {
-    return "Distancia indisponivel — complete seu endereco no perfil";
+    return "Distancia indisponível — complete seu Endereço no perfil";
   }
   if (distanciaLinhaReta) {
     return `~${distanciaKm.toFixed(1)} km`;

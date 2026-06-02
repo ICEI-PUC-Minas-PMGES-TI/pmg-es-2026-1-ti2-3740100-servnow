@@ -26,7 +26,7 @@ export function BotaoRota({ endereco }: BotaoRotaProps) {
 
   return (
     <div className="acomp-rota">
-      <p className="acomp-rota-endereco">
+      <p className="acomp-rota-Endereço">
         <MapPin size={15} aria-hidden="true" />
         <span>{enderecoLimpo}</span>
       </p>

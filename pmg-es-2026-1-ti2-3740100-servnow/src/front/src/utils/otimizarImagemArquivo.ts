@@ -13,7 +13,7 @@ function carregarImagem(file: File) {
 
     image.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error("Nao foi possivel ler a imagem."));
+      reject(new Error("Não foi possível ler a imagem."));
     };
 
     image.src = objectUrl;
@@ -25,7 +25,7 @@ function canvasParaJpegBlob(canvas: HTMLCanvasElement, quality: number) {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("Nao foi possivel processar a imagem."));
+          reject(new Error("Não foi possível processar a imagem."));
           return;
         }
         resolve(blob);
@@ -51,7 +51,7 @@ export async function otimizarImagemParaUpload(file: File) {
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("Nao foi possivel processar a imagem.");
+    throw new Error("Não foi possível processar a imagem.");
   }
 
   canvas.width = width;

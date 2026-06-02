@@ -29,12 +29,12 @@ export function Agendamentos() {
           headers: authHeader(session.token),
         });
         if (response.status === 401) {
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
         if (!response.ok) {
-          throw new Error("Nao foi possivel carregar os agendamentos.");
+          throw new Error("Não foi possível carregar os agendamentos.");
         }
         setAgendamentos((await response.json()) as SolicitacaoServicoResponse[]);
       } catch (error) {
@@ -53,7 +53,7 @@ export function Agendamentos() {
       <PainelSectionHeader
         eyebrow="Sua agenda"
         title="Agendamentos"
-        description="Servicos aceitos pelos clientes e ja confirmados na sua agenda."
+        description="Serviços aceitos pelos clientes e já confirmados na sua agenda."
       />
 
       <section className="painel-card">

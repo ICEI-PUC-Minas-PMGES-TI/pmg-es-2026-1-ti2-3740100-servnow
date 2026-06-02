@@ -28,14 +28,14 @@ export function Cadastro() {
       : "Cadastro de prestador na plataforma Servnow";
   const registerDescription =
     userType === "cliente"
-      ? "Cadastre-se como cliente para encontrar profissionais confiaveis, solicitar servicos e acompanhar seus atendimentos em um so lugar."
+      ? "Cadastre-se como cliente para encontrar profissionais confiaveis, solicitar serviços e acompanhar seus atendimentos em um so lugar."
       : "Cadastre-se como prestador para divulgar seus servicos, receber oportunidades e gerenciar seus atendimentos com praticidade.";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (senha !== confirmacaoSenha) {
-      toast.error("As senhas nao coincidem.");
+      toast.error("As senhas não coincidem.");
       return;
     }
 
@@ -58,7 +58,7 @@ export function Cadastro() {
       const data = (await response.json()) as AuthResponse | { detail?: string };
 
       if (!response.ok) {
-        throw new Error("detail" in data ? data.detail || "Nao foi possivel concluir o cadastro." : "Nao foi possivel concluir o cadastro.");
+        throw new Error("detail" in data ? data.detail || "Não foi possível concluir o cadastro." : "Não foi possível concluir o cadastro.");
       }
 
       const registerData = data as AuthResponse;
@@ -73,7 +73,7 @@ export function Cadastro() {
         navigate("/login");
       }, 700);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nao foi possivel concluir o cadastro.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível concluir o cadastro.");
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +116,7 @@ export function Cadastro() {
           <p className="login-sub">
             {userType === "cliente"
               ? "Cadastre-se para encontrar profissionais confiaveis perto de voce."
-              : "Cadastre-se para divulgar seus servicos e atender novos clientes."}
+              : "Cadastre-se para divulgar seus serviços e atender novos clientes."}
           </p>
 
           <form className="login-form" onSubmit={handleSubmit}>
@@ -154,7 +154,7 @@ export function Cadastro() {
                 <Briefcase size={17} className="input-icon" />
                 <input
                   type="text"
-                  value={userType === "cliente" ? "Cliente" : "Prestador de servicos"}
+                  value={userType === "cliente" ? "Cliente" : "Prestador de serviços"}
                   readOnly
                 />
               </div>

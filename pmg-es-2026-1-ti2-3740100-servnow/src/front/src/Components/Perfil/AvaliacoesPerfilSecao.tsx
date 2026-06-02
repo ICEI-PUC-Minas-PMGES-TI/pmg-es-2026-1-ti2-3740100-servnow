@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { CalendarDays, Star } from "lucide-react";
 
 import { listarAvaliacoesRecebidas, type AvaliacaoRecebida } from "../../services/perfil";

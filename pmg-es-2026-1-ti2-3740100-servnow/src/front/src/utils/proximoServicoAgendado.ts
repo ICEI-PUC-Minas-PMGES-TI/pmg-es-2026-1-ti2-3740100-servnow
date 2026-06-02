@@ -74,19 +74,19 @@ export function calcularProximoServicoAgendado(
     return {
       item,
       ehHoje: true,
-      titulo: horario ? `Voce tem um servico as ${horario}` : "Voce tem um servico hoje",
+      titulo: horario ? `Você tem um serviço às ${horario}` : "Você tem um serviço hoje",
       subtitulo: detalhe,
     };
   }
 
   const dataCurta = formatarDataSolicitacao(item.data!);
-  const quandoTexto = horario ? `${dataCurta} as ${horario}` : dataCurta;
+  const quandoTexto = horario ? `${dataCurta} às ${horario}` : dataCurta;
   const detalhe = parceiro ? `${tipo} · ${parceiro}` : tipo;
 
   return {
     item,
     ehHoje: false,
-    titulo: "Proximo servico",
+    titulo: "Próximo serviço",
     subtitulo: `${quandoTexto} · ${detalhe}`,
   };
 }

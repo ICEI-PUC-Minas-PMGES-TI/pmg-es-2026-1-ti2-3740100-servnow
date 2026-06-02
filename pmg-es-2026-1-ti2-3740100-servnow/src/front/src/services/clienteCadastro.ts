@@ -21,7 +21,7 @@ export async function sincronizarCadastrosCliente(
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel salvar enderecos e pagamentos."));
+    throw new Error(await getResponseError(response, "Não foi possível salvar Endereços e pagamentos."));
   }
 
   return (await response.json()) as PerfilResponse;
@@ -42,7 +42,7 @@ export async function enviarFotoEnderecoCliente(
   });
 
   if (!response.ok) {
-    throw new Error(await getResponseError(response, "Nao foi possivel enviar a foto do endereco."));
+    throw new Error(await getResponseError(response, "Não foi possível enviar a foto do Endereço."));
   }
 
   return (await response.json()) as PerfilResponse;

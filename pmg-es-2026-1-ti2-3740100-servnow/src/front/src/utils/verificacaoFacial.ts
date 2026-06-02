@@ -65,7 +65,7 @@ function redimensionarParaProcessamento(
   canvas.height = altura;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
-    throw new Error("Nao foi possivel preparar a imagem.");
+    throw new Error("Não foi possível preparar a imagem.");
   }
   ctx.drawImage(origem, 0, 0, largura, altura);
   return canvas;
@@ -85,7 +85,7 @@ async function descritorDeImagem(
     .withFaceDescriptor();
 
   if (!deteccao) {
-    throw new Error("Nenhum rosto detectado. Posicione o rosto de frente para a camera.");
+    throw new Error("Nenhum rosto detectado. Posicione o rosto de frente para a câmera.");
   }
   return deteccao.descriptor;
 }
@@ -101,7 +101,7 @@ export function mensagemVerificacaoAprovada(): string {
 }
 
 export function mensagemVerificacaoRejeitada(): string {
-  return "Nao foi possivel confirmar sua identidade. Posicione o rosto de frente, com boa iluminacao, e tente novamente.";
+  return "Não foi possível confirmar sua identidade. Posicione o rosto de frente, com boa iluminacao, e tente novamente.";
 }
 
 /** Calcula e guarda o descritor da foto de perfil (evita reprocessar a cada selfie). */
@@ -138,7 +138,7 @@ export async function compararCapturaComReferenciaPreparada(
 ): Promise<ResultadoComparacaoFacial> {
   await carregarModelosFaciais();
   if (!cacheReferencia || cacheReferencia.chave !== chaveCache) {
-    throw new Error("Foto de perfil ainda nao foi preparada. Aguarde um instante e tente novamente.");
+    throw new Error("Foto de perfil ainda não foi preparada. Aguarde um instante e tente novamente.");
   }
   const descritorCaptura = await descritorDeImagem(captura);
   return compararDescritores(cacheReferencia.descritor, descritorCaptura, limiarSimilaridade);
@@ -171,7 +171,7 @@ export async function imagemParaElemento(src: string): Promise<HTMLImageElement>
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Nao foi possivel carregar a foto de perfil."));
+    img.onerror = () => reject(new Error("Não foi possível carregar a foto de perfil."));
     img.src = src;
   });
 }
@@ -182,7 +182,7 @@ function capturarFrameDeVideo(video: HTMLVideoElement): HTMLCanvasElement {
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
-    throw new Error("Nao foi possivel capturar a imagem da camera.");
+    throw new Error("Não foi possível capturar a imagem da câmera.");
   }
   ctx.drawImage(video, 0, 0);
   return canvas;

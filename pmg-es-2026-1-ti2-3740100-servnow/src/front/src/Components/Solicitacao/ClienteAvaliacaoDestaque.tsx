@@ -1,4 +1,4 @@
-import { MessageSquareQuote, Star, User } from "lucide-react";
+﻿import { MessageSquareQuote, Star, User } from "lucide-react";
 
 import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../utils/formatarAvaliacao";
 
@@ -21,8 +21,8 @@ export function ClienteAvaliacaoDestaque({
 }: Props) {
   if (carregando) {
     return (
-      <section className="solicitacao-cliente-avaliacao" aria-busy="true" aria-label="Carregando avaliacao do cliente">
-        <p className="solicitacao-cliente-avaliacao-carregando">Carregando avaliacao do cliente...</p>
+      <section className="solicitacao-cliente-avaliacao" aria-busy="true" aria-label="Carregando avaliação do cliente">
+        <p className="solicitacao-cliente-avaliacao-carregando">Carregando avaliação do cliente...</p>
       </section>
     );
   }
@@ -30,14 +30,14 @@ export function ClienteAvaliacaoDestaque({
   const temAvaliacoes = avaliacaoMedia != null && totalAvaliacoes > 0;
 
   return (
-    <section className="solicitacao-cliente-avaliacao" aria-label={`Avaliacao de ${nome}`}>
+    <section className="solicitacao-cliente-avaliacao" aria-label={`Avaliação de ${nome}`}>
       <div className="solicitacao-cliente-avaliacao-topo">
         <div className="solicitacao-cliente-avaliacao-identidade">
           <span className="solicitacao-cliente-avaliacao-avatar" aria-hidden="true">
             <User size={18} />
           </span>
           <div>
-            <span className="solicitacao-cliente-avaliacao-rotulo">Cliente</span>
+            <span className="solicitacao-cliente-avaliacao-rótulo">Cliente</span>
             <strong className="solicitacao-cliente-avaliacao-nome">{nome}</strong>
           </div>
         </div>
@@ -46,8 +46,8 @@ export function ClienteAvaliacaoDestaque({
           className={`solicitacao-cliente-avaliacao-nota ${temAvaliacoes ? "" : "sem-avaliacao"}`}
           aria-label={
             temAvaliacoes
-              ? `Nota media ${formatarNotaAvaliacao(avaliacaoMedia!)} de 5`
-              : "Cliente sem avaliacoes na plataforma"
+              ? `Nota média ${formatarNotaAvaliacao(avaliacaoMedia!)} de 5`
+              : "Cliente sem Avaliações na plataforma"
           }
         >
           <Star size={18} fill={temAvaliacoes ? "currentColor" : "transparent"} />
@@ -61,7 +61,7 @@ export function ClienteAvaliacaoDestaque({
               </span>
             </>
           ) : (
-            <span className="solicitacao-cliente-avaliacao-nota-vazio">Sem avaliacoes</span>
+            <span className="solicitacao-cliente-avaliacao-nota-vazio">Sem avaliações</span>
           )}
         </div>
       </div>
@@ -70,13 +70,13 @@ export function ClienteAvaliacaoDestaque({
         <blockquote className="solicitacao-cliente-avaliacao-comentario">
           <MessageSquareQuote size={18} aria-hidden="true" />
           <div>
-            <span className="solicitacao-cliente-avaliacao-comentario-rotulo">Comentario em destaque</span>
+            <span className="solicitacao-cliente-avaliacao-comentario-rótulo">Comentário em destaque</span>
             <p>{comentarioDestaque}</p>
           </div>
         </blockquote>
       ) : (
         <p className="solicitacao-cliente-avaliacao-sem-comentario">
-          Este cliente ainda nao possui comentarios em destaque na plataforma.
+          Este cliente ainda não possui comentários em destaque na plataforma.
         </p>
       )}
 

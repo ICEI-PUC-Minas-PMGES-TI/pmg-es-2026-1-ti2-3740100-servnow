@@ -48,7 +48,7 @@ export function Login() {
       const data = (await response.json()) as AuthResponse | { detail?: string };
 
       if (!response.ok) {
-        throw new Error("detail" in data ? data.detail || "Nao foi possivel fazer login." : "Nao foi possivel fazer login.");
+        throw new Error("detail" in data ? data.detail || "Não foi possível fazer login." : "Não foi possível fazer login.");
       }
 
       const loginData = data as AuthResponse;
@@ -58,7 +58,7 @@ export function Login() {
 
       if (!validationResponse.ok) {
         clearAuthSession();
-        throw new Error("Login retornou um token que o backend nao aceitou. Reinicie o backend e tente novamente.");
+        throw new Error("Login retornou um token que o backend não aceitou. Reinicie o backend e tente novamente.");
       }
 
       saveAuthSession(loginData);
@@ -69,7 +69,7 @@ export function Login() {
         navigate(getDashboardRoute(loginData.tipoUsuario));
       }, 500);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Nao foi possivel fazer login.");
+      setErrorMessage(error instanceof Error ? error.message : "Não foi possível fazer login.");
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +112,7 @@ export function Login() {
           <p className="login-sub">
             {userType === "cliente"
               ? "Acesse e encontre o profissional ideal para voce."
-              : "Acesse e gerencie seus servicos e clientes."}
+              : "Acesse e gerencie seus serviços e clientes."}
           </p>
 
           <form className="login-form" onSubmit={handleSubmit}>

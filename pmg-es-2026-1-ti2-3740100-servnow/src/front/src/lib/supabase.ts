@@ -13,7 +13,7 @@ export function getSupabaseUrl(): string {
 export function createSupabaseClient(accessToken: string): SupabaseClient {
   if (!isSupabaseConfigured()) {
     throw new Error(
-      "Supabase nao configurado. Copie src/front/.env.example para .env e preencha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.",
+      "Supabase não configurado. Copie src/front/.env.example para .env e preencha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.",
     );
   }
 

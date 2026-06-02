@@ -16,12 +16,12 @@ export interface TipoServico {
 
 export const TIPOS_SERVICO_MAP: Record<string, TipoServico> = {
   ELETRICO: {
-    nome: "Eletrica",
+    nome: "Elétrica",
     icone: Zap,
     cor: "#FFD700",
   },
   HIDRAULICO: {
-    nome: "Hidraulica",
+    nome: "Hidráulica",
     icone: Droplet,
     cor: "#1E90FF",
   },
@@ -31,7 +31,7 @@ export const TIPOS_SERVICO_MAP: Record<string, TipoServico> = {
     cor: "#FF6347",
   },
   MONTAGEM: {
-    nome: "Montagem de moveis",
+    nome: "Montagem de móveis",
     icone: Sofa,
     cor: "#8B4513",
   },
@@ -41,7 +41,7 @@ export const TIPOS_SERVICO_MAP: Record<string, TipoServico> = {
     cor: "#32CD32",
   },
   MANUTENCAO_GERAL: {
-    nome: "Manutencao geral",
+    nome: "Manutenção geral",
     icone: Wrench,
     cor: "#696969",
   },

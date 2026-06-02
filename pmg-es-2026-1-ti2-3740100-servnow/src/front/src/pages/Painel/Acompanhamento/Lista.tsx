@@ -33,7 +33,7 @@ export function AcompanhamentoLista() {
       <PainelSectionHeader
         eyebrow="Processo 4"
         title="Acompanhamento"
-        description="Selecione um servico agendado para acompanhar em tempo real."
+        description="Selecione um serviço agendado para acompanhar em tempo real."
       />
 
       <section className="painel-card">

@@ -1,4 +1,4 @@
-import {
+﻿import {
   ArrowLeft,
   Calendar,
   Camera,
@@ -47,9 +47,9 @@ type PrestadorEtapa = "confirmar-chegada" | "em-execucao" | "aguardando-reagenda
 
 const ETAPAS_INFO: Array<{ id: PrestadorEtapa; label: string; numero: number }> = [
   { id: "confirmar-chegada", label: "Chegada", numero: 1 },
-  { id: "em-execucao", label: "Em execucao", numero: 2 },
+  { id: "em-execucao", label: "Em execução", numero: 2 },
   { id: "aguardando-pagamento", label: "Pagamento", numero: 3 },
-  { id: "aguardando-avaliacao", label: "Avaliacao", numero: 4 },
+  { id: "aguardando-avaliacao", label: "Avaliação", numero: 4 },
 ];
 
 function etapaBackendParaPrestador(etapa: string): PrestadorEtapa {
@@ -194,16 +194,16 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   async function handleConfirmarChegada() {
     const codigoCompleto = codigo.join("");
     if (codigoCompleto.length !== 4) {
-      toast.error("Informe o codigo de 4 digitos.");
+      toast.error("Informe o código de 4 dígitos.");
       return;
     }
     setEnviando(true);
     try {
       setDetalhe(await confirmarChegada(solicitacaoId, codigoCompleto));
       setCodigo(["", "", "", ""]);
-      toast.success("Chegada confirmada. Servico iniciado.");
+      toast.success("Chegada confirmada. Serviço iniciado.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Codigo invalido.");
+      toast.error(error instanceof Error ? error.message : "Código inválido.");
     } finally {
       setEnviando(false);
     }
@@ -217,9 +217,9 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       setNovaAtualizacao("");
       setNovaFoto(null);
       setPreviewFoto(null);
-      toast.success("Atualizacao enviada.");
+      toast.success("Atualização enviada.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar atualizacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar Atualização.");
     } finally {
       setEnviando(false);
     }
@@ -229,9 +229,9 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
     setEnviando(true);
     try {
       setDetalhe(await concluirExecucao(solicitacaoId));
-      toast.success("Execucao concluida. Aguardando pagamento do cliente.");
+      toast.success("Execução concluída. Aguardando pagamento do cliente.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao concluir servico.");
+      toast.error(error instanceof Error ? error.message : "Erro ao concluir serviço.");
     } finally {
       setEnviando(false);
     }
@@ -260,7 +260,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
   async function handleAvaliarCliente() {
     if (notaCliente === 0) {
-      toast.error("Selecione uma nota. A avaliacao do cliente e obrigatoria.");
+      toast.error("Selecione uma nota. A Avaliação do cliente é obrigatória.");
       return;
     }
     setEnviando(true);
@@ -270,12 +270,12 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       setNotaCliente(0);
       setComentarioCliente("");
       if (atualizado.etapa === "CONCLUIDA") {
-        toast.success("Avaliacao enviada. Servico finalizado!");
+        toast.success("Avaliação enviada. Serviço finalizado!");
       } else {
-        toast.success("Avaliacao enviada. Aguardando o cliente avaliar o servico.");
+        toast.success("Avaliação enviada. Aguardando o cliente avaliar o serviço.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar Avaliação.");
     } finally {
       setEnviando(false);
     }
@@ -298,7 +298,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       setModalVerificacaoAberto(false);
       toast.success(`${mensagemVerificacaoAprovada()} Agora informe o codigo do cliente.`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao registrar verificacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao registrar verificação.");
       throw error;
     }
   }
@@ -327,7 +327,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       )}
 
       <PainelSectionHeader
-        eyebrow="Servico em andamento"
+        eyebrow="Serviço em andamento"
         title={tituloServico}
         description="Confirme sua chegada e mantenha o cliente informado sobre o andamento."
       />
@@ -486,7 +486,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             <div className="acomp-form-bloco">
               <textarea
                 className="acomp-textarea"
-                placeholder="Descreva o andamento do servico..."
+                placeholder="Descreva o andamento do serviço..."
                 value={novaAtualizacao}
                 onChange={(event) => setNovaAtualizacao(event.target.value)}
               />
@@ -499,7 +499,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
               {previewFoto && (
                 <div className="acomp-foto-preview">
-                  <img src={previewFoto} alt="Preview da nova atualizacao" />
+                  <img src={previewFoto} alt="Preview da nova Atualização" />
                 </div>
               )}
 
@@ -556,7 +556,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
               <textarea
                 className="acomp-textarea"
-                placeholder="Observacao para o cliente (opcional)..."
+                placeholder="Observação para o cliente (opcional)..."
                 value={observacaoReagendamento}
                 onChange={(event) => setObservacaoReagendamento(event.target.value)}
                 style={{ marginBottom: 12 }}
@@ -684,7 +684,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       {(etapa === "aguardando-avaliacao" || (etapa === "concluido" && !prestadorJaAvaliouCliente)) && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>{prestadorJaAvaliouCliente ? "Avaliacao enviada" : "Avaliar cliente (obrigatorio)"}</h2>
+            <h2>{prestadorJaAvaliouCliente ? "Avaliação enviada" : "Avaliar cliente (obrigatório)"}</h2>
           </div>
 
           {!prestadorJaAvaliouCliente && (
@@ -735,7 +735,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
               <textarea
                 className="acomp-textarea"
-                placeholder="Comentario sobre o cliente (opcional)"
+                placeholder="Comentário sobre o cliente (opcional)"
                 value={comentarioCliente}
                 onChange={(event) => setComentarioCliente(event.target.value)}
                 style={{ marginTop: 8, marginBottom: 14 }}

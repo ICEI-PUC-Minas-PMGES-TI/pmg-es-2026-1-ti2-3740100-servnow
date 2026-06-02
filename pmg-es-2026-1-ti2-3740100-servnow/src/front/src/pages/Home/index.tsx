@@ -47,7 +47,7 @@ const categories: Array<IconItem & { signal: string }> = [
 const stats = [
   { icon: UsersRound, value: "12k+", label: "clientes atendidos" },
   { icon: BriefcaseBusiness, value: "3.5k", label: "prestadores verificados" },
-  { icon: Star, value: "4.9/5", label: "média de avaliação" },
+  { icon: Star, value: "4.9/5", label: "média de Avaliação" },
   { icon: MapPin, value: "200+", label: "cidades cobertas" },
 ];
 
@@ -55,17 +55,17 @@ const steps: IconItem[] = [
   {
     icon: Search,
     title: "Descreva a demanda",
-    description: "Escolha a categoria, detalhe o problema, informe seu endereço e publique o serviço.",
+    description: "Escolha a categoria, detalhe o problema, informe seu Endereço e publique o serviço.",
   },
   {
     icon: BadgeCheck,
     title: "Compare profissionais",
-    description: "Veja disponibilidade, avaliações, experiência e proposta antes de confirmar.",
+    description: "Veja disponibilidade, Avaliações, experiência e proposta antes de confirmar.",
   },
   {
     icon: CheckCircle2,
     title: "Acompanhe até o fim",
-    description: "Receba atualizações do atendimento e avalie o serviço quando tudo estiver pronto.",
+    description: "Receba Atualizações do atendimento e avalie o serviço quando tudo estiver pronto.",
   },
 ];
 
@@ -73,7 +73,7 @@ const platformBenefits: IconItem[] = [
   {
     icon: ShieldCheck,
     title: "Confiança operacional",
-    description: "Perfis verificados, histórico de atendimentos e avaliações reais reduzem risco na contratação.",
+    description: "Perfis verificados, Histórico de atendimentos e Avaliações reais reduzem risco na contratação.",
   },
   {
     icon: Clock3,
@@ -104,7 +104,7 @@ const reviews = [
     name: "Lucas Martins",
     role: "Prestador",
     initials: "LM",
-    quote: "O perfil com avaliações ajudou muito a passar confiança. Hoje fecho serviços maiores e tenho uma rotina mais previsível.",
+    quote: "O perfil com Avaliações ajudou muito a passar confiança. Hoje fecho serviços maiores e tenho uma rotina mais previsível.",
   },
 ];
 
@@ -199,7 +199,7 @@ export function Home() {
 
               <div className="home-panel-header">
                 <div>
-                  <span>Solicitação ativa</span>
+                  <span>solicitacao ativa</span>
                   <strong>Reparo elétrico</strong>
                 </div>
                 <span className="home-live-pill">ao vivo</span>
@@ -331,7 +331,7 @@ export function Home() {
             <ul className="home-check-list">
               <li><CheckCircle2 size={18} /> Profissionais verificados e avaliados</li>
               <li><CheckCircle2 size={18} /> Orçamentos claros antes da contratação</li>
-              <li><CheckCircle2 size={18} /> Agendamento online e histórico do atendimento</li>
+              <li><CheckCircle2 size={18} /> Agendamento online e Historico do atendimento</li>
             </ul>
             <br />
             <PrimaryCta to={ctaRoute}>Encontrar profissional</PrimaryCta>
@@ -356,7 +356,7 @@ export function Home() {
               e construa uma vitrine profissional sem depender de indicação informal.
             </p>
             <ul className="home-check-list">
-              <li><CheckCircle2 size={18} /> Perfil com avaliações e especialidades</li>
+              <li><CheckCircle2 size={18} /> Perfil com Avaliacoes e especialidades</li>
               <li><CheckCircle2 size={18} /> Pedidos por região e tipo de serviço</li>
               <li><CheckCircle2 size={18} /> Rotina comercial mais previsível</li>
             </ul>
@@ -375,7 +375,7 @@ export function Home() {
         <div className="home-container">
           <SectionIntro
             eyebrow="Vantagens"
-            title="A base de confiança que  Sass de serviços precisa."
+            title="A base de confiança que  SaaS de serviços precisa."
           />
 
           <div className="home-benefits-grid">

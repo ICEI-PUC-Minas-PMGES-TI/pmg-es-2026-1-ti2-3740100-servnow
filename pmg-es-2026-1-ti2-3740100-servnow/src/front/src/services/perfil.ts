@@ -19,7 +19,7 @@ export type AvaliacoesRecebidasResponse = {
 export async function listarAvaliacoesRecebidas(): Promise<AvaliacoesRecebidasResponse> {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const response = await fetch(`${API_URL}/api/perfil/avaliacoes-recebidas`, {
@@ -28,7 +28,7 @@ export async function listarAvaliacoesRecebidas(): Promise<AvaliacoesRecebidasRe
 
   if (!response.ok) {
     const texto = await response.text();
-    throw new Error(texto || "Nao foi possivel carregar as avaliacoes.");
+    throw new Error(texto || "Não foi possível carregar as avaliações.");
   }
 
   return (await response.json()) as AvaliacoesRecebidasResponse;

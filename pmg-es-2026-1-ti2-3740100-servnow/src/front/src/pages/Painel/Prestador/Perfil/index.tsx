@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { CreditCard, MapPin, MessageSquare, Star, User } from "lucide-react";
 
 import { AvaliacoesPerfilSecao } from "../../../../Components/Perfil/AvaliacoesPerfilSecao";
@@ -84,7 +84,7 @@ export function PerfilPrestador() {
       <PainelSectionHeader
         eyebrow="Meu perfil"
         title="Perfil"
-        description="Visualize seus dados e o historico de avaliacoes e comentarios dos clientes."
+        description="Visualize seus dados e o histórico de avaliações e comentários dos clientes."
       />
 
       <section className="painel-perfil-grid">
@@ -125,7 +125,7 @@ export function PerfilPrestador() {
           ) : enderecoResumo ? (
             <p className="painel-perfil-resumo-linha">{enderecoResumo}</p>
           ) : (
-            <p className="painel-perfil-vazio">Nenhum endereco cadastrado. Configure em Configurar perfil.</p>
+            <p className="painel-perfil-vazio">Nenhum endereço cadastrado. Configure em Configurar perfil.</p>
           )}
         </div>
 
@@ -159,8 +159,8 @@ export function PerfilPrestador() {
         </div>
 
         <AvaliacoesPerfilSecao
-          descricaoLista="Historico de notas deixadas por clientes apos servicos concluidos."
-          mensagemVazia="Voce ainda nao recebeu avaliacoes. Conclua atendimentos para que os clientes possam avaliar seu trabalho."
+          descricaoLista="Histórico de notas deixadas por clientes após serviços concluídos."
+          mensagemVazia="Você ainda não recebeu Avaliações. Conclua atendimentos para que os clientes possam avaliar seu trabalho."
         />
 
         <div className="painel-card painel-perfil-card">
@@ -174,7 +174,7 @@ export function PerfilPrestador() {
             </div>
           </div>
           <p className="painel-perfil-vazio">
-            Os comentarios aparecem junto de cada avaliacao na lista acima.
+            Os comentários aparecem junto de cada avaliação na lista acima.
           </p>
         </div>
       </section>

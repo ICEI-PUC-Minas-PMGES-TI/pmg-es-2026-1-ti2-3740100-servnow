@@ -61,7 +61,7 @@ export type VerificacaoFacialResultado = {
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const response = await fetch(`${API_URL}${path}`, {
@@ -74,7 +74,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const texto = await response.text();
-    let mensagem = "Nao foi possivel concluir a operacao.";
+    let mensagem = "Não foi possível concluir a operacao.";
     try {
       const json = JSON.parse(texto) as { detail?: string; title?: string };
       mensagem = json.detail ?? json.title ?? mensagem;
@@ -134,7 +134,7 @@ export function confirmarChegada(solicitacaoId: number, codigo: string) {
 export function registrarAtualizacao(solicitacaoId: number, descricao: string, foto?: File) {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const form = new FormData();
@@ -150,7 +150,7 @@ export function registrarAtualizacao(solicitacaoId: number, descricao: string, f
   }).then(async (response) => {
     if (!response.ok) {
       const texto = await response.text();
-      throw new Error(texto || "Nao foi possivel enviar a atualizacao.");
+      throw new Error(texto || "Não foi possível enviar a Atualização.");
     }
     return (await response.json()) as AcompanhamentoDetalhe;
   });
@@ -210,7 +210,7 @@ export function confirmarPagamento(solicitacaoId: number, metodoPagamento: "PIX"
 export async function carregarPixQrCode(solicitacaoId: number): Promise<string> {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const response = await fetch(`${API_URL}/api/acompanhamento/${solicitacaoId}/pix-qrcode`, {
@@ -219,7 +219,7 @@ export async function carregarPixQrCode(solicitacaoId: number): Promise<string> 
 
   if (!response.ok) {
     const texto = await response.text();
-    let mensagem = "Nao foi possivel carregar o QR Code PIX.";
+    let mensagem = "Não foi possível carregar o QR Code PIX.";
     try {
       const json = JSON.parse(texto) as { detail?: string; title?: string };
       mensagem = json.detail ?? json.title ?? mensagem;
@@ -238,7 +238,7 @@ export async function carregarPixQrCode(solicitacaoId: number): Promise<string> 
 export async function carregarPixCopiaCola(solicitacaoId: number): Promise<string> {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const response = await fetch(`${API_URL}/api/acompanhamento/${solicitacaoId}/pix-copia-cola`, {
@@ -247,7 +247,7 @@ export async function carregarPixCopiaCola(solicitacaoId: number): Promise<strin
 
   if (!response.ok) {
     const texto = await response.text();
-    let mensagem = "Nao foi possivel carregar o codigo PIX.";
+    let mensagem = "Não foi possível carregar o código PIX.";
     try {
       const json = JSON.parse(texto) as { detail?: string; title?: string };
       mensagem = json.detail ?? json.title ?? mensagem;

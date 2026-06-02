@@ -69,16 +69,16 @@ export function Historico() {
           headers: authHeader(session.token),
         });
         if (response.status === 401) {
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
         if (!response.ok) {
-          throw new Error("Nao foi possivel carregar o historico.");
+          throw new Error("Não foi possível carregar o Histórico.");
         }
         setConcluidos((await response.json()) as SolicitacaoServicoResponse[]);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar historico.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar Histórico.");
       } finally {
         setIsLoading(false);
       }
@@ -101,8 +101,8 @@ export function Historico() {
     <>
       <PainelSectionHeader
         eyebrow="Resumo"
-        title="Historico"
-        description="Servicos concluidos e ganhos do periodo selecionado."
+        title="Histórico"
+        description="Serviços concluídos e ganhos do período selecionado."
       />
 
       <section className="painel-card">
@@ -181,7 +181,7 @@ export function Historico() {
                     </div>
                   </div>
                   <div className="painel-lista-item-acoes">
-                    <span className="painel-status concluido">Concluido</span>
+                    <span className="painel-status concluído">Concluido</span>
                     <button
                       type="button"
                       className="painel-btn-ghost"

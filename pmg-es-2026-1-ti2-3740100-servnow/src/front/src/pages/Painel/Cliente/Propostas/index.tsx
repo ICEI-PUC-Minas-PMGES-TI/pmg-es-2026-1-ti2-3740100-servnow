@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, DollarSign, Eye, FileText, MessageSquare, Star, User, X } from "lucide-react";
 import { PerfilPublicoModal } from "../../../../Components/Perfil/PerfilPublicoModal";
@@ -61,12 +61,12 @@ export function Propostas() {
           headers: authHeader(session.token),
         });
         if (response.status === 401) {
-          toast.error("Sessao expirada. Entre novamente.");
+          toast.error("Sessão expirada. Entre novamente.");
           navigate("/login");
           return;
         }
         if (!response.ok) {
-          throw new Error(await getResponseError(response, "Nao foi possivel carregar as propostas."));
+          throw new Error(await getResponseError(response, "Não foi possível carregar as propostas."));
         }
         const lista = (await response.json()) as PropostaServicoResponse[];
         setPropostas(lista);
@@ -99,7 +99,7 @@ export function Propostas() {
   async function responderProposta(propostaId: number, acao: "aceitar" | "recusar") {
     const session = getValidAuthSession();
     if (!session?.token) {
-      toast.error("Sessao expirada. Entre novamente.");
+      toast.error("Sessão expirada. Entre novamente.");
       navigate("/login");
       return;
     }
@@ -111,7 +111,7 @@ export function Propostas() {
         headers: authHeaders(session.token),
       });
       if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
@@ -119,7 +119,7 @@ export function Propostas() {
         throw new Error(
           await getResponseError(
             response,
-            acao === "aceitar" ? "Nao foi possivel aceitar a proposta." : "Nao foi possivel recusar a proposta.",
+            acao === "aceitar" ? "Não foi possível aceitar a proposta." : "Não foi possível recusar a proposta.",
           ),
         );
       }
@@ -138,10 +138,10 @@ export function Propostas() {
             return item;
           }),
         );
-        toast.success("Proposta aceita. As demais propostas desta solicitacao foram canceladas.");
+        toast.success("Proposta aceita. As demais propostas desta solicitação foram canceladas.");
       } else {
         setPropostas((atual) => atual.map((item) => (item.id === atualizada.id ? atualizada : item)));
-        toast.success("Proposta recusada. Ela permanece no historico em Recusadas.");
+        toast.success("Proposta recusada. Ela permanece no Histórico em Recusadas.");
       }
 
       dispararAtualizacaoNotificacoes();
@@ -159,7 +159,7 @@ export function Propostas() {
       <PainelSectionHeader
         eyebrow="Propostas recebidas"
         title="Propostas"
-        description="Veja as propostas enviadas por prestadores para as solicitacoes que voce criou."
+        description="Veja as propostas enviadas por prestadores para as solicitações que você criou."
       />
 
       <section className="painel-card">
@@ -211,7 +211,7 @@ export function Propostas() {
                 >
                   <div className="painel-proposta-cabecalho">
                     <div>
-                      <span className="painel-proposta-solicitacao">{tituloSolicitacao(proposta)}</span>
+                      <span className="painel-proposta-solicitação">{tituloSolicitacao(proposta)}</span>
                       <h3>{proposta.prestadorNome}</h3>
                     </div>
 
@@ -299,35 +299,35 @@ export function Propostas() {
       ) : null}
 
       {confirmarRecusa && (
-        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarRecusa(null)}>
+        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setConfirmarRecusa(null)}>
           <div
-            className="solicitacao-modal"
+            className="solicitação-modal"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: 460 }}
           >
-            <header className="solicitacao-modal-cabecalho">
-              <div className="solicitacao-modal-titulo-grupo">
+            <header className="solicitação-modal-cabecalho">
+              <div className="solicitação-modal-titulo-grupo">
                 <X size={20} />
                 <h3>Recusar proposta</h3>
               </div>
               <button
                 type="button"
-                className="solicitacao-modal-fechar"
+                className="solicitação-modal-fechar"
                 onClick={() => setConfirmarRecusa(null)}
                 aria-label="Fechar"
               >
                 <X size={18} />
               </button>
             </header>
-            <div className="solicitacao-modal-corpo">
+            <div className="solicitação-modal-corpo">
               <p style={{ marginTop: 0 }}>Deseja recusar a proposta de {confirmarRecusa.prestadorNome}?</p>
               <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
                 A proposta continuara visivel no filtro Recusadas.
               </p>
             </div>
-            <footer className="solicitacao-modal-rodape">
+            <footer className="solicitação-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setConfirmarRecusa(null)}>
                 Cancelar
               </button>

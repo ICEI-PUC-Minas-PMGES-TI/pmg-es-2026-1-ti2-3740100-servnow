@@ -10,7 +10,7 @@ const TIPO_PARA_FILTRO: Record<string, string> = {
   ELETRICO: "eletrica",
   HIDRAULICO: "hidraulica",
   PINTURA: "pintura",
-  MONTAGEM: "moveis",
+  MONTAGEM: "móveis",
   MANUTENCAO_GERAL: "manutencao",
   ELETRODOMESTICOS: "eletro",
 };
@@ -79,7 +79,7 @@ export { formatarDistancia } from "../../../../utils/formatarDistancia";
 
 export function getFaixaPrecoLabel(faixaPreco: string) {
   const labels: Record<string, string> = {
-    ATE_150: "Ate R$ 150",
+    ATE_150: "Até R$ 150",
     DE_150_A_300: "R$ 150 a R$ 300",
     DE_300_A_600: "R$ 300 a R$ 600",
     DE_600_A_1000: "R$ 600 a R$ 1.000",

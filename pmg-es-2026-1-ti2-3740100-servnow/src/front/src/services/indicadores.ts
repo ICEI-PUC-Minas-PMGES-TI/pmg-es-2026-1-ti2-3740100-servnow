@@ -33,7 +33,7 @@ export type IndicadorPrestadorResponse = {
 export async function buscarIndicadoresPrestador(periodo: PeriodoIndicador): Promise<IndicadorPrestadorResponse> {
   const session = getValidAuthSession();
   if (!session?.token) {
-    throw new Error("Sessao expirada.");
+    throw new Error("Sessão expirada.");
   }
 
   const response = await fetch(`${API_URL}/api/solicitacoes/prestador/indicadores?periodo=${periodo}`, {
@@ -41,7 +41,7 @@ export async function buscarIndicadoresPrestador(periodo: PeriodoIndicador): Pro
   });
 
   if (!response.ok) {
-    throw new Error("Nao foi possivel carregar os indicadores.");
+    throw new Error("Não foi possível carregar os indicadores.");
   }
 
   return (await response.json()) as IndicadorPrestadorResponse;

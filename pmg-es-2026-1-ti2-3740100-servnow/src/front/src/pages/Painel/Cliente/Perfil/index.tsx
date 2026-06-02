@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { MapPin, MessageSquare, Star, User } from "lucide-react";
 
 import { AvaliacoesPerfilSecao } from "../../../../Components/Perfil/AvaliacoesPerfilSecao";
@@ -86,7 +86,7 @@ export function PerfilCliente() {
       <PainelSectionHeader
         eyebrow="Meu perfil"
         title="Perfil"
-        description="Visualize seus dados e o historico de comentarios e avaliacoes recebidas."
+        description="Visualize seus dados e o histórico de comentários e avaliações recebidas."
       />
 
       <section className="painel-perfil-grid">
@@ -129,7 +129,7 @@ export function PerfilCliente() {
               {enderecosExibicao.map((item) => (
                 <li key={item.id || `${item.rua}-${item.numero}`} className={item.principal ? "painel-perfil-item--ativo" : ""}>
                   <strong>
-                    {item.rotulo || "Endereco"}
+                    {item.rotulo || "Endereço"}
                     {item.principal ? " (em uso)" : ""}
                   </strong>
                   <span>
@@ -139,13 +139,13 @@ export function PerfilCliente() {
               ))}
             </ul>
           ) : (
-            <p className="painel-perfil-vazio">Nenhum endereco cadastrado. Configure em Configurar perfil.</p>
+            <p className="painel-perfil-vazio">Nenhum endereço cadastrado. Configure em Configurar perfil.</p>
           )}
         </div>
 
         <AvaliacoesPerfilSecao
-          descricaoLista="Historico de notas deixadas por prestadores apos servicos concluidos."
-          mensagemVazia="Voce ainda nao recebeu avaliacoes. Conclua servicos para que os prestadores possam avaliar voce."
+          descricaoLista="Histórico de notas deixadas por prestadores após serviços concluídos."
+          mensagemVazia="Você ainda não recebeu Avaliações. Conclua serviços para que os prestadores possam avaliar voce."
         />
 
         <div className="painel-card painel-perfil-card">
@@ -159,7 +159,7 @@ export function PerfilCliente() {
             </div>
           </div>
           <p className="painel-perfil-vazio">
-            Os comentarios aparecem junto de cada avaliacao na lista acima.
+            Os comentários aparecem junto de cada avaliação na lista acima.
           </p>
         </div>
       </section>

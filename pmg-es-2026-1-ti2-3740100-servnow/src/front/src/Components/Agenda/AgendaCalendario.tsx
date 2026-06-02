@@ -14,7 +14,7 @@ type AgendaCalendarioProps = {
 };
 
 const NOMES_MES = [
-  "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho",
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
@@ -71,26 +71,28 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
 
   return (
     <div className="agenda">
-      <div className="agenda-cabecalho">
-        <button type="button" className="agenda-nav" onClick={() => mudarMes(-1)} aria-label="Mes anterior">
-          <ChevronLeft size={18} />
-        </button>
-        <strong className="agenda-mes-titulo">
-          {NOMES_MES[mes]} {ano}
-        </strong>
-        <button type="button" className="agenda-nav" onClick={() => mudarMes(1)} aria-label="Proximo mes">
-          <ChevronRight size={18} />
-        </button>
-      </div>
+      <div className="agenda-layout">
+        <div className="agenda-calendario">
+          <div className="agenda-cabecalho">
+            <button type="button" className="agenda-nav" onClick={() => mudarMes(-1)} aria-label="Mês anterior">
+              <ChevronLeft size={18} />
+            </button>
+            <strong className="agenda-mes-titulo">
+              {NOMES_MES[mes]} {ano}
+            </strong>
+            <button type="button" className="agenda-nav" onClick={() => mudarMes(1)} aria-label="Próximo mês">
+              <ChevronRight size={18} />
+            </button>
+          </div>
 
-      <div className="agenda-grid agenda-grid-dias">
-        {DIAS_SEMANA.map((nome) => (
-          <span key={nome} className="agenda-dia-semana">{nome}</span>
-        ))}
-      </div>
+          <div className="agenda-grid agenda-grid-dias">
+            {DIAS_SEMANA.map((nome) => (
+              <span key={nome} className="agenda-dia-semana">{nome}</span>
+            ))}
+          </div>
 
-      <div className="agenda-grid">
-        {celulas.map((dia, indice) => {
+          <div className="agenda-grid">
+            {celulas.map((dia, indice) => {
           if (dia === null) {
             return <span key={`vazio-${indice}`} className="agenda-celula agenda-celula-vazia" />;
           }
@@ -117,16 +119,17 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
               {temServico && <span className="agenda-celula-marcador">{quantidade}</span>}
             </button>
           );
-        })}
-      </div>
+            })}
+          </div>
+        </div>
 
-      <div className="agenda-detalhes">
-        {!diaSelecionado ? (
-          <p className="agenda-detalhes-vazio">
-            <Calendar size={16} /> Selecione um dia com servico marcado para ver os detalhes.
-          </p>
-        ) : servicosDoDia.length === 0 ? (
-          <p className="agenda-detalhes-vazio">Nenhum servico para este dia.</p>
+        <div className="agenda-detalhes">
+          {!diaSelecionado ? (
+            <p className="agenda-detalhes-vazio">
+              <Calendar size={16} /> Selecione um dia com serviço marcado para ver os detalhes.
+            </p>
+          ) : servicosDoDia.length === 0 ? (
+            <p className="agenda-detalhes-vazio">Nenhum serviço para este dia.</p>
         ) : (
           <>
             <h3 className="agenda-detalhes-titulo">{formatarDiaSelecionado(diaSelecionado)}</h3>
@@ -156,7 +159,7 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
                         </span>
                       </div>
                       {item.descricao && (
-                        <p className="agenda-servico-descricao">{item.descricao}</p>
+                        <p className="agenda-servico-descrição">{item.descricao}</p>
                       )}
                       {papel === "PRESTADOR" && (
                         <div style={{ marginTop: 12 }}>
@@ -179,7 +182,8 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
               })}
             </div>
           </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

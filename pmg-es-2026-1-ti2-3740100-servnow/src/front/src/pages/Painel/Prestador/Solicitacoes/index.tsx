@@ -96,7 +96,7 @@ export function Solicitacoes() {
       const session = getValidAuthSession();
 
       if (!session?.token) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
@@ -107,18 +107,18 @@ export function Solicitacoes() {
         });
 
         if (response.status === 401) {
-          toast.error("Nao foi possivel autenticar. Entre novamente e tente de novo.");
+          toast.error("Não foi possível autenticar. Entre novamente e tente de novo.");
           return;
         }
 
         if (!response.ok) {
-          throw new Error(await getResponseError(response, "Nao foi possivel carregar as solicitacoes."));
+          throw new Error(await getResponseError(response, "Não foi possível carregar as solicitações."));
         }
 
         const dados = (await response.json()) as SolicitacaoServicoResponse[];
         setSolicitacoes(dados.map(enriquecerSolicitacao));
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitacoes.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar solicitações.");
       } finally {
         setIsLoading(false);
       }
@@ -161,7 +161,7 @@ export function Solicitacoes() {
 
   function abrirVisualizacaoMapa() {
     if (lista.length === 0) {
-      toast.info("Nenhuma solicitacao para exibir no mapa.");
+      toast.info("Nenhuma solicitação para exibir no mapa.");
       return;
     }
     setVisualizacao("mapa");
@@ -204,7 +204,7 @@ export function Solicitacoes() {
 
     const session = getValidAuthSession();
     if (!session?.token) {
-      toast.error("Sessao expirada. Entre novamente.");
+      toast.error("Sessão expirada. Entre novamente.");
       navigate("/login");
       return;
     }
@@ -224,18 +224,18 @@ export function Solicitacoes() {
       });
 
       if (response.status === 401) {
-        toast.error("Sessao expirada. Entre novamente.");
+        toast.error("Sessão expirada. Entre novamente.");
         navigate("/login");
         return;
       }
       if (response.status === 404) {
-        toast.error("Esta solicitacao nao esta mais disponivel para proposta. Atualize a lista.");
+        toast.error("Esta solicitação não esta mais disponivel para proposta. Atualize a lista.");
         setPropostaAberta(null);
         setSolicitacoes((atual) => atual.filter((item) => item.id !== propostaAberta.id));
         return;
       }
       if (!response.ok) {
-        throw new Error(await getResponseError(response, "Nao foi possivel enviar a proposta."));
+        throw new Error(await getResponseError(response, "Não foi possível enviar a proposta."));
       }
 
       const solicitacaoId = propostaAberta.id;
@@ -257,7 +257,7 @@ export function Solicitacoes() {
     <>
       <PainelSectionHeader
         eyebrow="Oportunidades"
-        title="Solicitacoes"
+        title="Solicitações"
         description="Filtre por tipo, preco e distancia. Envie propostas para os servicos disponiveis."
       />
 
@@ -283,7 +283,7 @@ export function Solicitacoes() {
                 <option value="">Tipo</option>
                 <option value="eletrica">Eletrica</option>
                 <option value="hidraulica">Hidraulica</option>
-                <option value="moveis">Montagem de moveis</option>
+                <option value="móveis">Montagem de moveis</option>
                 <option value="manutencao">Manutencao geral</option>
                 <option value="pintura">Pintura</option>
                 <option value="eletro">Eletrodomesticos</option>
@@ -395,7 +395,7 @@ export function Solicitacoes() {
                     <SolicitacaoImagemThumb
                       solicitacaoId={item.id}
                       imagemUrl={item.imagemUrl}
-                      className="solicitacao-imagem-thumb"
+                      className="solicitação-imagem-thumb"
                       onClick={() => setDetalheAberto(item)}
                     />
                   )}
@@ -453,14 +453,14 @@ export function Solicitacoes() {
       />
 
       {propostaAberta && (
-        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setPropostaAberta(null)}>
-          <div className="solicitacao-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <header className="solicitacao-modal-cabecalho">
-              <div className="solicitacao-modal-titulo-grupo">
+        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setPropostaAberta(null)}>
+          <div className="solicitação-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <header className="solicitação-modal-cabecalho">
+              <div className="solicitação-modal-titulo-grupo">
                 <h3>Enviar proposta</h3>
               </div>
             </header>
-            <div className="solicitacao-modal-corpo">
+            <div className="solicitação-modal-corpo">
               <section className="painel-card" style={{ padding: 14, marginBottom: 10 }}>
                 <h4 style={{ marginTop: 0, marginBottom: 10 }}>Perfil do cliente</h4>
                 <PerfilPublicoConteudo perfil={perfilCliente} carregando={carregandoPerfilCliente} />
@@ -492,7 +492,7 @@ export function Solicitacoes() {
                 </label>
               </div>
             </div>
-            <footer className="solicitacao-modal-rodape">
+            <footer className="solicitação-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setPropostaAberta(null)} disabled={enviandoProposta}>
                 Cancelar
               </button>

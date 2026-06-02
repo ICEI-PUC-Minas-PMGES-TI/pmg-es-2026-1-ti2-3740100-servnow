@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -38,7 +38,7 @@ import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
 type MetodoPagamento = "PIX" | "CREDITO" | "DEBITO";
 
-type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "reagendamento" | "visita-reagendada" | "pagamento" | "avaliacao" | "concluido";
+type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "reagendamento" | "visita-reagendada" | "pagamento" | "avaliação" | "concluido";
 
 const METODOS_PAGAMENTO: Array<{ id: MetodoPagamento; nome: string; desc: string; icone: typeof QrCode }> = [
   { id: "PIX", nome: "PIX", desc: "Pagamento instantaneo", icone: QrCode },
@@ -50,7 +50,7 @@ const ETAPAS_INFO: Array<{ id: ClienteEtapa; label: string; numero: number }> = 
   { id: "aguardando-chegada", label: "Aguardando chegada", numero: 1 },
   { id: "em-andamento", label: "Em andamento", numero: 2 },
   { id: "pagamento", label: "Pagamento", numero: 3 },
-  { id: "avaliacao", label: "Avaliacao", numero: 4 },
+  { id: "avaliação", label: "Avaliação", numero: 4 },
 ];
 
 function etapaBackendParaCliente(etapa: string): ClienteEtapa {
@@ -64,7 +64,7 @@ function etapaBackendParaCliente(etapa: string): ClienteEtapa {
     case "AGUARDANDO_PAGAMENTO":
       return "pagamento";
     case "AGUARDANDO_AVALIACAO":
-      return "avaliacao";
+      return "avaliação";
     case "CONCLUIDA":
       return "concluido";
     default:
@@ -130,9 +130,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     setEnviando(true);
     try {
       setDetalhe(await renovarCodigo(solicitacaoId));
-      toast.success("Novo codigo gerado.");
+      toast.success("Novo código gerado.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao renovar codigo.");
+      toast.error(error instanceof Error ? error.message : "Erro ao renovar código.");
     } finally {
       setEnviando(false);
     }
@@ -220,7 +220,7 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             return null;
           });
           setPixCopiaCola(null);
-          setPixQrErro(error instanceof Error ? error.message : "Nao foi possivel gerar o QR Code PIX.");
+          setPixQrErro(error instanceof Error ? error.message : "Não foi possível gerar o QR Code PIX.");
         }
       } finally {
         if (!cancelado) {
@@ -253,9 +253,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     }
     try {
       await navigator.clipboard.writeText(pixCopiaCola);
-      toast.success("Codigo PIX copiado.");
+      toast.success("Código PIX copiado.");
     } catch {
-      toast.error("Nao foi possivel copiar o codigo PIX.");
+      toast.error("Não foi possível copiar o código PIX.");
     }
   }
 
@@ -266,12 +266,12 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       const atualizado = await avaliarServico(solicitacaoId, nota, comentario || undefined);
       setDetalhe(atualizado);
       if (atualizado.etapa === "CONCLUIDA") {
-        toast.success("Avaliacao enviada. Servico finalizado!");
+        toast.success("Avaliação enviada. Serviço finalizado!");
       } else {
-        toast.success("Avaliacao enviada. Aguardando o prestador avaliar o atendimento.");
+        toast.success("Avaliação enviada. Aguardando o prestador avaliar o atendimento.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar avaliacao.");
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar Avaliação.");
     } finally {
       setEnviando(false);
     }
@@ -306,9 +306,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
       </button>
 
       <PainelSectionHeader
-        eyebrow="Servico atual"
+        eyebrow="Serviço atual"
         title={tituloServico}
-        description="Acompanhe em tempo real o servico que voce contratou."
+        description="Acompanhe em tempo real o serviço que você contratou."
       />
 
       {etapa !== "concluido" && (
@@ -553,7 +553,7 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             <strong>{formatarMoedaBrl(valorExibir)}</strong>
           </div>
 
-          <div className="acomp-pagamento-opcoes">
+          <div className="acomp-pagamento-opções">
             {METODOS_PAGAMENTO.map((metodo) => {
               const Icone = metodo.icone;
               return (
@@ -588,12 +588,12 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
               {pixQrUrl && (
                 <img
                   src={pixQrUrl}
-                  alt="QR Code PIX para pagamento do servico"
+                  alt="QR Code PIX para pagamento do serviço"
                   className="acomp-pix-qr-imagem"
                 />
               )}
               {!carregandoPixQr && !pixQrUrl && (
-                <p className="acomp-pix-qr-status">{pixQrErro ?? "Nao foi possivel carregar o QR Code."}</p>
+                <p className="acomp-pix-qr-status">{pixQrErro ?? "Não foi possível carregar o QR Code."}</p>
               )}
               <p className="acomp-pix-qr-legenda">
                 Valor: {formatarMoedaBrl(valorExibir)} — pague para {detalhe.prestadorNome ?? "o prestador"}
@@ -635,10 +635,10 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
         </section>
       )}
 
-      {etapa === "avaliacao" && (
+      {etapa === "avaliação" && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>{clienteJaAvaliouPrestador ? "Avaliacao enviada" : "Avaliar prestador"}</h2>
+            <h2>{clienteJaAvaliouPrestador ? "Avaliação enviada" : "Avaliar prestador"}</h2>
           </div>
 
           {clienteJaAvaliouPrestador && !prestadorJaAvaliouCliente && (
@@ -685,7 +685,7 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
 
               <textarea
                 className="acomp-textarea"
-                placeholder="Comentario (opcional)"
+                placeholder="Comentário (opcional)"
                 value={comentario}
                 onChange={(event) => setComentario(event.target.value)}
                 style={{ marginTop: 8, marginBottom: 14 }}

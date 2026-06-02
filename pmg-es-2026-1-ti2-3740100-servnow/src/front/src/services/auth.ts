@@ -348,11 +348,11 @@ export async function getResponseError(response: Response, fallback: string) {
 
 export function formatarDataIso(valor: string | null | undefined) {
   if (!valor) {
-    return "Data nao informada";
+    return "Data não informada";
   }
   const data = new Date(valor);
   if (Number.isNaN(data.getTime())) {
-    return "Data nao informada";
+    return "Data não informada";
   }
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
