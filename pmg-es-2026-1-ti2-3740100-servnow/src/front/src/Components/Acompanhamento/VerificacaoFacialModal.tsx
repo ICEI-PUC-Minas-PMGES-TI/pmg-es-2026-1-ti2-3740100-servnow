@@ -5,8 +5,12 @@ import { getValidAuthSession } from "../../services/auth";
 import { carregarArquivoAutenticado } from "../../utils/arquivoAutenticado";
 import {
   capturarFrameDoVideo,
+  compararCapturaComReferenciaPreparada,
   compararRostoComReferencia,
   imagemParaElemento,
+  mensagemVerificacaoRejeitada,
+  preCarregarModelosFaciais,
+  prepararReferenciaFacial,
 } from "../../utils/verificacaoFacial";
 
 type Props = {
@@ -48,6 +52,8 @@ export function VerificacaoFacialModal({
   const streamRef = useRef<MediaStream | null>(null);
   const [etapa, setEtapa] = useState<EtapaCamera>("solicitar");
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [preparando, setPreparando] = useState(false);
+  const referenciaProntaRef = useRef(false);
 
   const pararCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -88,10 +94,49 @@ export function VerificacaoFacialModal({
       pararCamera();
       setEtapa("solicitar");
       setMensagem(null);
+      setPreparando(false);
+      referenciaProntaRef.current = false;
       return;
     }
 
     let cancelado = false;
+    preCarregarModelosFaciais();
+
+    async function prepararPerfil() {
+      if (!fotoPerfilUrl) {
+        referenciaProntaRef.current = false;
+        return;
+      }
+      const session = getValidAuthSession();
+      if (!session?.token) {
+        return;
+      }
+      setPreparando(true);
+      try {
+        const arquivoPerfil = await carregarArquivoAutenticado(fotoPerfilUrl, session.token);
+        if (cancelado || !arquivoPerfil?.url) {
+          return;
+        }
+        const referencia = await imagemParaElemento(arquivoPerfil.url);
+        if (cancelado) {
+          return;
+        }
+        await prepararReferenciaFacial(referencia, fotoPerfilUrl);
+        if (!cancelado) {
+          referenciaProntaRef.current = true;
+        }
+      } catch {
+        if (!cancelado) {
+          referenciaProntaRef.current = false;
+        }
+      } finally {
+        if (!cancelado) {
+          setPreparando(false);
+        }
+      }
+    }
+
+    void prepararPerfil();
 
     async function tentarCameraJaPermitida() {
       if (!navigator.permissions?.query) {
@@ -116,7 +161,7 @@ export function VerificacaoFacialModal({
       cancelado = true;
       pararCamera();
     };
-  }, [aberto, pararCamera, solicitarCamera]);
+  }, [aberto, fotoPerfilUrl, pararCamera, solicitarCamera]);
 
   async function handleCapturar() {
     if (!videoRef.current || !fotoPerfilUrl) {
@@ -136,20 +181,25 @@ export function VerificacaoFacialModal({
     setMensagem(null);
 
     try {
-      const arquivoPerfil = await carregarArquivoAutenticado(fotoPerfilUrl, session.token);
-      if (!arquivoPerfil?.url) {
-        throw new Error("Nao foi possivel carregar a foto de perfil.");
-      }
-
-      const referencia = await imagemParaElemento(arquivoPerfil.url);
       const captura = capturarFrameDoVideo(videoRef.current);
-      const resultado = await compararRostoComReferencia(referencia, captura, limiarSimilaridade);
+
+      let resultado;
+      if (referenciaProntaRef.current) {
+        resultado = await compararCapturaComReferenciaPreparada(captura, fotoPerfilUrl, limiarSimilaridade);
+      } else {
+        const arquivoPerfil = await carregarArquivoAutenticado(fotoPerfilUrl, session.token);
+        if (!arquivoPerfil?.url) {
+          throw new Error("Nao foi possivel carregar a foto de perfil.");
+        }
+        const referencia = await imagemParaElemento(arquivoPerfil.url);
+        await prepararReferenciaFacial(referencia, fotoPerfilUrl);
+        referenciaProntaRef.current = true;
+        resultado = await compararRostoComReferencia(referencia, captura, limiarSimilaridade, fotoPerfilUrl);
+      }
 
       if (!resultado.aprovado) {
         setEtapa("ativa");
-        setMensagem(
-          `Similaridade ${resultado.similaridade.toFixed(1)}% (minimo ${limiarSimilaridade}%). Ajuste a iluminacao e tente novamente.`,
-        );
+        setMensagem(mensagemVerificacaoRejeitada());
         return;
       }
 
@@ -186,6 +236,9 @@ export function VerificacaoFacialModal({
         <p className="verif-facial-texto">
           Confirme que voce e o prestador cadastrado. Sua selfie sera comparada com a foto de perfil e nao sera
           armazenada no servidor.
+          {preparando && (
+            <span className="verif-facial-preparando"> Preparando verificacao (primeira vez pode levar alguns segundos)...</span>
+          )}
         </p>
 
         <div className="verif-facial-video-wrap">
@@ -217,8 +270,10 @@ export function VerificacaoFacialModal({
             </div>
           )}
 
-          {etapa === "processando" && (
-            <div className="verif-facial-processando">Analisando rosto...</div>
+          {(etapa === "processando" || preparando) && (
+            <div className="verif-facial-processando">
+              {etapa === "processando" ? "Analisando rosto..." : "Carregando modelos..."}
+            </div>
           )}
         </div>
 

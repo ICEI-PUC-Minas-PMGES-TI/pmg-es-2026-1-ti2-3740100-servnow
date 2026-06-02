@@ -38,6 +38,10 @@ import {
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
+import {
+  mensagemVerificacaoAprovada,
+  preCarregarModelosFaciais,
+} from "../../../../utils/verificacaoFacial";
 
 type PrestadorEtapa = "confirmar-chegada" | "em-execucao" | "aguardando-reagendamento" | "visita-reagendada" | "aguardando-pagamento" | "aguardando-avaliacao" | "concluido";
 
@@ -103,6 +107,12 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   }, [carregar]);
 
   const etapa = detalhe ? etapaBackendParaPrestador(detalhe.etapa) : "confirmar-chegada";
+
+  useEffect(() => {
+    if (etapa === "confirmar-chegada" && detalhe?.verificacaoFacialObrigatoria) {
+      preCarregarModelosFaciais();
+    }
+  }, [etapa, detalhe?.verificacaoFacialObrigatoria]);
   const progressoAtual = detalhe?.percentualConcluido ?? 0;
   const percentualMinimo = Math.min(progressoAtual + 1, 99);
 
@@ -286,7 +296,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       await verificarIdentidadeFacial(solicitacaoId, similaridade);
       setDetalhe(await obterDetalhe(solicitacaoId));
       setModalVerificacaoAberto(false);
-      toast.success("Identidade verificada. Agora informe o codigo do cliente.");
+      toast.success(`${mensagemVerificacaoAprovada()} Agora informe o codigo do cliente.`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao registrar verificacao.");
       throw error;
@@ -375,10 +385,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
                 {identidadeVerificada ? (
                   <p className="verif-facial-status-ok">
                     <CheckCircle2 size={18} />
-                    Identidade verificada
-                    {detalhe.identidadeSimilaridade != null
-                      ? ` (${detalhe.identidadeSimilaridade.toFixed(1)}% de similaridade)`
-                      : ""}
+                    {mensagemVerificacaoAprovada()}
                   </p>
                 ) : (
                   <>
