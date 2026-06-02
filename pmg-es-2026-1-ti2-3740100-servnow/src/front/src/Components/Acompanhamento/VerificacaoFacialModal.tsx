@@ -1,4 +1,4 @@
-import { ScanFace, X } from "lucide-react";
+import { Camera, ScanFace, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getValidAuthSession } from "../../services/auth";
@@ -17,6 +17,26 @@ type Props = {
   onSucesso: (similaridade: number) => Promise<void>;
 };
 
+type EtapaCamera = "solicitar" | "ativa" | "processando" | "negada";
+
+function mensagemErroCamera(erro: unknown): string {
+  if (erro instanceof DOMException) {
+    if (erro.name === "NotAllowedError" || erro.name === "PermissionDeniedError") {
+      return "Acesso a camera negado. Toque em \"Permitir camera\" para o navegador exibir o pedido de permissao.";
+    }
+    if (erro.name === "NotFoundError" || erro.name === "DevicesNotFoundError") {
+      return "Nenhuma camera encontrada neste dispositivo.";
+    }
+    if (erro.name === "NotReadableError" || erro.name === "TrackStartError") {
+      return "A camera esta em uso por outro aplicativo. Feche-o e tente novamente.";
+    }
+  }
+  if (erro instanceof Error && erro.message) {
+    return erro.message;
+  }
+  return "Nao foi possivel acessar a camera. Tente novamente.";
+}
+
 export function VerificacaoFacialModal({
   aberto,
   fotoPerfilUrl,
@@ -26,7 +46,7 @@ export function VerificacaoFacialModal({
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [status, setStatus] = useState<"camera" | "processando" | "erro">("camera");
+  const [etapa, setEtapa] = useState<EtapaCamera>("solicitar");
   const [mensagem, setMensagem] = useState<string | null>(null);
 
   const pararCamera = useCallback(() => {
@@ -37,60 +57,82 @@ export function VerificacaoFacialModal({
     }
   }, []);
 
+  const solicitarCamera = useCallback(async () => {
+    setMensagem(null);
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setEtapa("negada");
+      setMensagem("Seu navegador nao suporta acesso a camera.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      setEtapa("ativa");
+    } catch (erro) {
+      setEtapa("negada");
+      setMensagem(mensagemErroCamera(erro));
+    }
+  }, []);
+
   useEffect(() => {
     if (!aberto) {
       pararCamera();
-      setStatus("camera");
+      setEtapa("solicitar");
       setMensagem(null);
       return;
     }
 
     let cancelado = false;
 
-    async function iniciarCamera() {
+    async function tentarCameraJaPermitida() {
+      if (!navigator.permissions?.query) {
+        return;
+      }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false,
-        });
+        const status = await navigator.permissions.query({ name: "camera" as PermissionName });
         if (cancelado) {
-          stream.getTracks().forEach((track) => track.stop());
           return;
         }
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+        if (status.state === "granted") {
+          await solicitarCamera();
         }
       } catch {
-        setStatus("erro");
-        setMensagem("Permita o acesso a camera nas configuracoes do navegador para verificar sua identidade.");
+        // Permissions API indisponivel ou nome nao suportado — usuario clica no botao
       }
     }
 
-    void iniciarCamera();
+    void tentarCameraJaPermitida();
 
     return () => {
       cancelado = true;
       pararCamera();
     };
-  }, [aberto, pararCamera]);
+  }, [aberto, pararCamera, solicitarCamera]);
 
   async function handleCapturar() {
     if (!videoRef.current || !fotoPerfilUrl) {
       setMensagem("Cadastre uma foto de perfil com o rosto visivel antes de continuar.");
-      setStatus("erro");
+      setEtapa("negada");
       return;
     }
 
     const session = getValidAuthSession();
     if (!session?.token) {
       setMensagem("Sessao expirada. Faca login novamente.");
-      setStatus("erro");
+      setEtapa("negada");
       return;
     }
 
-    setStatus("processando");
+    setEtapa("processando");
     setMensagem(null);
 
     try {
@@ -104,7 +146,7 @@ export function VerificacaoFacialModal({
       const resultado = await compararRostoComReferencia(referencia, captura, limiarSimilaridade);
 
       if (!resultado.aprovado) {
-        setStatus("camera");
+        setEtapa("ativa");
         setMensagem(
           `Similaridade ${resultado.similaridade.toFixed(1)}% (minimo ${limiarSimilaridade}%). Ajuste a iluminacao e tente novamente.`,
         );
@@ -115,11 +157,11 @@ export function VerificacaoFacialModal({
         await onSucesso(resultado.similaridade);
         pararCamera();
       } catch (error) {
-        setStatus("camera");
+        setEtapa("ativa");
         setMensagem(error instanceof Error ? error.message : "Nao foi possivel registrar a verificacao no servidor.");
       }
     } catch (error) {
-      setStatus("camera");
+      setEtapa("ativa");
       setMensagem(error instanceof Error ? error.message : "Falha na verificacao facial.");
     }
   }
@@ -127,6 +169,9 @@ export function VerificacaoFacialModal({
   if (!aberto) {
     return null;
   }
+
+  const cameraAtiva = etapa === "ativa" || etapa === "processando";
+  const mostrarPedidoPermissao = etapa === "solicitar" || etapa === "negada";
 
   return (
     <div className="verif-facial-overlay" role="dialog" aria-modal="true" aria-labelledby="verif-facial-titulo">
@@ -144,26 +189,53 @@ export function VerificacaoFacialModal({
         </p>
 
         <div className="verif-facial-video-wrap">
-          <video ref={videoRef} className="verif-facial-video" playsInline muted />
-          {status === "processando" && (
+          <video
+            ref={videoRef}
+            className={`verif-facial-video ${cameraAtiva ? "" : "verif-facial-video--oculto"}`}
+            playsInline
+            muted
+          />
+
+          {mostrarPedidoPermissao && (
+            <div className="verif-facial-placeholder">
+              <Camera size={40} strokeWidth={1.5} />
+              <p>
+                {etapa === "solicitar"
+                  ? "Toque no botao abaixo. O navegador vai abrir um pedido para usar a camera."
+                  : "Permissao necessaria para continuar."}
+              </p>
+              <button type="button" className="acomp-btn-primary" onClick={() => void solicitarCamera()}>
+                <Camera size={16} />
+                Permitir camera
+              </button>
+              {etapa === "negada" && (
+                <p className="verif-facial-dica">
+                  Se o pedido nao aparecer, abra o cadeado na barra de endereco do navegador e libere a camera para
+                  este site.
+                </p>
+              )}
+            </div>
+          )}
+
+          {etapa === "processando" && (
             <div className="verif-facial-processando">Analisando rosto...</div>
           )}
         </div>
 
-        {mensagem && <p className="verif-facial-erro">{mensagem}</p>}
+        {mensagem && <p className={etapa === "negada" ? "verif-facial-erro" : "verif-facial-aviso"}>{mensagem}</p>}
 
         <div className="verif-facial-acoes">
-          <button type="button" className="painel-btn-ghost" onClick={onFechar} disabled={status === "processando"}>
+          <button type="button" className="painel-btn-ghost" onClick={onFechar} disabled={etapa === "processando"}>
             Cancelar
           </button>
           <button
             type="button"
             className="acomp-btn-primary"
             onClick={() => void handleCapturar()}
-            disabled={status === "processando" || status === "erro"}
+            disabled={etapa !== "ativa" && etapa !== "processando"}
           >
             <ScanFace size={16} />
-            {status === "processando" ? "Verificando..." : "Capturar e verificar"}
+            {etapa === "processando" ? "Verificando..." : "Capturar e verificar"}
           </button>
         </div>
       </div>

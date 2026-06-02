@@ -1310,6 +1310,53 @@
   transform: scaleX(-1);
 }
 
+.verif-facial-video--oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.verif-facial-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+  color: var(--workspace-muted);
+}
+
+.verif-facial-placeholder p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  max-width: 280px;
+}
+
+.verif-facial-placeholder .acomp-btn-primary {
+  width: auto;
+  min-width: 200px;
+  margin-top: 4px;
+}
+
+.verif-facial-dica {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--workspace-muted);
+  max-width: 300px;
+}
+
+.verif-facial-aviso {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--workspace-muted);
+}
+
 .verif-facial-processando {
   position: absolute;
   inset: 0;
