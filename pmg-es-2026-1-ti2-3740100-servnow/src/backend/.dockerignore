@@ -1,0 +1,8 @@
+target/
+*.class
+data/
+.git/
+.idea/
+*.iml
+.vscode/
+HELP.md
