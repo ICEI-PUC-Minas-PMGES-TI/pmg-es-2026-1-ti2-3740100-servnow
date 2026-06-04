@@ -22,7 +22,9 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         List<String> patterns = new ArrayList<>(List.of(
             "http://localhost:*",
-            "http://127.0.0.1:*"
+            "http://127.0.0.1:*",
+            "https://*.vercel.app",
+            "https://*.onrender.com"
         ));
 
         if (allowedOrigins != null && !allowedOrigins.isBlank()) {
