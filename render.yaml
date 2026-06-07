@@ -1,10 +1,10 @@
-# Render Blueprint - cria o backend (Docker) e o frontend (site estatico) de uma vez.
-# Como usar: Render -> New + -> Blueprint -> conecta este repositorio do GitHub.
-# O banco ja e hospedado (Supabase), entao nao entra aqui.
+# Render Blueprint - hospeda o BACKEND (Docker) do ServNow.
+# O frontend e hospedado no Vercel e o banco e o Supabase, entao so o back fica aqui.
+# Como usar: Render -> New + -> Blueprint -> conecta este repositorio.
 #
-# Depois que os dois servicos forem criados, defina as 2 variaveis cruzadas (sync: false):
-#   - backend  APP_CORS_ALLOWED_ORIGINS = URL do frontend  (ex.: https://servnow-frontend.onrender.com)
-#   - frontend VITE_API_URL             = URL do backend   (ex.: https://servnow-backend.onrender.com)
+# O CORS ja libera *.vercel.app e *.onrender.com por padrao (ver CorsConfig.java),
+# entao normalmente nao precisa setar APP_CORS_ALLOWED_ORIGINS. Use a variavel apenas
+# para liberar um dominio extra (separe por virgula).
 
 services:
   - type: web
@@ -15,22 +15,5 @@ services:
     plan: free
     region: oregon
     envVars:
-      # URL do frontend hospedado, para liberar no CORS.
       - key: APP_CORS_ALLOWED_ORIGINS
         sync: false
-
-  - type: web
-    name: servnow-frontend
-    runtime: static
-    rootDir: pmg-es-2026-1-ti2-3740100-servnow/src/front
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
-      # URL do backend hospedado (o Vite "assa" isso no build).
-      - key: VITE_API_URL
-        sync: false
-    routes:
-      # SPA: qualquer rota cai no index.html (React Router resolve o resto).
-      - type: rewrite
-        source: /*
-        destination: /index.html

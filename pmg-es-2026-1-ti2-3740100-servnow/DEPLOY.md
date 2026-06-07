@@ -1,11 +1,46 @@
-# Deploy do ServNow (Docker)
+# Deploy do ServNow
 
-O projeto está dockerizado: **frontend** (React/Vite servido por nginx) e **backend**
-(Spring Boot). O banco já é hospedado no **Supabase** — não precisa subir banco.
+Arquitetura em produção:
 
-## Rodar tudo localmente com Docker
+| Parte | Onde | Como |
+|-------|------|------|
+| **Frontend** (React/Vite) | **Vercel** | Importar o repo, Root Directory = `pmg-es-2026-1-ti2-3740100-servnow/src/front`, env `VITE_API_URL` = URL do backend |
+| **Backend** (Spring Boot) | **Render** | Blueprint (`render.yaml`) com Docker |
+| **Banco de dados** | **Supabase** | Já hospedado (config no `application.properties`) |
 
-Na pasta que contém o `docker-compose.yml`:
+URLs atuais:
+- Front: https://pmg-es-2026-1-ti2-3740100-servnow.vercel.app
+- Back: https://servnow-backend.onrender.com
+
+## Backend no Render (Blueprint)
+
+1. Render → **New +** → **Blueprint** → conecta este repositório.
+2. O Render lê o `render.yaml` (na raiz) e cria o serviço `servnow-backend` (Docker).
+3. Deploy. A URL fica tipo `https://servnow-backend.onrender.com`.
+
+O backend respeita a porta do host via `server.port=${PORT:8080}` e o CORS já libera
+`*.vercel.app` e `*.onrender.com` por padrão (ver `CorsConfig.java`).
+
+> Plano free: o backend "dorme" após 15 min parado; o primeiro acesso demora ~50s
+> (cold start) e depois fica rápido.
+
+## Frontend no Vercel
+
+1. Vercel → **Add New** → **Project** → importa o repositório.
+2. **Root Directory:** `pmg-es-2026-1-ti2-3740100-servnow/src/front`
+3. Framework: **Vite** (detectado automaticamente).
+4. **Environment Variables:** `VITE_API_URL` = URL do backend (ex.: `https://servnow-backend.onrender.com`).
+5. Deploy.
+
+O `vercel.json` (em `src/front`) cuida do roteamento SPA (todas as rotas caem no `index.html`).
+
+> Importante: o `VITE_API_URL` é "assado" no build. Se mudar a URL do backend, faça um
+> novo deploy do front.
+
+## Rodar localmente com Docker (opcional)
+
+Há também `Dockerfile` no back e no front + `docker-compose.yml` para subir tudo em
+containers localmente:
 
 ```bash
 docker compose up --build
@@ -14,44 +49,10 @@ docker compose up --build
 - Frontend: http://localhost:5173
 - Backend: http://localhost:8080
 
-## Variáveis importantes
+## Variáveis de ambiente úteis
 
-| Onde | Variável | Para que serve |
-|------|----------|----------------|
-| Front (build) | `VITE_API_URL` | URL pública do backend. O Vite "assa" essa URL no build, então precisa ser definida **no build** (build arg). |
-| Back (runtime) | `APP_CORS_ALLOWED_ORIGINS` | Domínios liberados no CORS, separados por vírgula (ex.: a URL do front hospedado). |
-
-## Hospedar de graça (sugestão: Render)
-
-O backend precisa de Docker; o front pode ir como Static Site ou também via Docker.
-
-### Backend (Web Service / Docker)
-1. Render → **New +** → **Web Service** → conecta o repositório do GitHub.
-2. **Root Directory:** `pmg-es-2026-1-ti2-3740100-servnow/src/backend`
-3. **Runtime:** Docker (ele acha o `Dockerfile` automaticamente).
-4. Em **Environment**, adicione:
-   - `APP_CORS_ALLOWED_ORIGINS` = a URL do front publicado (ex.: `https://servnow-front.onrender.com`)
-5. Deploy. Anote a URL gerada (ex.: `https://servnow-back.onrender.com`).
-
-> Obs.: o backend usa porta 8080. No Render isso funciona direto. Se o host exigir a
-> variável `PORT`, dá pra mapear com `server.port=${PORT:8080}` no application.properties.
-
-### Frontend (Web Service / Docker)
-1. Render → **New +** → **Web Service** → mesmo repositório.
-2. **Root Directory:** `pmg-es-2026-1-ti2-3740100-servnow/src/front`
-3. **Runtime:** Docker.
-4. Em **Build Arguments** (ou Environment, dependendo do plano), defina:
-   - `VITE_API_URL` = a URL do backend publicado (ex.: `https://servnow-back.onrender.com`)
-5. Deploy.
-
-### Ordem recomendada
-1. Sobe o **backend** primeiro → pega a URL dele.
-2. Sobe o **frontend** com `VITE_API_URL` = URL do backend.
-3. Volta no **backend** e ajusta `APP_CORS_ALLOWED_ORIGINS` = URL do frontend.
-
-## Observações
-- O **limite de 15 conexões** do Supabase continua valendo. Para o backend hospedado
-  não brigar com os backends locais do time, vale limitar o pool:
-  `spring.datasource.hikari.maximum-pool-size=3` no application.properties.
-- A imagem do backend usa `eclipse-temurin:25-jdk`. Dá para trocar o runtime por
-  `eclipse-temurin:25-jre` (imagem menor) se o time quiser otimizar.
+| Variável | Onde | Para que serve |
+|----------|------|----------------|
+| `VITE_API_URL` | Front (build) | URL pública do backend |
+| `APP_CORS_ALLOWED_ORIGINS` | Back (runtime) | Domínios extras no CORS (separados por vírgula). Normalmente não precisa, pois `*.vercel.app` e `*.onrender.com` já são liberados. |
+| `APP_JWT_SECRET` | Back (runtime) | Segredo do JWT (tem default no `application.properties`). |
