@@ -130,32 +130,28 @@ Dessa forma, a solução proposta busca reduzir a informalidade na contratação
 
 ## 4. Projeto da solução
 
-A seção de projeto da solução consolida as decisões técnicas e o **modelo de dados** que sustentam os processos descritos. São apresentados o diagrama entidade-relacionamento do ServNow, as tecnologias adotadas no front-end e no back-end (incluindo React, Vite, Spring Boot, JPA/Hibernate e PostgreSQL hospedado em nuvem), bem como integrações com serviços externos de CEP e mapas.
-
-O modelo relacional foi pensado para suportar não apenas o funcionamento operacional da aplicação, mas também os **indicadores de desempenho** definidos para o trabalho (avaliações, serviços concluídos e pagos, totais financeiros por período).
-O documento a seguir apresenta o detalhamento do projeto da solução. São apresentadas duas seções que descrevem, respectivamente: modelo relacional e tecnologias._
 
 [Projeto da solução](solution-design.md "Detalhamento do projeto da solução: modelo relacional e tecnologias.")
 
 
 ## 5. Indicadores de desempenho
 
-Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade e o volume dos serviços mediados pela plataforma. Foram definidos, no mínimo, três indicadores — avaliação média, serviços concluídos e gastos/ganhos mensais — com fórmulas de cálculo e fontes de dados explicitamente vinculadas às tabelas do modelo relacional, conforme exigência do template acadêmico.
-_O documento a seguir apresenta os indicadores de desempenho dos processos._
+Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade e o volume dos serviços mediados pela plataforma. Foram definidos 4 indicadores: Avaliação média, Participação nos Ganhos Totais da Plataforma, Percentual de Efetividade e  Participação nos Ganhos Totais da Plataforma por categoria de serviço
+
 
 [Indicadores de desempenho dos processos](performance-indicators.md)
 
 
 ## 6. Interface do sistema
 
-A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, fluxo de solicitação e propostas, mapa de oportunidades, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e telas de perfil. O objetivo é demonstrar como os processos modelados se materializam na experiência do usuário.
-_A sessão a seguir apresenta a descrição do produto de software desenvolvido._ 
+A documentação de interface descreve as principais telas do ServNow: Cadastro e Login, Painéis do cliente e do prestador, fluxo de solicitação e propostas,, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e telas de perfil. O objetivo é demonstrar como os processos modelados se materializam na experiência do usuário.
+A sessão a seguir apresenta a descrição do produto de software desenvolvido.
 
 [Documentação da interface do sistema](interface.md)
 
 ## 7. Conclusão
 
-_Apresente aqui a conclusão do seu trabalho. Deve ser apresentada aqui uma discussão dos resultados obtidos no trabalho, local em que se verifica as observações pessoais de cada aluno. Essa seção poderá também apresentar sugestões de novas linhas de estudo._
+Apresente aqui a conclusão do seu trabalho. Deve ser apresentada aqui uma discussão dos resultados obtidos no trabalho, local em que se verifica as observações pessoais de cada aluno. Essa seção poderá também apresentar sugestões de novas linhas de estudo._
 
 # REFERÊNCIAS
 

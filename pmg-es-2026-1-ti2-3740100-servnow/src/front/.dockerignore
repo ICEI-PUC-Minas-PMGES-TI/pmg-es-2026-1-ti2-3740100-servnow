@@ -4,3 +4,6 @@ dist/
 .vscode/
 .idea/
 *.log
+.env
+.env.*
+!.env.example

@@ -1,8 +1,7 @@
-# Código do projeto — ServNow
+# APIs do backend — ServNow
 
-- **Como rodar:** [InstruçõesparaRodar.md](./InstruçõesparaRodar.md)
-- **Backend:** `backend/` (Spring Boot, porta **8080**)
-- **Front:** `front/` (React + Vite, porta **5173**)
+- **Como rodar:** [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md)
+- **Deploy:** [DEPLOY.md](./DEPLOY.md)
 
 Todas as rotas abaixo exigem autenticação JWT (`Authorization: Bearer <token>`), exceto `/api/auth/register` e `/api/auth/login`.
 
@@ -55,7 +54,7 @@ Base URL local: `http://localhost:8080`
 | `GET` | `/api/solicitacoes/prestador/agendadas` | Lista solicitações **AGENDADA** do prestador logado. |
 | `GET` | `/api/solicitacoes/cliente/pagas` | Lista serviços do cliente com **pagamento confirmado** (ganhos/gastos no painel). |
 | `GET` | `/api/solicitacoes/prestador/pagas` | Lista serviços do prestador com **pagamento confirmado** (gráfico de ganhos). |
-| `GET` | `/api/indicadores/prestador?periodo=mes\|semana` | Indicadores do prestador: ganhos, efetividade, participação na plataforma e por tipo de serviço. |
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=mes\|semana` | Métricas do prestador: receita, efetividade, participação na plataforma e por tipo de serviço. |
 | `PUT` | `/api/solicitacoes/{id}` | Cliente edita solicitação (JSON ou `multipart`; parâmetro `removerImagem`). |
 | `DELETE` | `/api/solicitacoes/{id}` | Cliente exclui solicitação (se permitido pelo status). |
 | `GET` | `/api/solicitacoes/{id}/imagem` | Baixa a imagem anexada à solicitação. |
@@ -84,16 +83,15 @@ Fluxo após a solicitação estar agendada: ordem de serviço, código de chegad
 | `GET` | `/api/acompanhamento/{solicitacaoId}` | Detalhe da ordem de serviço (etapa, código, atualizações, valores). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/iniciar` | Prestador inicia o serviço e gera código de verificação de chegada. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/renovar-codigo` | Renova o código de chegada (expiração). |
-| `POST` | `/api/acompanhamento/{solicitacaoId}/verificar-identidade` | Prestador registra verificação facial (`similaridade` 0–100, calculada no navegador). |
-| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-chegada` | Prestador informa o código do cliente → confirma chegada (exige verificação facial se habilitada). |
+| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-chegada` | Cliente informa o código → confirma chegada do prestador. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/atualizacoes` | Prestador registra atualização do serviço (`descricao` + `foto` opcional). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/concluir-execucao` | Prestador marca execução como concluída → etapa de pagamento. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/solicitar-reagendamento` | Solicita reagendamento (nova data/observação). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-reagendamento` | Confirma reagendamento acordado. |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/selecionar-metodo-pagamento` | Cliente escolhe método (Pix, cartão, dinheiro) antes de confirmar. |
-| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-pagamento` | Cliente confirma pagamento → libera avaliações; entra no resumo financeiro (`/pagas`). |
-| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-qrcode` | Gera imagem PNG do QR Code Pix (prestador). |
-| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-copia-cola` | Retorna payload Pix copia e cola (texto). |
+| `POST` | `/api/acompanhamento/{solicitacaoId}/confirmar-pagamento` | Prestador confirma pagamento recebido → libera avaliações; entra no resumo financeiro (`/pagas`). |
+| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-qrcode` | Gera imagem PNG do QR Code Pix (cliente, após escolher PIX). |
+| `GET` | `/api/acompanhamento/{solicitacaoId}/pix-copia-cola` | Retorna payload Pix copia e cola (cliente, após escolher PIX). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/avaliar` | Cliente avalia o prestador (nota e comentário). |
 | `POST` | `/api/acompanhamento/{solicitacaoId}/avaliar-cliente` | Prestador avalia o cliente. |
 | `GET` | `/api/acompanhamento/{solicitacaoId}/atualizacoes/{atualizacaoId}/foto` | Baixa foto de uma atualização do acompanhamento. |
@@ -102,12 +100,12 @@ Quando cliente e prestador avaliam, a solicitação passa para status **CONCLUID
 
 ---
 
-## Indicadores — `/api/indicadores`
+## Métricas do prestador — `/api/solicitacoes/prestador/indicadores`
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| `GET` | `/api/indicadores/prestador?periodo=mes` | Ganhos próprios, efetividade, participação na plataforma e por tipo de serviço (últimos 6 meses). |
-| `GET` | `/api/indicadores/prestador?periodo=semana` | Mesmos indicadores para a semana atual (por dia). |
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=mes` | Receita, efetividade, participação na plataforma e por tipo de serviço (últimos 6 meses). |
+| `GET` | `/api/solicitacoes/prestador/indicadores?periodo=semana` | Mesmas métricas para a semana atual (por dia). |
 
 ---
 
@@ -130,11 +128,6 @@ Quando cliente e prestador avaliam, a solicitação passa para status **CONCLUID
 | Início cliente — gastos do mês | `GET /api/solicitacoes/cliente/pagas` |
 | Início cliente — próximo serviço | `GET /api/solicitacoes/cliente/agendadas` |
 | Início prestador — ganhos do mês | `GET /api/solicitacoes/prestador/pagas` |
-| Gráfico de ganhos e indicadores | `GET /api/indicadores/prestador?periodo=mes` ou `semana` |
+| Métricas do prestador | `GET /api/solicitacoes/prestador/indicadores?periodo=mes` ou `semana` |
 | Agenda | `GET /api/solicitacoes/cliente/agendadas` ou `/prestador/agendadas` |
 | Fotos de perfil/solicitação | `GET /api/perfil/...`, `GET /api/solicitacoes/{id}/imagem` |
-
----
-
-
-

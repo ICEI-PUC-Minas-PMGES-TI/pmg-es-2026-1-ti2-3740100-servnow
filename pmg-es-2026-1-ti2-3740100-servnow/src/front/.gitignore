@@ -7,11 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment
-.env
+
 .env.local
 .env.*.local
-.env.example
 
 # Dependencies
 node_modules

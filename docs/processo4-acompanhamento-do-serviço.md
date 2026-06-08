@@ -1,6 +1,6 @@
 ### 3.3.4 Processo 4 – ACOMPANHAMENTO DO SERVIÇO
 
-após o agendamento (Processo 3), o prestador solicita o início do atendimento e o sistema gera um código de verificação para o cliente confirmar a chegada do profissional. Antes de informar o código, o prestador passa por **verificação facial**: uma selfie ao vivo é comparada com a foto de perfil cadastrada (biblioteca face-api no navegador); o servidor registra apenas o resultado (similaridade e data), sem armazenar a selfie (LGPD). Com o código validado, o prestador registra o início do serviço (fotos e observações do estado inicial) e pode enviar atualizações com fotos e descrições durante a execução, enquanto o cliente acompanha em tempo real. Ao concluir, o prestador informa o valor final, fotos do estado final e encaminha a cobrança. O cliente revisa o trabalho executado, aceita e paga (PIX com QR/copia-e-cola, cartão ou débito) ou contesta o valor. Após a confirmação do pagamento, os usuarios se avaliam  (nota e comentário), encerrando a ordem de serviço e atualizando a reputação na plataforma.
+Após o agendamento (Processo 3), o prestador solicita o início do atendimento e o sistema gera um código de verificação para o cliente confirmar a chegada do profissional. Antes de informar o código, o prestador passa por uma verificação facial: uma selfie ao vivo é comparada com a foto de perfil cadastrada o servidor registra apenas o resultado (similaridade e data), sem armazenar a selfie (LGPD). Com o código validado, o prestador registra o início do serviço (fotos e observações do estado inicial) e pode enviar atualizações com fotos e descrições durante a execução, enquanto o cliente acompanha em tempo real. Ao concluir, o prestador informa o valor final, fotos do estado final e encaminha a cobrança. O cliente revisa o trabalho executado, aceita e paga (PIX com QR/copia-e-cola, cartão ou débito) ou contesta o valor. Após a confirmação do pagamento, os usuarios se avaliam  (nota e comentário), encerrando a ordem de serviço e atualizando a reputação na plataforma.
 
 Modelo BPMN do Processo 4 
 
@@ -37,18 +37,17 @@ Modelo BPMN do Processo 4
 
 ### Campos
 
-| Campo              | Tipo    | Restrições                                                                 |
-|--------------------|---------|----------------------------------------------------------------------------|
-| Selfie ao vivo     | Imagem  | Capturada pela câmera do dispositivo; não persistida no servidor           |
-| Foto de perfil     | Imagem  | Referência já cadastrada no perfil do prestador                            |
-| Similaridade (%)   | Número  | Calculada no navegador; mínimo configurável (padrão 55%) para aprovação   |
+| Campo              | Tipo    | Restrições                             |
+|--------------------|---------|----------------------------------------|
+| Selfie ao vivo     | Imagem  |                                        |
+| Similaridade (%)   | Número  | Mínimo  (padrão 55%) para aprovação    |
 
 ### Comandos
 
 | Comando              | Destino                              | Tipo    |
 |----------------------|--------------------------------------|---------|
 | Verificar identidade | Habilitar confirmação do código      | default |
-| Tentar novamente     | Nova captura se similaridade baixa   | button  |
+| Tentar novamente     | Nova captura de similaridade baixa   | button  |
 
 ---
 
@@ -67,7 +66,7 @@ Modelo BPMN do Processo 4
 | Comando                   | Destino                         | Tipo    |
 |---------------------------|---------------------------------|---------|
 | Confirmar e enviar código | Prestador insere código         | button  |
-| Reenviar código           | Gerar novo código ao cliente    | button  |
+| Reenviar código           | Gerar novo código para o cliente| button  |
 | Recusar presença          | Cancelar atendimento            | cancel  |
 
 

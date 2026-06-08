@@ -1,5 +1,6 @@
-# Render Blueprint - hospeda o BACKEND (Docker) do ServNow.
-# O frontend e hospedado no Vercel e o banco e o Supabase, entao so o back fica aqui.
+# Render Blueprint — backend (Docker) do ServNow.
+# Front: Vercel (src/front) | Banco: Supabase
+# Docs: pmg-es-2026-1-ti2-3740100-servnow/docs/README.md
 # Como usar: Render -> New + -> Blueprint -> conecta este repositorio.
 #
 # O CORS ja libera *.vercel.app e *.onrender.com por padrao (ver CorsConfig.java),

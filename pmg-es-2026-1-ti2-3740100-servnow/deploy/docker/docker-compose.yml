@@ -1,0 +1,30 @@
+# Sobe front e back em containers para desenvolvimento local.
+# Banco: Supabase (config em src/backend/src/main/resources/application.properties).
+#
+# Uso (a partir da raiz do repositório Git):
+#   docker compose -f pmg-es-2026-1-ti2-3740100-servnow/deploy/docker/docker-compose.yml up --build
+#
+# URLs:
+#   front → http://localhost:5173
+#   back  → http://localhost:8080
+
+services:
+  backend:
+    build:
+      context: ../../src/backend
+    ports:
+      - "8080:8080"
+    environment:
+      APP_CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:5174"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../../src/front
+      args:
+        VITE_API_URL: "http://localhost:8080"
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
