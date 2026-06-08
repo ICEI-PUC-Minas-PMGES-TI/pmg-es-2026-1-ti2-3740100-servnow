@@ -1,7 +1,5 @@
 # APIs do backend — ServNow
 
-- **Como rodar:** [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md)
-- **Deploy:** [DEPLOY.md](./DEPLOY.md)
 
 Todas as rotas abaixo exigem autenticação JWT (`Authorization: Bearer <token>`), exceto `/api/auth/register` e `/api/auth/login`.
 
