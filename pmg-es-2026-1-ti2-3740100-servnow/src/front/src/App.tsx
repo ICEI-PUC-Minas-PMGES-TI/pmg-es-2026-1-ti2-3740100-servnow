@@ -105,7 +105,7 @@ function App() {
           )}
         />
         <Route
-          path="/acompanhamento/:solicitaçãoId"
+          path="/acompanhamento/:solicitacaoId"
           element={(
             <ProtectedRoute>
               <AcompanhamentoPage />

@@ -1,5 +1,6 @@
 package com.servnow.backend.solicitacao.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,10 +21,37 @@ public interface SolicitacaoServicoRepository extends JpaRepository<SolicitacaoS
     Optional<SolicitacaoServico> findByIdForUpdate(@Param("id") Long id);
     List<SolicitacaoServico> findByClienteIdOrderByCriadoEmDesc(Long clienteId);
     List<SolicitacaoServico> findByStatusOrderByCriadoEmDesc(StatusSolicitacao status);
+    List<SolicitacaoServico> findByStatusInOrderByCriadoEmDesc(Collection<StatusSolicitacao> statuses);
     Optional<SolicitacaoServico> findByIdAndClienteId(Long id, Long clienteId);
     long deleteByIdAndClienteId(Long id, Long clienteId);
     List<SolicitacaoServico> findByClienteIdAndStatusOrderByAceitoEmDesc(Long clienteId, StatusSolicitacao status);
     List<SolicitacaoServico> findByPrestadorIdAndStatusOrderByAceitoEmDesc(Long prestadorId, StatusSolicitacao status);
+
+    @Query("""
+        SELECT s FROM SolicitacaoServico s
+        JOIN FETCH s.cliente
+        LEFT JOIN FETCH s.prestador
+        WHERE s.cliente.id = :clienteId
+          AND s.status = :status
+        ORDER BY s.aceitoEm DESC
+        """)
+    List<SolicitacaoServico> findAgendadasComParticipantesByClienteId(
+        @Param("clienteId") Long clienteId,
+        @Param("status") StatusSolicitacao status
+    );
+
+    @Query("""
+        SELECT s FROM SolicitacaoServico s
+        JOIN FETCH s.cliente
+        LEFT JOIN FETCH s.prestador
+        WHERE s.prestador.id = :prestadorId
+          AND s.status = :status
+        ORDER BY s.aceitoEm DESC
+        """)
+    List<SolicitacaoServico> findAgendadasComParticipantesByPrestadorId(
+        @Param("prestadorId") Long prestadorId,
+        @Param("status") StatusSolicitacao status
+    );
     List<SolicitacaoServico> findByPrestadorIdOrderByAceitoEmDesc(Long prestadorId);
     Optional<SolicitacaoServico> findFirstByLatitudeIsNullAndCepIsNotNullOrderByIdAsc();
 }

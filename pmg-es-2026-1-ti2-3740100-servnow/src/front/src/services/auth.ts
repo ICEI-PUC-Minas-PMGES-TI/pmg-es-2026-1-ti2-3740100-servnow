@@ -263,6 +263,49 @@ export function saveAuthSession(session: AuthResponse) {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
 }
 
+export function mergeAuthSessionFromMe(
+  session: AuthResponse,
+  me: CurrentUserResponse,
+): AuthResponse {
+  return {
+    ...session,
+    nome: me.nome,
+    email: me.email,
+    fotoPerfilUrl: me.fotoPerfilUrl,
+    fotoPerfilAjusteX: me.fotoPerfilAjusteX,
+    fotoPerfilAjusteY: me.fotoPerfilAjusteY,
+    fotoPerfilEnquadramento: me.fotoPerfilEnquadramento,
+  };
+}
+
+export async function fetchCurrentUser(token: string): Promise<CurrentUserResponse | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/me`, {
+      headers: authHeader(token),
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as CurrentUserResponse;
+  } catch {
+    return null;
+  }
+}
+
+export async function refreshAuthSessionFromMe(): Promise<AuthResponse | null> {
+  const session = getValidAuthSession();
+  if (!session?.token) {
+    return null;
+  }
+  const me = await fetchCurrentUser(session.token);
+  if (!me) {
+    return session;
+  }
+  const atualizado = mergeAuthSessionFromMe(session, me);
+  saveAuthSession(atualizado);
+  return atualizado;
+}
+
 export function getAuthSession(): AuthResponse | null {
   const raw = localStorage.getItem(AUTH_STORAGE_KEY);
   if (!raw) {

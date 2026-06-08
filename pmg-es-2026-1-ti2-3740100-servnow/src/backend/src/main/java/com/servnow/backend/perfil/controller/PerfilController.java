@@ -177,7 +177,7 @@ public class PerfilController {
         @org.springframework.web.bind.annotation.PathVariable Long id
     ) {
         Usuario perfil = perfilService.encontrarParaLeituraArquivoPublico(id, usuario);
-        return responderArquivo(perfilService.caminhoFotoPerfil(perfil), "Foto de perfil nao encontrada.");
+        return responderArquivo(perfilService.caminhoFotoPerfilPublico(perfil), "Foto de perfil nao encontrada.");
     }
 
     @GetMapping("/foto-local")

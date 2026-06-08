@@ -39,10 +39,28 @@ public class OrdemServicoSchemaMigration implements ApplicationRunner {
             jdbcTemplate.execute(
                 "ALTER TABLE ordens_servico ADD COLUMN IF NOT EXISTS observacao_reagendamento varchar(300)"
             );
+            jdbcTemplate.execute(
+                "ALTER TABLE ordens_servico ADD COLUMN IF NOT EXISTS identidade_verificada_em timestamptz"
+            );
+            jdbcTemplate.execute(
+                "ALTER TABLE ordens_servico ADD COLUMN IF NOT EXISTS identidade_similaridade double precision"
+            );
+            normalizarEtapasInvalidas();
             atualizarCheckConstraintEtapa();
         } catch (Exception exception) {
             log.warn("Nao foi possivel aplicar migracao de reagendamento em ordens_servico: {}", exception.getMessage());
         }
+    }
+
+    private void normalizarEtapasInvalidas() {
+        jdbcTemplate.execute(
+            """
+            UPDATE ordens_servico
+            SET etapa = 'AGUARDANDO_CHEGADA'
+            WHERE etapa IS NULL
+               OR etapa NOT IN (%s)
+            """.formatted(ETAPAS_PERMITIDAS)
+        );
     }
 
     private void atualizarCheckConstraintEtapa() {

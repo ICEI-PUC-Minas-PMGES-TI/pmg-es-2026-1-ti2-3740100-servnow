@@ -74,7 +74,7 @@ public class PerfilService {
             usuario.getBairro(),
             usuario.getCidade(),
             usuario.getEstado(),
-            urlFotoPerfilPublica(usuario),
+            urlFotoPerfilPublicaDoUsuario(usuario),
             usuario.getDescricaoProfissional(),
             prestador ? usuario.getEspecialidades() : null,
             prestador ? usuario.getDiasDisponiveis() : null,
@@ -153,6 +153,19 @@ public class PerfilService {
 
     public String caminhoFotoPerfil(Usuario usuario) {
         return usuario.getFotoPerfilArquivoRelativo();
+    }
+
+    public String caminhoFotoPerfilPublico(Usuario usuario) {
+        if (temArquivo(usuario.getFotoPerfilArquivoRelativo())) {
+            return usuario.getFotoPerfilArquivoRelativo();
+        }
+        if (temArquivo(usuario.getFotoLocalArquivoRelativo())) {
+            return usuario.getFotoLocalArquivoRelativo();
+        }
+        if (usuario.getTipoUsuario() == TipoUsuario.CLIENTE) {
+            return clienteCadastroService.caminhoFotoEnderecoPrincipal(usuario);
+        }
+        return null;
     }
 
     public Usuario encontrarParaLeituraArquivoPublico(Long usuarioId, UsuarioAutenticado autenticado) {
@@ -447,8 +460,8 @@ public class PerfilService {
         return temArquivo(usuario.getFotoPerfilArquivoRelativo()) ? "/api/perfil/foto-perfil" : null;
     }
 
-    public static String urlFotoPerfilPublica(Usuario usuario) {
-        return temArquivo(usuario.getFotoPerfilArquivoRelativo())
+    public String urlFotoPerfilPublicaDoUsuario(Usuario usuario) {
+        return temArquivo(caminhoFotoPerfilPublico(usuario))
             ? "/api/perfil/publico/" + usuario.getId() + "/foto-perfil"
             : null;
     }

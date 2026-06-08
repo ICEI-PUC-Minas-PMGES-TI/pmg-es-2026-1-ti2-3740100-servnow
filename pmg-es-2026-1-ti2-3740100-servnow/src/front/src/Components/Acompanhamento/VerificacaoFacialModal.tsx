@@ -234,8 +234,7 @@ export function VerificacaoFacialModal({
         </div>
 
         <p className="verif-facial-texto">
-          Confirme que voce e o prestador cadastrado. Sua selfie sera comparada com a foto de perfil e nao sera
-          armazenada no servidor.
+          Confirme que voce e o prestador cadastrado. Sua selfie sera comparada com a foto de perfil.
           {preparando && (
             <span className="verif-facial-preparando"> Preparando verificacao (primeira vez pode levar alguns segundos)...</span>
           )}

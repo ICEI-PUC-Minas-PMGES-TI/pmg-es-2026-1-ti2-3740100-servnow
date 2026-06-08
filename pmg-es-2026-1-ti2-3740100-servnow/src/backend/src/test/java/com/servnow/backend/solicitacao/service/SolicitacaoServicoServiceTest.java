@@ -114,8 +114,10 @@ class SolicitacaoServicoServiceTest {
 
         when(usuarioRepository.findById(2L)).thenReturn(Optional.of(prestador));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO))
-            .thenReturn(List.of(publicada));
+        when(solicitacaoRepository.findByStatusInOrderByCriadoEmDesc(List.of(
+            StatusSolicitacao.PUBLICADO,
+            StatusSolicitacao.AGUARDANDO_PROPOSTAS
+        ))).thenReturn(List.of(publicada));
         when(geocodingService.geocode(any(Usuario.class))).thenReturn(Optional.empty());
         when(geocodingService.geocode(any(SolicitacaoServico.class))).thenReturn(Optional.empty());
         when(distanceService.calcularEmLoteParaPrestador(any(Usuario.class), any())).thenReturn(java.util.Map.of());
@@ -126,6 +128,30 @@ class SolicitacaoServicoServiceTest {
 
         assertThat(response).hasSize(1);
         assertThat(response.getFirst().distanciaKm()).isEqualTo(3.2);
+    }
+
+    @Test
+    void listarParaPrestadoresIncluiSolicitacoesAguardandoPropostas() {
+        Usuario prestador = usuario(2L, "Prestador", "prestador@email.com", TipoUsuario.PRESTADOR);
+        prestador.setLatitude(-19.94);
+        prestador.setLongitude(-43.94);
+        Usuario cliente = usuario(1L, "Cliente", "cliente@email.com", TipoUsuario.CLIENTE);
+        SolicitacaoServico aguardando = solicitacao(cliente, "Eletrica", "Trocar tomada");
+        aguardando.setStatus(StatusSolicitacao.AGUARDANDO_PROPOSTAS);
+        aguardando.setLatitude(-19.9167);
+        aguardando.setLongitude(-43.9345);
+
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(prestador));
+        when(solicitacaoRepository.findByStatusInOrderByCriadoEmDesc(List.of(
+            StatusSolicitacao.PUBLICADO,
+            StatusSolicitacao.AGUARDANDO_PROPOSTAS
+        ))).thenReturn(List.of(aguardando));
+        when(distanceService.calcularEmLoteParaPrestador(any(Usuario.class), any())).thenReturn(java.util.Map.of());
+
+        List<SolicitacaoServicoResponse> response = solicitacaoService.listarParaPrestadores(usuarioAutenticadoPrestador());
+
+        assertThat(response).hasSize(1);
+        assertThat(response.getFirst().status()).isEqualTo("AGUARDANDO_PROPOSTAS");
     }
 
     @Test

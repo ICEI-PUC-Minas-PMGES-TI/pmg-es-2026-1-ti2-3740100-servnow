@@ -79,11 +79,11 @@ public class AcompanhamentoService {
     public List<AcompanhamentoDisponivelResponse> listarDisponiveis(UsuarioAutenticado usuarioAutenticado) {
         Usuario usuario = encontrarUsuario(usuarioAutenticado);
         List<SolicitacaoServico> solicitacoes = switch (usuario.getTipoUsuario()) {
-            case CLIENTE -> solicitacaoRepository.findByClienteIdAndStatusOrderByAceitoEmDesc(
+            case CLIENTE -> solicitacaoRepository.findAgendadasComParticipantesByClienteId(
                 usuario.getId(),
                 StatusSolicitacao.AGENDADA
             );
-            case PRESTADOR -> solicitacaoRepository.findByPrestadorIdAndStatusOrderByAceitoEmDesc(
+            case PRESTADOR -> solicitacaoRepository.findAgendadasComParticipantesByPrestadorId(
                 usuario.getId(),
                 StatusSolicitacao.AGENDADA
             );
@@ -95,17 +95,23 @@ public class AcompanhamentoService {
             .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AcompanhamentoDetalheResponse obterDetalhe(Long solicitacaoId, UsuarioAutenticado usuarioAutenticado) {
         SolicitacaoServico solicitacao = buscarSolicitacaoParticipante(solicitacaoId, usuarioAutenticado);
         validarPodeConsultarDetalhe(solicitacao);
-        OrdemServico ordem = ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                solicitacao.getStatus() == StatusSolicitacao.AGENDADA
-                    ? "Ordem de servico ainda nao iniciada."
-                    : "Ordem de servico nao encontrada."
-            ));
+        OrdemServico ordem = switch (solicitacao.getStatus()) {
+            case AGENDADA -> {
+                validarPodeAcompanhar(solicitacao);
+                OrdemServico existente = obterOuCriarOrdem(solicitacao);
+                prepararCodigoChegadaSeNecessario(solicitacao, existente);
+                yield existente;
+            }
+            default -> ordemRepository.findWithDetalhesBySolicitacaoId(solicitacaoId)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Ordem de servico nao encontrada."
+                ));
+        };
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
     }
 
@@ -626,8 +632,8 @@ public class AcompanhamentoService {
     }
 
     private AcompanhamentoDisponivelResponse toDisponivel(SolicitacaoServico solicitacao, TipoUsuario tipoUsuario) {
-        String etapa = ordemRepository.findBySolicitacaoId(solicitacao.getId())
-            .map(ordem -> ordem.getEtapa().name())
+        String etapa = ordemRepository.findEtapaBySolicitacaoId(solicitacao.getId())
+            .map(EtapaOrdemServico::name)
             .orElse(null);
 
         String contraparte = tipoUsuario == TipoUsuario.CLIENTE

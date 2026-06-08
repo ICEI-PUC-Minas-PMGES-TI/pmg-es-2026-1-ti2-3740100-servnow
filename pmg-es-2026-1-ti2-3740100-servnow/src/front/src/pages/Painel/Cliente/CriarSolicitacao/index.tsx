@@ -172,11 +172,17 @@ export function CriarSolicitacao() {
       return;
     }
 
+    const descricaoNormalizada = descricao.trim();
+    if (!descricaoNormalizada) {
+      toast.error("Informe a descrição do serviço.");
+      return;
+    }
+
     const dados: SolicitacaoServicoCreateRequest = {
       tipoServico,
       iconeServico: tipoServico || undefined,
       faixaPreco,
-      descricao,
+      descricao: descricaoNormalizada,
       cep,
       rua,
       numero,
@@ -428,8 +434,8 @@ export function CriarSolicitacao() {
 
             <label className="form-field form-field-full">
               <span className="form-label">Foto do local ou do problema (opcional)</span>
-              <div className="solicitação-foto-upload">
-                <label className="btn-secondary solicitação-foto-btn">
+              <div className="solicitacao-foto-upload">
+                <label className="btn-secondary solicitacao-foto-btn">
                   <ImageIcon size={16} />
                   <span>{imagemArquivo ? "Trocar foto" : "Selecionar foto"}</span>
                   <input
@@ -440,9 +446,9 @@ export function CriarSolicitacao() {
                   />
                 </label>
                 {imagemPreviewUrl && (
-                  <div className="solicitação-foto-preview">
+                  <div className="solicitacao-foto-preview">
                     <img src={imagemPreviewUrl} alt="Pre-visualizacao da foto" />
-                    <button type="button" className="solicitação-foto-remover" onClick={removerImagem} aria-label="Remover foto">
+                    <button type="button" className="solicitacao-foto-remover" onClick={removerImagem} aria-label="Remover foto">
                       <X size={16} />
                     </button>
                   </div>
@@ -452,7 +458,7 @@ export function CriarSolicitacao() {
             </label>
 
             <label className="form-field form-field-full">
-              <span className="form-label">Descricao do servico</span>
+              <span className="form-label">Descricao do servico (obrigatorio)</span>
               <div className="form-control form-control-textarea">
                 <FileText size={16} />
                 <textarea

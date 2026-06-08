@@ -9,15 +9,21 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.servnow.backend.acompanhamento.domain.EtapaOrdemServico;
 import com.servnow.backend.acompanhamento.domain.OrdemServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
 
 public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long> {
 
-    Optional<OrdemServico> findBySolicitacaoId(Long solicitacaoId);
+    @Query("SELECT o FROM OrdemServico o WHERE o.solicitacao.id = :solicitacaoId")
+    Optional<OrdemServico> findBySolicitacaoId(@Param("solicitacaoId") Long solicitacaoId);
+
+    @Query("SELECT o.etapa FROM OrdemServico o WHERE o.solicitacao.id = :solicitacaoId")
+    Optional<EtapaOrdemServico> findEtapaBySolicitacaoId(@Param("solicitacaoId") Long solicitacaoId);
 
     @EntityGraph(attributePaths = {"solicitacao", "solicitacao.cliente", "solicitacao.prestador", "atualizacoes"})
-    Optional<OrdemServico> findWithDetalhesBySolicitacaoId(Long solicitacaoId);
+    @Query("SELECT o FROM OrdemServico o WHERE o.solicitacao.id = :solicitacaoId")
+    Optional<OrdemServico> findWithDetalhesBySolicitacaoId(@Param("solicitacaoId") Long solicitacaoId);
 
     @Query("""
         SELECT o FROM OrdemServico o

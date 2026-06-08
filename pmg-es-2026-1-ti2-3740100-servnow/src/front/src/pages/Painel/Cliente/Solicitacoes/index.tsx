@@ -346,7 +346,7 @@ export function Solicitacoes() {
                     <SolicitacaoImagemThumb
                       solicitacaoId={item.id}
                       imagemUrl={item.imagemUrl}
-                      className="solicitação-imagem-thumb"
+                      className="solicitacao-imagem-thumb"
                       onClick={() => setDetalheAberto(item)}
                     />
                   )}
@@ -411,14 +411,14 @@ export function Solicitacoes() {
       />
 
       {editando && editForm && (
-        <div className="solicitação-modal-overlay" role="presentation" onClick={fecharEdicao}>
-          <div className="solicitação-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <header className="solicitação-modal-cabecalho">
-              <div className="solicitação-modal-titulo-grupo">
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={fecharEdicao}>
+          <div className="solicitacao-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
                 <h3>Editar solicitacao</h3>
               </div>
             </header>
-            <div className="solicitação-modal-corpo">
+            <div className="solicitacao-modal-corpo">
               <div className="workspace-form">
                 <div className="painel-form-grid">
                   <label className="form-field">
@@ -536,10 +536,10 @@ export function Solicitacoes() {
                         <SolicitacaoImagemThumb
                           solicitacaoId={editando.id}
                           imagemUrl={editando.imagemUrl}
-                          className="solicitação-imagem-thumb"
+                          className="solicitacao-imagem-thumb"
                         />
                       ) : (
-                        <div className="solicitação-imagem-placeholder" style={{ width: 120, height: 90 }}>
+                        <div className="solicitacao-imagem-placeholder" style={{ width: 120, height: 90 }}>
                           <ImageIcon size={20} />
                         </div>
                       )}
@@ -548,7 +548,7 @@ export function Solicitacoes() {
                 </div>
               </div>
             </div>
-            <footer className="solicitação-modal-rodape">
+            <footer className="solicitacao-modal-rodape">
               <button type="button" className="btn-secondary" onClick={fecharEdicao} disabled={salvandoEdicao}>
                 Cancelar
               </button>
@@ -561,29 +561,29 @@ export function Solicitacoes() {
       )}
 
       {confirmarExclusao && (
-        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setConfirmarExclusao(null)}>
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarExclusao(null)}>
           <div
-            className="solicitação-modal"
+            className="solicitacao-modal"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: 460 }}
           >
-            <header className="solicitação-modal-cabecalho">
-              <div className="solicitação-modal-titulo-grupo">
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
                 <Trash2 size={20} />
                 <h3>Excluir solicitacao</h3>
               </div>
               <button
                 type="button"
-                className="solicitação-modal-fechar"
+                className="solicitacao-modal-fechar"
                 onClick={() => setConfirmarExclusao(null)}
                 aria-label="Fechar"
               >
                 <X size={18} />
               </button>
             </header>
-            <div className="solicitação-modal-corpo">
+            <div className="solicitacao-modal-corpo">
               <p style={{ marginTop: 0, fontWeight: 600, color: "var(--workspace-text)" }}>
                 Deseja excluir esta solicitacao?
               </p>
@@ -591,7 +591,7 @@ export function Solicitacoes() {
                 As propostas vinculadas tambem serao removidas. Essa acao nao pode ser desfeita.
               </p>
             </div>
-            <footer className="solicitação-modal-rodape">
+            <footer className="solicitacao-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setConfirmarExclusao(null)}>
                 Cancelar
               </button>

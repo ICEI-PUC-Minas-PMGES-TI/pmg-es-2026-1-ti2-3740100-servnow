@@ -1,9 +1,11 @@
-﻿import { MessageSquareQuote, Star, User } from "lucide-react";
+﻿import { LoaderCircle, MessageSquareQuote, Star, User } from "lucide-react";
 
+import { useArquivoUrl } from "../../hooks/useArquivoUrl";
 import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../utils/formatarAvaliacao";
 
 type Props = {
   nome: string;
+  fotoPerfilUrl?: string | null;
   avaliacaoMedia: number | null;
   totalAvaliacoes: number;
   comentarioDestaque: string | null;
@@ -13,12 +15,15 @@ type Props = {
 
 export function ClienteAvaliacaoDestaque({
   nome,
+  fotoPerfilUrl = null,
   avaliacaoMedia,
   totalAvaliacoes,
   comentarioDestaque,
   carregando = false,
   onVerPerfil,
 }: Props) {
+  const { src: fotoPerfilSrc, carregando: fotoPerfilCarregando } = useArquivoUrl(fotoPerfilUrl);
+
   if (carregando) {
     return (
       <section className="solicitacao-cliente-avaliacao" aria-busy="true" aria-label="Carregando avaliação do cliente">
@@ -34,10 +39,16 @@ export function ClienteAvaliacaoDestaque({
       <div className="solicitacao-cliente-avaliacao-topo">
         <div className="solicitacao-cliente-avaliacao-identidade">
           <span className="solicitacao-cliente-avaliacao-avatar" aria-hidden="true">
-            <User size={18} />
+            {fotoPerfilCarregando ? (
+              <LoaderCircle className="painel-spin" size={18} />
+            ) : fotoPerfilSrc ? (
+              <img src={fotoPerfilSrc} alt="" className="solicitacao-cliente-avaliacao-avatar-foto" />
+            ) : (
+              <User size={18} />
+            )}
           </span>
           <div>
-            <span className="solicitacao-cliente-avaliacao-rótulo">Cliente</span>
+            <span className="solicitacao-cliente-avaliacao-rotulo">Cliente</span>
             <strong className="solicitacao-cliente-avaliacao-nome">{nome}</strong>
           </div>
         </div>
@@ -70,7 +81,7 @@ export function ClienteAvaliacaoDestaque({
         <blockquote className="solicitacao-cliente-avaliacao-comentario">
           <MessageSquareQuote size={18} aria-hidden="true" />
           <div>
-            <span className="solicitacao-cliente-avaliacao-comentario-rótulo">Comentário em destaque</span>
+            <span className="solicitacao-cliente-avaliacao-comentario-rotulo">Comentário em destaque</span>
             <p>{comentarioDestaque}</p>
           </div>
         </blockquote>

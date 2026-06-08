@@ -154,28 +154,28 @@ export function PerfilPublicoModal({ usuarioId, titulo = "Perfil", onFechar }: P
   }, [usuarioId]);
 
   return (
-    <div className="solicitação-modal-overlay" role="presentation" onClick={onFechar}>
+    <div className="solicitacao-modal-overlay" role="presentation" onClick={onFechar}>
       <div
-        className="solicitação-modal"
+        className="solicitacao-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="perfil-publico-titulo"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="solicitação-modal-cabecalho">
-          <div className="solicitação-modal-titulo-grupo">
+        <header className="solicitacao-modal-cabecalho">
+          <div className="solicitacao-modal-titulo-grupo">
             <h3 id="perfil-publico-titulo">{titulo}</h3>
           </div>
-          <button type="button" className="solicitação-modal-fechar" onClick={onFechar} aria-label="Fechar">
+          <button type="button" className="solicitacao-modal-fechar" onClick={onFechar} aria-label="Fechar">
             <X size={18} />
           </button>
         </header>
 
-        <div className="solicitação-modal-corpo">
+        <div className="solicitacao-modal-corpo">
           <PerfilPublicoConteudo perfil={perfil} carregando={carregando} />
         </div>
 
-        <footer className="solicitação-modal-rodape">
+        <footer className="solicitacao-modal-rodape">
           <button type="button" className="btn-secondary" onClick={onFechar}>
             Fechar
           </button>

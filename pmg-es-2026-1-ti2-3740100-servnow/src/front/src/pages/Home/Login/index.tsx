@@ -10,8 +10,10 @@ import {
   authHeader,
   clearAuthSession,
   getDashboardRoute,
+  mergeAuthSessionFromMe,
   saveAuthSession,
   type AuthResponse,
+  type CurrentUserResponse,
 } from "../../../services/auth";
 
 type UserType = "cliente" | "prestador";
@@ -61,7 +63,8 @@ export function Login() {
         throw new Error("Login retornou um token que o backend não aceitou. Reinicie o backend e tente novamente.");
       }
 
-      saveAuthSession(loginData);
+      const me = (await validationResponse.json()) as CurrentUserResponse;
+      saveAuthSession(mergeAuthSessionFromMe(loginData, me));
       setSuccessMessage(`Login realizado como ${loginData.tipoUsuario.toLowerCase()}.`);
       setEmail("");
       setPassword("");

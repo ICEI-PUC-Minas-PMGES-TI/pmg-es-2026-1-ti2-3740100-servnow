@@ -39,14 +39,17 @@ export function PainelSidebar({
 
       <div className="painel-sidebar-corpo">
         <span className="painel-sidebar-titulo">Menu</span>
-        <nav className="painel-nav">{children}</nav>
-      </div>
-
-      <div className="painel-sidebar-rodape">
-        <button type="button" className="painel-nav-item" onClick={onEditarConta}>
-          <Pencil size={18} />
-          <span>Editar conta</span>
-        </button>
+        <nav className="painel-nav">
+          {children}
+          <button
+            type="button"
+            className="painel-nav-item painel-nav-item-editar"
+            onClick={onEditarConta}
+          >
+            <Pencil size={18} />
+            <span>Editar conta</span>
+          </button>
+        </nav>
       </div>
     </aside>
   );

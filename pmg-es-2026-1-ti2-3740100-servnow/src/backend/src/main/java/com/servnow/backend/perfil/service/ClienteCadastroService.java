@@ -107,6 +107,16 @@ public class ClienteCadastroService {
         return endereco.getFotoArquivoRelativo();
     }
 
+    public String caminhoFotoEnderecoPrincipal(Usuario usuario) {
+        validarCliente(usuario);
+        return enderecoRepository.findByUsuario_IdOrderByPrincipalDescCriadoEmAsc(usuario.getId()).stream()
+            .filter(ClienteEndereco::isPrincipal)
+            .map(ClienteEndereco::getFotoArquivoRelativo)
+            .filter(ClienteCadastroService::temArquivo)
+            .findFirst()
+            .orElse(null);
+    }
+
     public static String urlFotoEndereco(Long enderecoId) {
         return "/api/perfil/cliente/enderecos/" + enderecoId + "/foto";
     }

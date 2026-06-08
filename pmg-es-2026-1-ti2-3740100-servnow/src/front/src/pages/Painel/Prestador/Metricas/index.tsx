@@ -92,7 +92,7 @@ function GraficoBarras({
   }, [dados, modo]);
 
   return (
-    <div className="painel-gráfico" aria-label={ariaLabel}>
+    <div className="painel-grafico" aria-label={ariaLabel}>
       {dados.map((item, indice) => {
         const valorExibido = valorBarra(item, modo);
         const rotuloValor = rotuloBarra(item, modo);
@@ -101,18 +101,18 @@ function GraficoBarras({
         return (
           <div
             key={`${item.label}-${indice}`}
-            className="painel-gráfico-coluna"
+            className="painel-grafico-coluna"
             style={{ minHeight: ALTURA_AREA_BARRAS + ESPACO_ROTULO_VALOR + 28 }}
           >
-            <span className="painel-gráfico-valor">{rotuloValor}</span>
-            <div className="painel-gráfico-area" style={{ height: ALTURA_AREA_BARRAS }}>
+            <span className="painel-grafico-valor">{rotuloValor}</span>
+            <div className="painel-grafico-area" style={{ height: ALTURA_AREA_BARRAS }}>
               <div
-                className="painel-gráfico-barra"
+                className="painel-grafico-barra"
                 style={{ height: alturaPx }}
                 title={`${item.label}: ${rotuloValor}`}
               />
             </div>
-            <span className="painel-gráfico-label">{item.label}</span>
+            <span className="painel-grafico-label">{item.label}</span>
           </div>
         );
       })}
@@ -163,19 +163,19 @@ function GraficoComparativoDuplo({
   }, [pontos]);
 
   return (
-    <div className="painel-gráfico-participacao">
-      <div className="painel-gráfico-comparacao">
-        <div className="painel-gráfico-comparacao-item painel-gráfico-comparacao-voce">
-          <span className="painel-gráfico-comparacao-rótulo">{rotuloVoce}</span>
+    <div className="painel-grafico-participacao">
+      <div className="painel-grafico-comparacao">
+        <div className="painel-grafico-comparacao-item painel-grafico-comparacao-voce">
+          <span className="painel-grafico-comparacao-rotulo">{rotuloVoce}</span>
           <strong>{formatarValor(valorVocePeriodo)}</strong>
         </div>
-        <div className="painel-gráfico-comparacao-item painel-gráfico-comparacao-plataforma">
-          <span className="painel-gráfico-comparacao-rótulo">{rotuloPlataforma}</span>
+        <div className="painel-grafico-comparacao-item painel-grafico-comparacao-plataforma">
+          <span className="painel-grafico-comparacao-rotulo">{rotuloPlataforma}</span>
           <strong>{formatarValor(valorPlataformaPeriodo)}</strong>
         </div>
       </div>
 
-      <div className="painel-gráfico painel-gráfico-duplo" aria-label={ariaLabel}>
+      <div className="painel-grafico painel-grafico-duplo" aria-label={ariaLabel}>
         {pontos.map((item, indice) => {
           const alturaVoce = alturaBarraPx(item.valor, maxValor);
           const alturaPlataforma = alturaBarraPx(item.totalPlataforma, maxValor);
@@ -183,50 +183,50 @@ function GraficoComparativoDuplo({
           return (
             <div
               key={`${item.label}-${indice}`}
-              className="painel-gráfico-coluna painel-gráfico-coluna-dupla"
+              className="painel-grafico-coluna painel-grafico-coluna-dupla"
               style={{ minHeight: ALTURA_AREA_BARRAS + ESPACO_ROTULO_VALOR + 32 }}
             >
-              <div className="painel-gráfico-valores-duplos">
-                <span className="painel-gráfico-valor">
+              <div className="painel-grafico-valores-duplos">
+                <span className="painel-grafico-valor">
                   {item.valor > 0 ? formatarValor(item.valor) : "-"}
                 </span>
-                <span className="painel-gráfico-valor">
+                <span className="painel-grafico-valor">
                   {item.totalPlataforma > 0 ? formatarValor(item.totalPlataforma) : "-"}
                 </span>
               </div>
-              <div className="painel-gráfico-area-dupla" style={{ height: ALTURA_AREA_BARRAS }}>
-                <div className="painel-gráfico-par">
-                  <div className="painel-gráfico-area painel-gráfico-area-interna">
+              <div className="painel-grafico-area-dupla" style={{ height: ALTURA_AREA_BARRAS }}>
+                <div className="painel-grafico-par">
+                  <div className="painel-grafico-area painel-grafico-area-interna">
                     <div
-                      className="painel-gráfico-barra painel-gráfico-barra-voce"
+                      className="painel-grafico-barra painel-grafico-barra-voce"
                       style={{ height: alturaVoce }}
                       title={`${tituloVoce}: ${formatarValor(item.valor)}`}
                     />
                   </div>
                 </div>
-                <div className="painel-gráfico-par">
-                  <div className="painel-gráfico-area painel-gráfico-area-interna">
+                <div className="painel-grafico-par">
+                  <div className="painel-grafico-area painel-grafico-area-interna">
                     <div
-                      className="painel-gráfico-barra painel-gráfico-barra-plataforma"
+                      className="painel-grafico-barra painel-grafico-barra-plataforma"
                       style={{ height: alturaPlataforma }}
                       title={`${tituloPlataforma}: ${formatarValor(item.totalPlataforma)}`}
                     />
                   </div>
                 </div>
               </div>
-              <span className="painel-gráfico-label">{item.label}</span>
+              <span className="painel-grafico-label">{item.label}</span>
             </div>
           );
         })}
       </div>
 
-      <div className="painel-gráfico-legenda" aria-hidden>
-        <span className="painel-gráfico-legenda-item">
-          <i className="painel-gráfico-legenda-cor painel-gráfico-barra-voce" />
+      <div className="painel-grafico-legenda" aria-hidden>
+        <span className="painel-grafico-legenda-item">
+          <i className="painel-grafico-legenda-cor painel-grafico-barra-voce" />
           {legendaVoce}
         </span>
-        <span className="painel-gráfico-legenda-item">
-          <i className="painel-gráfico-legenda-cor painel-gráfico-barra-plataforma" />
+        <span className="painel-grafico-legenda-item">
+          <i className="painel-grafico-legenda-cor painel-grafico-barra-plataforma" />
           {legendaPlataforma}
         </span>
       </div>

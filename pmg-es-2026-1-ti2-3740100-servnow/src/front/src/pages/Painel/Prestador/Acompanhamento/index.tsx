@@ -30,7 +30,7 @@ import {
   verificarIdentidadeFacial,
   type AcompanhamentoDetalhe
 } from "../../../../services/acompanhamento";
-import { getValidAuthSession } from "../../../../services/auth";
+import { getValidAuthSession, refreshAuthSessionFromMe } from "../../../../services/auth";
 import {
   formatarDataHoraAcompanhamento,
   formatarHorarioAcompanhamento,
@@ -89,6 +89,17 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const [percentualReagendamento, setPercentualReagendamento] = useState(50);
   const [observacaoReagendamento, setObservacaoReagendamento] = useState("");
   const [modalVerificacaoAberto, setModalVerificacaoAberto] = useState(false);
+  const [fotoPerfilUrl, setFotoPerfilUrl] = useState<string | null | undefined>(
+    () => getValidAuthSession()?.fotoPerfilUrl,
+  );
+
+  useEffect(() => {
+    void refreshAuthSessionFromMe().then((session) => {
+      if (session) {
+        setFotoPerfilUrl(session.fotoPerfilUrl);
+      }
+    });
+  }, []);
 
   const carregar = useCallback(async () => {
     try {
@@ -288,8 +299,6 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
   const identidadeVerificada = Boolean(detalhe?.identidadeVerificadaEm);
   const exigeVerificacaoFacial = detalhe?.verificacaoFacialObrigatoria ?? false;
-  const session = getValidAuthSession();
-  const fotoPerfilUrl = session?.fotoPerfilUrl;
 
   async function handleVerificacaoFacialSucesso(similaridade: number) {
     try {

@@ -724,6 +724,14 @@ body {
   border-radius: 12px;
   background: rgba(20, 184, 166, 0.18);
   color: var(--brand-strong);
+  overflow: hidden;
+}
+
+.solicitacao-cliente-avaliacao-avatar-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .solicitacao-cliente-avaliacao-rotulo {

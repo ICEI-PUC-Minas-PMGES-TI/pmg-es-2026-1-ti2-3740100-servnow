@@ -211,7 +211,7 @@ export function Propostas() {
                 >
                   <div className="painel-proposta-cabecalho">
                     <div>
-                      <span className="painel-proposta-solicitação">{tituloSolicitacao(proposta)}</span>
+                      <span className="painel-proposta-solicitacao">{tituloSolicitacao(proposta)}</span>
                       <h3>{proposta.prestadorNome}</h3>
                     </div>
 
@@ -299,35 +299,35 @@ export function Propostas() {
       ) : null}
 
       {confirmarRecusa && (
-        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setConfirmarRecusa(null)}>
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarRecusa(null)}>
           <div
-            className="solicitação-modal"
+            className="solicitacao-modal"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: 460 }}
           >
-            <header className="solicitação-modal-cabecalho">
-              <div className="solicitação-modal-titulo-grupo">
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
                 <X size={20} />
                 <h3>Recusar proposta</h3>
               </div>
               <button
                 type="button"
-                className="solicitação-modal-fechar"
+                className="solicitacao-modal-fechar"
                 onClick={() => setConfirmarRecusa(null)}
                 aria-label="Fechar"
               >
                 <X size={18} />
               </button>
             </header>
-            <div className="solicitação-modal-corpo">
+            <div className="solicitacao-modal-corpo">
               <p style={{ marginTop: 0 }}>Deseja recusar a proposta de {confirmarRecusa.prestadorNome}?</p>
               <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
                 A proposta continuara visivel no filtro Recusadas.
               </p>
             </div>
-            <footer className="solicitação-modal-rodape">
+            <footer className="solicitacao-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setConfirmarRecusa(null)}>
                 Cancelar
               </button>

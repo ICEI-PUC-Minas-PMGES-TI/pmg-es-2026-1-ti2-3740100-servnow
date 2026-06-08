@@ -90,11 +90,8 @@
   padding-top: 14px;
 }
 
-.painel-sidebar-rodape {
-  flex-shrink: 0;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--workspace-border);
+.painel-nav-item-editar {
+  margin-top: 4px;
 }
 
 .painel-sidebar-corpo .painel-nav {
@@ -1873,11 +1870,6 @@
     flex: initial;
   }
 
-  .painel-sidebar-rodape {
-    margin-top: 10px;
-    padding-top: 10px;
-  }
-
   .painel-sidebar-titulo {
     display: none;
   }
@@ -1888,11 +1880,6 @@
     overflow-x: auto;
     overflow-y: hidden;
     gap: 6px;
-  }
-
-  .painel-sidebar-rodape .painel-nav-item {
-    width: 100%;
-    justify-content: center;
   }
 
   .painel-nav-item {

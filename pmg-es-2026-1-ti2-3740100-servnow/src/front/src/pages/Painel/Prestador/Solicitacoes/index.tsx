@@ -387,7 +387,8 @@ export function Solicitacoes() {
             {lista.map((item) => {
               const tipoServico = TIPOS_SERVICO_MAP[item.tipoServico];
               const IconComponent = tipoServico?.icone || FileText;
-              const nova = item.status === "PUBLICADO" || item.status === "AGUARDANDO_PROPOSTAS";
+              const nova = item.status === "PUBLICADO";
+              const aguardandoPropostas = item.status === "AGUARDANDO_PROPOSTAS";
 
               return (
                 <div key={item.id} className="painel-lista-item">
@@ -395,7 +396,7 @@ export function Solicitacoes() {
                     <SolicitacaoImagemThumb
                       solicitacaoId={item.id}
                       imagemUrl={item.imagemUrl}
-                      className="solicitação-imagem-thumb"
+                      className="solicitacao-imagem-thumb"
                       onClick={() => setDetalheAberto(item)}
                     />
                   )}
@@ -429,7 +430,9 @@ export function Solicitacoes() {
                     </div>
                   </div>
                   <div className="painel-lista-item-acoes">
-                    <span className="painel-status aguardando">Nova oportunidade</span>
+                    <span className="painel-status aguardando">
+                      {nova ? "Nova oportunidade" : aguardandoPropostas ? "Aguardando propostas" : "Disponivel"}
+                    </span>
                     <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
                       Ver detalhes
                     </button>
@@ -453,14 +456,14 @@ export function Solicitacoes() {
       />
 
       {propostaAberta && (
-        <div className="solicitação-modal-overlay" role="presentation" onClick={() => setPropostaAberta(null)}>
-          <div className="solicitação-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <header className="solicitação-modal-cabecalho">
-              <div className="solicitação-modal-titulo-grupo">
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setPropostaAberta(null)}>
+          <div className="solicitacao-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
                 <h3>Enviar proposta</h3>
               </div>
             </header>
-            <div className="solicitação-modal-corpo">
+            <div className="solicitacao-modal-corpo">
               <section className="painel-card" style={{ padding: 14, marginBottom: 10 }}>
                 <h4 style={{ marginTop: 0, marginBottom: 10 }}>Perfil do cliente</h4>
                 <PerfilPublicoConteudo perfil={perfilCliente} carregando={carregandoPerfilCliente} />
@@ -492,7 +495,7 @@ export function Solicitacoes() {
                 </label>
               </div>
             </div>
-            <footer className="solicitação-modal-rodape">
+            <footer className="solicitacao-modal-rodape">
               <button type="button" className="btn-secondary" onClick={() => setPropostaAberta(null)} disabled={enviandoProposta}>
                 Cancelar
               </button>

@@ -31,6 +31,11 @@ import com.servnow.backend.usuario.repository.UsuarioRepository;
 @Service
 public class SolicitacaoServicoService {
 
+    private static final List<StatusSolicitacao> STATUS_ABERTAS_PARA_PRESTADORES = List.of(
+        StatusSolicitacao.PUBLICADO,
+        StatusSolicitacao.AGUARDANDO_PROPOSTAS
+    );
+
     private final SolicitacaoServicoRepository solicitacaoRepository;
     private final OrdemServicoRepository ordemServicoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -151,16 +156,16 @@ public class SolicitacaoServicoService {
         Usuario prestador = encontrarUsuario(usuarioAutenticado);
         validarTipo(prestador, TipoUsuario.PRESTADOR);
 
-        List<SolicitacaoServico> publicadas =
-            solicitacaoRepository.findByStatusOrderByCriadoEmDesc(StatusSolicitacao.PUBLICADO);
+        List<SolicitacaoServico> abertas =
+            solicitacaoRepository.findByStatusInOrderByCriadoEmDesc(STATUS_ABERTAS_PARA_PRESTADORES);
         Usuario prestadorComCoordenadas = garantirCoordenadasPrestador(prestador);
         Long prestadorId = prestadorComCoordenadas != null ? prestadorComCoordenadas.getId() : prestador.getId();
         prestadorComCoordenadas = usuarioRepository.findById(prestadorId).orElse(prestadorComCoordenadas != null ? prestadorComCoordenadas : prestador);
-        preencherCoordenadasPendentes(publicadas);
+        preencherCoordenadasPendentes(abertas);
 
         Usuario prestadorReferencia = prestadorComCoordenadas;
-        Map<Long, DistanciaCalculada> distancias = distanceService.calcularEmLoteParaPrestador(prestadorReferencia, publicadas);
-        return publicadas.stream()
+        Map<Long, DistanciaCalculada> distancias = distanceService.calcularEmLoteParaPrestador(prestadorReferencia, abertas);
+        return abertas.stream()
             .map(solicitacao -> {
                 Long solicitacaoId = solicitacao.getId();
                 DistanciaCalculada distancia = solicitacaoId == null ? null : distancias.get(solicitacaoId);
@@ -301,7 +306,7 @@ public class SolicitacaoServicoService {
         }
 
         if (usuario.getTipoUsuario() == TipoUsuario.PRESTADOR) {
-            if (solicitacao.getStatus() != StatusSolicitacao.PUBLICADO) {
+            if (!STATUS_ABERTAS_PARA_PRESTADORES.contains(solicitacao.getStatus())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solicitacao indisponivel.");
             }
             return solicitacao;

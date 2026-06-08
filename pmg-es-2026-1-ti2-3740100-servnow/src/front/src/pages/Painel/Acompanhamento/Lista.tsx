@@ -31,7 +31,7 @@ export function AcompanhamentoLista() {
   return (
     <>
       <PainelSectionHeader
-        eyebrow="Processo 4"
+        eyebrow="Vizualize os serviços agendandados"
         title="Acompanhamento"
         description="Selecione um serviço agendado para acompanhar em tempo real."
       />
