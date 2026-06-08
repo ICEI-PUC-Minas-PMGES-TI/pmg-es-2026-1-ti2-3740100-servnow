@@ -1,6 +1,6 @@
 # Orientações do projeto
 
-Comandos rápidos, logins de teste e padrões de commit.
+Comandos rápidos, logins de teste e padrões de commit
 
 ## Comandos rápidos
 
@@ -17,8 +17,6 @@ cd pmg-es-2026-1-ti2-3740100-servnow-1\pmg-es-2026-1-ti2-3740100-servnow\src\bac
 cd pmg-es-2026-1-ti2-3740100-servnow-1\pmg-es-2026-1-ti2-3740100-servnow\src\front
 npm run dev
 ```
-
-Guia completo: [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md)
 
 ## Logins para testes/desenvolvimento
 
