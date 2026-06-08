@@ -92,7 +92,7 @@ Mais detalhes: [ORIENTACOES_PROJETO.md](./ORIENTACOES_PROJETO.md)
 
 ---
 
-## Rodar localmente com Docker (opcional)
+## Rodar localmente com Docker 
 
 ```bash
 cd pmg-es-2026-1-ti2-3740100-servnow

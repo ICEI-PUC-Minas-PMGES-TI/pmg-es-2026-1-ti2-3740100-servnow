@@ -1,6 +1,9 @@
 # Deploy e infraestrutura — ServNow
 
+Projeto hospedado: https://pmg-es-2026-1-ti2-3740100-servnow.vercel.app
+
 Visão geral dos arquivos de deploy e onde cada um fica no repositório.
+
 
 ## Mapa de arquivos
 
@@ -49,21 +52,6 @@ O `vercel.json` cuida do roteamento SPA (todas as rotas caem no `index.html`).
 
 > O `VITE_API_URL` é "assado" no build. Se mudar a URL do backend, faça um novo deploy do front.
 
-## Docker local
-
-```bash
-cd pmg-es-2026-1-ti2-3740100-servnow
-docker compose up --build
-```
-
-Ou com caminho explícito:
-
-```bash
-docker compose -f pmg-es-2026-1-ti2-3740100-servnow/deploy/docker/docker-compose.yml up --build
-```
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8080
 
 ## Variáveis de ambiente
 

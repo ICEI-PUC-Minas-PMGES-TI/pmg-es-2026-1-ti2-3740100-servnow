@@ -21,8 +21,8 @@ Além disso, o sistema visa oferecer maior transparência e confiabilidade por m
 Toda a documentação está em [docs/](pmg-es-2026-1-ti2-3740100-servnow/docs/README.md):
 
 - [Como rodar localmente](pmg-es-2026-1-ti2-3740100-servnow/docs/LOCAL_DEVELOPMENT.md)
-- [Deploy (Vercel / Render / Docker)](pmg-es-2026-1-ti2-3740100-servnow/docs/DEPLOY.md)
-- [APIs](pmg-es-2026-1-ti2-3740100-servnow/docs/APIS.md)
+- [Deploy ](pmg-es-2026-1-ti2-3740100-servnow/docs/DEPLOY.md)
+- [APIS](pmg-es-2026-1-ti2-3740100-servnow/docs/APIS.md)
 - [Orientações do projeto](pmg-es-2026-1-ti2-3740100-servnow/docs/ORIENTACOES_PROJETO.md)
 
 ## Histórico de versões
