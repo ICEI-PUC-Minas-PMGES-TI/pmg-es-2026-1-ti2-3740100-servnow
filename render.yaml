@@ -13,8 +13,9 @@ services:
     runtime: docker
     rootDir: pmg-es-2026-1-ti2-3740100-servnow/src/backend
     dockerfilePath: ./Dockerfile
+    # Mesma regiao do banco Supabase (us-east-2 / Ohio) para reduzir a latencia das queries.
     plan: free
-    region: oregon
+    region: ohio
     envVars:
       - key: APP_CORS_ALLOWED_ORIGINS
         sync: false
