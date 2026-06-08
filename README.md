@@ -18,7 +18,12 @@ Além disso, o sistema visa oferecer maior transparência e confiabilidade por m
 
 ## Instruções de utilização
 
-Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.
+Toda a documentação está em [docs/](pmg-es-2026-1-ti2-3740100-servnow/docs/README.md):
+
+- [Como rodar localmente](pmg-es-2026-1-ti2-3740100-servnow/docs/LOCAL_DEVELOPMENT.md)
+- [Deploy ](pmg-es-2026-1-ti2-3740100-servnow/docs/DEPLOY.md)
+- [APIS](pmg-es-2026-1-ti2-3740100-servnow/docs/APIS.md)
+- [Orientações do projeto](pmg-es-2026-1-ti2-3740100-servnow/docs/ORIENTACOES_PROJETO.md)
 
 ## Histórico de versões
 
