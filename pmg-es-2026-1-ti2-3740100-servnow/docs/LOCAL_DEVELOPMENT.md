@@ -81,7 +81,7 @@ O front chama a API em `http://localhost:8080` (valor padrão de `VITE_API_URL`)
 
 ## 5. Entrar no sistema (contas de teste)
 
-Use os logins que o time já cadastrou no banco Supabase compartilhado, por exemplo:
+Use os logins que cadastramos no banco Supabase compartilhado
 
 | Perfil | E-mail | Senha |
 |--------|--------|-------|
