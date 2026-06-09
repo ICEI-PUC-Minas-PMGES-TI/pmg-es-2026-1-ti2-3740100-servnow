@@ -6,6 +6,7 @@ public record ParticipacaoCategoriaResponse(
     String tipoServico,
     BigDecimal ganhoPrestador,
     BigDecimal ganhoPlataforma,
-    BigDecimal percentual
+    BigDecimal percentual,
+    BigDecimal crescimentoTrimestral
 ) {
 }

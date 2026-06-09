@@ -1,28 +1,35 @@
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, Percent, PieChart, Target, TrendingUp, Wallet } from "lucide-react";
+import { BarChart3, Percent, PieChart, Star, Target, TrendingUp, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import {
   buscarIndicadoresPrestador,
+  METAS_INDICADORES,
   type IndicadorPrestadorResponse,
   type IndicadorSeriePonto,
   type PeriodoIndicador,
 } from "../../../../services/indicadores";
 import { getValidAuthSession } from "../../../../services/auth";
+import { formatarNotaAvaliacao, formatarQuantidadeAvaliacoes } from "../../../../utils/formatarAvaliacao";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
-type TipoIndicador = "ganhos" | "efetividade" | "participacao_plataforma" | "participacao_categoria";
+type TipoIndicador = "ganhos" | "avaliacao" | "efetividade" | "participacao_plataforma" | "participacao_categoria";
 
 const CORES_CATEGORIA = ["#38bdf8", "#14b8a6", "#f59e0b", "#a78bfa", "#f472b6", "#94a3b8"];
 
 const INDICADORES: Array<{ id: TipoIndicador; label: string }> = [
   { id: "ganhos", label: "Receita propria" },
-  { id: "efetividade", label: "Serviços na plataforma" },
+  { id: "avaliacao", label: "Avaliacao media" },
+  { id: "efetividade", label: "Efetividade" },
   { id: "participacao_plataforma", label: "Participacao na plataforma" },
   { id: "participacao_categoria", label: "Por tipo de serviço" },
 ];
+
+function rotuloMeta(atingida: boolean): string {
+  return atingida ? "Meta atingida" : "Meta nao atingida";
+}
 
 function formatarPercentual(valor: number): string {
   return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
@@ -63,14 +70,6 @@ function ganhoPlataformaDoPonto(item: IndicadorSeriePonto): number {
     return 0;
   }
   return (item.valor / pct) * 100;
-}
-
-function totalPlataformaDoPonto(item: IndicadorSeriePonto): number {
-  const pct = item.percentual ?? 0;
-  if (pct <= 0 || item.valor <= 0) {
-    return 0;
-  }
-  return Math.round((item.valor * 100) / pct);
 }
 
 function formatarQuantidade(valor: number): string {
@@ -286,6 +285,8 @@ function GraficoCategorias({
                   {" · "}
                   {formatarPercentual(item.percentual)} do faturamento da categoria
                   {" · "}
+                  Crescimento trimestral: {formatarPercentual(item.crescimentoTrimestral)}
+                  {" · "}
                   {formatarMoedaBrl(item.ganhoPrestador)} de {formatarMoedaBrl(item.ganhoPlataforma)}
                 </span>
               </div>
@@ -338,35 +339,57 @@ export function Metricas() {
       return { titulo: "", valor: "", detalhe: "", icone: Wallet };
     }
     switch (indicador) {
-      case "efetividade":
+      case "avaliacao": {
+        const metaAtingida = dados.avaliacaoMedia != null
+          && dados.avaliacaoMedia >= METAS_INDICADORES.avaliacaoMedia;
         return {
-          titulo: "Participacao nos serviços concluídos",
+          titulo: "Avaliacao media",
+          valor: dados.avaliacaoMedia != null ? formatarNotaAvaliacao(dados.avaliacaoMedia) : "—",
+          detalhe: dados.totalAvaliacoes > 0
+            ? `${formatarQuantidadeAvaliacoes(dados.totalAvaliacoes)} · Meta: ≥ ${METAS_INDICADORES.avaliacaoMedia} estrelas · ${rotuloMeta(metaAtingida)}`
+            : "Sem avaliacoes ainda",
+          icone: Star,
+        };
+      }
+      case "efetividade": {
+        const metaAtingida = dados.efetividadePercentual >= METAS_INDICADORES.efetividadePercentual;
+        return {
+          titulo: "Percentual de efetividade",
           valor: formatarPercentual(dados.efetividadePercentual),
-          detalhe: `${dados.servicosConcluidos} serviços concluídos de ${dados.servicosConcluidosPlataforma} na plataforma`,
+          detalhe: `${dados.servicosConcluidos} concluidos de ${dados.servicosRecebidos} recebidos · Meta: ≥ ${METAS_INDICADORES.efetividadePercentual}% · ${rotuloMeta(metaAtingida)}`,
           icone: Target,
         };
-      case "participacao_plataforma":
+      }
+      case "participacao_plataforma": {
+        const metaAtingida = dados.crescimentoParticipacaoMensal >= METAS_INDICADORES.crescimentoParticipacaoMensal;
         return {
           titulo: "Participacao nos ganhos da plataforma",
           valor: formatarPercentual(dados.participacaoPlataformaPercentual),
-          detalhe: `${formatarMoedaBrl(dados.ganhoPrestadorPeriodo)} de ${formatarMoedaBrl(dados.ganhoPlataformaPeriodo)} no periodo atual`,
+          detalhe: periodo === "mes"
+            ? `Crescimento mensal: ${formatarPercentual(dados.crescimentoParticipacaoMensal)} · Meta: ≥ ${METAS_INDICADORES.crescimentoParticipacaoMensal}% · ${rotuloMeta(metaAtingida)}`
+            : `${formatarMoedaBrl(dados.ganhoPrestadorPeriodo)} de ${formatarMoedaBrl(dados.ganhoPlataformaPeriodo)} no periodo atual`,
           icone: Percent,
         };
-      case "participacao_categoria":
+      }
+      case "participacao_categoria": {
+        const maiorCrescimento = dados.participacaoPorCategoria.reduce(
+          (maior, item) => (item.crescimentoTrimestral > maior.crescimentoTrimestral ? item : maior),
+          { crescimentoTrimestral: -Infinity, tipoServico: "" } as { crescimentoTrimestral: number; tipoServico: string },
+        );
+        const metaAtingida = dados.participacaoPorCategoria.length > 0 && dados.participacaoPorCategoria.every(
+          (item) => item.crescimentoTrimestral >= METAS_INDICADORES.crescimentoCategoriaTrimestral,
+        );
         return {
           titulo: "Participacao por tipo de serviço",
           valor: dados.participacaoPorCategoria.length > 0
-            ? formatarPercentual(
-              dados.participacaoPorCategoria.reduce((maior, item) => (
-                item.percentual > maior.percentual ? item : maior
-              )).percentual,
-            )
+            ? formatarPercentual(maiorCrescimento.crescimentoTrimestral)
             : "—",
           detalhe: dados.participacaoPorCategoria.length > 0
-            ? `Maior fatia: ${nomeTipoServico(dados.participacaoPorCategoria[0].tipoServico)}`
-            : "Sem dados no período atual",
+            ? `Maior crescimento trimestral: ${nomeTipoServico(maiorCrescimento.tipoServico)} · Meta: ≥ ${METAS_INDICADORES.crescimentoCategoriaTrimestral}% em cada categoria · ${rotuloMeta(metaAtingida)}`
+            : "Sem dados no periodo atual",
           icone: PieChart,
         };
+      }
       default:
         return {
           titulo: "Receita propria no período atual",
@@ -465,20 +488,28 @@ export function Metricas() {
               />
             )}
 
+            {indicador === "avaliacao" && (
+              <p className="workspace-hint" style={{ marginTop: 14 }}>
+                Media das notas de 1 a 5 estrelas recebidas dos clientes em servicos concluidos e pagos.
+              </p>
+            )}
+
             {indicador === "efetividade" && (
               <GraficoComparativoDuplo
                 dados={dados.efetividadeSerie}
                 valorVocePeriodo={dados.servicosConcluidos}
-                valorPlataformaPeriodo={dados.servicosConcluidosPlataforma}
-                derivarTotalPlataforma={totalPlataformaDoPonto}
+                valorPlataformaPeriodo={dados.servicosRecebidos}
+                derivarTotalPlataforma={(item) => item.percentual != null && item.percentual > 0
+                  ? Math.round((item.valor * 100) / item.percentual)
+                  : 0}
                 formatarValor={formatarQuantidade}
-                rotuloVoce="Voce"
-                rotuloPlataforma="Plataforma (total)"
-                legendaVoce="Seus serviços concluídos"
-                legendaPlataforma="Serviços concluídos na plataforma"
-                ariaLabel="Grafico comparativo de serviços concluídos"
-                tituloVoce="Voce"
-                tituloPlataforma="Plataforma"
+                rotuloVoce="Concluidos"
+                rotuloPlataforma="Recebidos"
+                legendaVoce="Servicos concluidos"
+                legendaPlataforma="Servicos recebidos"
+                ariaLabel="Grafico de efetividade do prestador"
+                tituloVoce="Concluidos"
+                tituloPlataforma="Recebidos"
               />
             )}
 

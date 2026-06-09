@@ -1,5 +1,7 @@
 package com.servnow.backend.perfil.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -234,6 +236,74 @@ public class PerfilService {
             && usuario.getCep() != null;
     }
 
+    public void exigirPerfilCompletoParaPropostas(Usuario usuario) {
+        validarTipo(usuario, TipoUsuario.PRESTADOR);
+        List<String> pendencias = pendenciasPerfilPrestador(usuario);
+        if (!pendencias.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Complete seu perfil antes de enviar propostas: " + String.join("; ", pendencias) + "."
+            );
+        }
+    }
+
+    public List<String> pendenciasPerfilPrestador(Usuario usuario) {
+        List<String> pendencias = new ArrayList<>();
+
+        if (!temEnderecoCompleto(usuario)) {
+            pendencias.add("endereco completo (rua, numero, CEP, bairro, cidade e estado)");
+        } else {
+            String cep = normalizarTexto(usuario.getCep());
+            if (cep == null || !cep.replaceAll("\\D", "").matches("\\d{8}")) {
+                pendencias.add("CEP valido com 8 digitos");
+            }
+        }
+
+        if (normalizarTextoLongo(usuario.getDescricaoProfissional()) == null) {
+            pendencias.add("descricao profissional");
+        }
+
+        if (contarItensSeparadosPorVirgula(usuario.getEspecialidades()) == 0) {
+            pendencias.add("pelo menos um tipo de servico");
+        }
+
+        if (contarItensSeparadosPorVirgula(usuario.getDiasDisponiveis()) == 0) {
+            pendencias.add("pelo menos um dia disponivel");
+        }
+
+        String horarioInicio = normalizarTexto(usuario.getHorarioInicio());
+        String horarioFim = normalizarTexto(usuario.getHorarioFim());
+        if (horarioInicio == null || horarioFim == null || horarioInicio.compareTo(horarioFim) >= 0) {
+            pendencias.add("horario de inicio anterior ao de fim");
+        }
+
+        Integer raio = usuario.getRaioAtendimentoKm();
+        if (raio == null || raio < 1 || raio > 30) {
+            pendencias.add("raio de atendimento entre 1 e 30 km");
+        }
+
+        if (!temArquivo(usuario.getDocumentoIdentidadeArquivoRelativo())) {
+            pendencias.add("documento de identidade");
+        }
+
+        if (normalizarTexto(usuario.getChavePix()) == null) {
+            pendencias.add("chave PIX");
+        }
+
+        return pendencias;
+    }
+
+    private int contarItensSeparadosPorVirgula(String valor) {
+        String texto = normalizarTexto(valor);
+        if (texto == null) {
+            return 0;
+        }
+        return (int) Arrays.stream(texto.split(","))
+            .map(String::trim)
+            .filter(item -> !item.isEmpty())
+            .count();
+    }
+
     private void aplicarAtualizacaoComum(
         Usuario usuario,
         PerfilUpdateRequest request,
@@ -422,6 +492,13 @@ public class PerfilService {
             enderecos = clienteCadastroService.listarEnderecos(usuario);
             chavesPix = clienteCadastroService.listarChavesPix(usuario);
         }
+        Boolean perfilCompleto = null;
+        List<String> pendenciasPerfil = List.of();
+        if (usuario.getTipoUsuario() == TipoUsuario.PRESTADOR) {
+            pendenciasPerfil = pendenciasPerfilPrestador(usuario);
+            perfilCompleto = pendenciasPerfil.isEmpty();
+        }
+
         return new PerfilResponse(
             usuario.getId(),
             usuario.getNome(),
@@ -452,7 +529,9 @@ public class PerfilService {
             usuario.getLatitude(),
             usuario.getLongitude(),
             enderecos,
-            chavesPix
+            chavesPix,
+            perfilCompleto,
+            pendenciasPerfil
         );
     }
 

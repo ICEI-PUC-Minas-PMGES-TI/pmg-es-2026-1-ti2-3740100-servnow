@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.servnow.backend.notificacao.domain.TipoNotificacao;
 import com.servnow.backend.notificacao.service.NotificacaoService;
 import com.servnow.backend.perfil.service.AvaliacaoService;
+import com.servnow.backend.perfil.service.PerfilService;
 import com.servnow.backend.proposta.domain.PropostaServico;
 import com.servnow.backend.proposta.domain.StatusProposta;
 import com.servnow.backend.proposta.dto.PropostaCreateRequest;
@@ -36,25 +37,29 @@ public class PropostaServicoService {
     private final UsuarioRepository usuarioRepository;
     private final NotificacaoService notificacaoService;
     private final AvaliacaoService avaliacaoService;
+    private final PerfilService perfilService;
 
     public PropostaServicoService(
         PropostaServicoRepository propostaRepository,
         SolicitacaoServicoRepository solicitacaoRepository,
         UsuarioRepository usuarioRepository,
         NotificacaoService notificacaoService,
-        AvaliacaoService avaliacaoService
+        AvaliacaoService avaliacaoService,
+        PerfilService perfilService
     ) {
         this.propostaRepository = propostaRepository;
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.notificacaoService = notificacaoService;
         this.avaliacaoService = avaliacaoService;
+        this.perfilService = perfilService;
     }
 
     @Transactional
     public PropostaServicoResponse enviarProposta(UsuarioAutenticado usuarioAutenticado, PropostaCreateRequest request) {
         Usuario prestador = encontrarUsuario(usuarioAutenticado);
         validarTipo(prestador, TipoUsuario.PRESTADOR);
+        perfilService.exigirPerfilCompletoParaPropostas(prestador);
 
         SolicitacaoServico solicitacao = solicitacaoRepository.findById(request.solicitacaoId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitacao nao encontrada."));

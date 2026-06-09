@@ -70,6 +70,8 @@ export type PerfilResponse = {
   longitude?: number | null;
   enderecos?: ClienteEnderecoResponse[];
   chavesPix?: ClienteChavePixResponse[];
+  perfilCompleto?: boolean | null;
+  pendenciasPerfil?: string[];
 };
 
 export type ClienteEnderecoResponse = {

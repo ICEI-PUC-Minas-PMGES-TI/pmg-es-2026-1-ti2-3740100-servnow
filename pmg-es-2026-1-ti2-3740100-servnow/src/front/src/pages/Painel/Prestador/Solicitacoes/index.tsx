@@ -48,9 +48,12 @@ export function Solicitacoes() {
   const [carregandoPerfilCliente, setCarregandoPerfilCliente] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
   const [localPrestador, setLocalPrestador] = useState<LocalPrestadorMapa | null>(null);
+  const [perfilPrestador, setPerfilPrestador] = useState<PerfilResponse | null>(null);
+
+  const perfilCompletoParaPropostas = perfilPrestador?.perfilCompleto !== false;
 
   useEffect(() => {
-    async function carregarLocalPrestador() {
+    async function carregarPerfilPrestador() {
       const session = getValidAuthSession();
       if (!session?.token) {
         return;
@@ -65,6 +68,8 @@ export function Solicitacoes() {
         }
 
         const perfil = (await response.json()) as PerfilResponse;
+        setPerfilPrestador(perfil);
+
         if (
           perfil.latitude == null ||
           perfil.longitude == null ||
@@ -84,11 +89,11 @@ export function Solicitacoes() {
           endereco: endereco || undefined,
         });
       } catch {
-        // Local do prestador e opcional no mapa.
+        // Perfil do prestador e opcional no mapa.
       }
     }
 
-    void carregarLocalPrestador();
+    void carregarPerfilPrestador();
   }, [navigate]);
 
   useEffect(() => {
@@ -167,7 +172,16 @@ export function Solicitacoes() {
     setVisualizacao("mapa");
   }
 
+  function irParaPerfil() {
+    navigate("/perfil");
+  }
+
   async function abrirModalProposta(item: OportunidadeSolicitacao) {
+    if (!perfilCompletoParaPropostas) {
+      toast.error("Complete seu perfil em Configurar perfil para enviar propostas.");
+      return;
+    }
+
     setPropostaAberta(item);
     setValorProposta("");
     setMensagemProposta("");
@@ -234,6 +248,10 @@ export function Solicitacoes() {
         setSolicitacoes((atual) => atual.filter((item) => item.id !== propostaAberta.id));
         return;
       }
+      if (response.status === 409) {
+        toast.error(await getResponseError(response, "Complete seu perfil antes de enviar propostas."));
+        return;
+      }
       if (!response.ok) {
         throw new Error(await getResponseError(response, "Não foi possível enviar a proposta."));
       }
@@ -258,10 +276,29 @@ export function Solicitacoes() {
       <PainelSectionHeader
         eyebrow="Oportunidades"
         title="Solicitações"
-        description="Filtre por tipo, preco e distancia. Envie propostas para os servicos disponiveis."
+        description="Filtre por tipo, preco e distancia. Com o perfil completo, envie propostas para os servicos disponiveis."
       />
 
       <section className="painel-card">
+        {perfilPrestador && perfilPrestador.perfilCompleto === false && (
+          <div className="painel-filtro-aviso" style={{ marginBottom: 16 }}>
+            <p style={{ margin: 0 }}>
+              Para enviar propostas, complete seu perfil em{" "}
+              <button type="button" className="painel-btn-ghost" onClick={irParaPerfil} style={{ padding: 0, minHeight: 0 }}>
+                Configurar perfil
+              </button>
+              .
+            </p>
+            {perfilPrestador.pendenciasPerfil && perfilPrestador.pendenciasPerfil.length > 0 && (
+              <ul style={{ margin: "8px 0 0", paddingLeft: 20 }}>
+                {perfilPrestador.pendenciasPerfil.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
         <div className="painel-card-cabecalho painel-card-cabecalho-coluna">
           <h2>Propostas de clientes</h2>
           <div className="painel-filtros-toolbar">
@@ -436,7 +473,17 @@ export function Solicitacoes() {
                     <button type="button" className="painel-btn-ghost" onClick={() => setDetalheAberto(item)}>
                       Ver detalhes
                     </button>
-                    <button type="button" className="painel-btn-aceitar" onClick={() => void abrirModalProposta(item)}>
+                    <button
+                      type="button"
+                      className="painel-btn-aceitar"
+                      onClick={() => void abrirModalProposta(item)}
+                      disabled={!perfilCompletoParaPropostas}
+                      title={
+                        perfilCompletoParaPropostas
+                          ? undefined
+                          : "Complete seu perfil em Configurar perfil para enviar propostas."
+                      }
+                    >
                       Enviar proposta
                     </button>
                   </div>

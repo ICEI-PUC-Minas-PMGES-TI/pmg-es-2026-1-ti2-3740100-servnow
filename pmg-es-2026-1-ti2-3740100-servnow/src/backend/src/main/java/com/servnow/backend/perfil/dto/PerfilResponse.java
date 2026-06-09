@@ -32,6 +32,8 @@ public record PerfilResponse(
     Double latitude,
     Double longitude,
     List<ClienteEnderecoResponse> enderecos,
-    List<ClienteChavePixResponse> chavesPix
+    List<ClienteChavePixResponse> chavesPix,
+    Boolean perfilCompleto,
+    List<String> pendenciasPerfil
 ) {
 }

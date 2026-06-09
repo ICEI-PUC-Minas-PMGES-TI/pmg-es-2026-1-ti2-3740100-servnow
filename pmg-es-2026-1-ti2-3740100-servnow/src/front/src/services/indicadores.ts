@@ -13,22 +13,33 @@ export type ParticipacaoCategoria = {
   ganhoPrestador: number;
   ganhoPlataforma: number;
   percentual: number;
+  crescimentoTrimestral: number;
 };
 
 export type IndicadorPrestadorResponse = {
   periodo: PeriodoIndicador;
   ganhosPropriosTotal: number;
   ganhosPropriosSerie: IndicadorSeriePonto[];
+  avaliacaoMedia: number | null;
+  totalAvaliacoes: number;
   efetividadePercentual: number;
   servicosConcluidos: number;
-  servicosConcluidosPlataforma: number;
+  servicosRecebidos: number;
   efetividadeSerie: IndicadorSeriePonto[];
   participacaoPlataformaPercentual: number;
+  crescimentoParticipacaoMensal: number;
   ganhoPrestadorPeriodo: number;
   ganhoPlataformaPeriodo: number;
   participacaoPlataformaSerie: IndicadorSeriePonto[];
   participacaoPorCategoria: ParticipacaoCategoria[];
 };
+
+export const METAS_INDICADORES = {
+  avaliacaoMedia: 4.0,
+  efetividadePercentual: 85,
+  crescimentoParticipacaoMensal: 5,
+  crescimentoCategoriaTrimestral: 10,
+} as const;
 
 export async function buscarIndicadoresPrestador(periodo: PeriodoIndicador): Promise<IndicadorPrestadorResponse> {
   const session = getValidAuthSession();

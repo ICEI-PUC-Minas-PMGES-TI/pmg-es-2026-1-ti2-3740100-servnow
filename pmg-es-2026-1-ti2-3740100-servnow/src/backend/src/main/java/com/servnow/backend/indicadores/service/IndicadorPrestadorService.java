@@ -20,9 +20,11 @@ import com.servnow.backend.acompanhamento.repository.OrdemServicoRepository;
 import com.servnow.backend.indicadores.dto.IndicadorPrestadorResponse;
 import com.servnow.backend.indicadores.dto.IndicadorSeriePontoResponse;
 import com.servnow.backend.indicadores.dto.ParticipacaoCategoriaResponse;
+import com.servnow.backend.perfil.service.AvaliacaoService;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.solicitacao.domain.SolicitacaoServico;
 import com.servnow.backend.solicitacao.domain.StatusSolicitacao;
+import com.servnow.backend.solicitacao.repository.SolicitacaoServicoRepository;
 import com.servnow.backend.usuario.domain.TipoUsuario;
 import com.servnow.backend.usuario.domain.Usuario;
 import com.servnow.backend.usuario.repository.UsuarioRepository;
@@ -36,14 +38,20 @@ public class IndicadorPrestadorService {
     private static final String[] DIAS_SEMANA_CURTO = {"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"};
 
     private final OrdemServicoRepository ordemServicoRepository;
+    private final SolicitacaoServicoRepository solicitacaoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AvaliacaoService avaliacaoService;
 
     public IndicadorPrestadorService(
         OrdemServicoRepository ordemServicoRepository,
-        UsuarioRepository usuarioRepository
+        SolicitacaoServicoRepository solicitacaoRepository,
+        UsuarioRepository usuarioRepository,
+        AvaliacaoService avaliacaoService
     ) {
         this.ordemServicoRepository = ordemServicoRepository;
+        this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.avaliacaoService = avaliacaoService;
     }
 
     @Transactional(readOnly = true)
@@ -53,8 +61,22 @@ public class IndicadorPrestadorService {
 
         List<OrdemServico> pagasPlataforma = ordemServicoRepository.findAllPagas();
         List<OrdemServico> pagasPrestador = ordemServicoRepository.findPagasDoPrestador(prestador.getId());
-        List<OrdemServico> concluidasPlataforma =
-            ordemServicoRepository.findBySolicitacaoStatus(StatusSolicitacao.CONCLUIDA);
+        List<OrdemServico> concluidasPrestador =
+            ordemServicoRepository.findBySolicitacaoStatus(StatusSolicitacao.CONCLUIDA).stream()
+                .filter(ordem -> ordem.getSolicitacao().getPrestador() != null)
+                .filter(ordem -> prestador.getId().equals(ordem.getSolicitacao().getPrestador().getId()))
+                .toList();
+        List<SolicitacaoServico> servicosAtribuidos = solicitacaoRepository
+            .findByPrestadorIdOrderByAceitoEmDesc(prestador.getId()).stream()
+            .filter(solicitacao -> solicitacao.getStatus() == StatusSolicitacao.AGENDADA
+                || solicitacao.getStatus() == StatusSolicitacao.CONCLUIDA)
+            .toList();
+
+        var resumoAvaliacoes = avaliacaoService.calcularResumo(prestador);
+        BigDecimal avaliacaoMedia = resumoAvaliacoes.media() == null
+            ? null
+            : BigDecimal.valueOf(resumoAvaliacoes.media()).setScale(2, RoundingMode.HALF_UP);
+        long totalAvaliacoes = resumoAvaliacoes.total();
 
         LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
         List<BucketPeriodo> buckets = criarBuckets(periodoNormalizado, hoje);
@@ -64,7 +86,7 @@ public class IndicadorPrestadorService {
 
         List<IndicadorSeriePontoResponse> efetividadeSerie = new ArrayList<>();
         long concluidosPeriodo = 0;
-        long concluidosPlataformaPeriodo = 0;
+        long recebidosPeriodo = 0;
 
         List<IndicadorSeriePontoResponse> participacaoSerie = new ArrayList<>();
         BigDecimal ganhoPrestadorPeriodo = BigDecimal.ZERO;
@@ -77,17 +99,17 @@ public class IndicadorPrestadorService {
                 ganhosTotal = ganhoBucket;
             }
 
-            long concluidosPlataforma = contarConcluidos(concluidasPlataforma, bucket);
-            long concluidosPrestador = contarConcluidosPrestador(concluidasPlataforma, prestador.getId(), bucket);
-            BigDecimal efetividade = percentual(concluidosPrestador, concluidosPlataforma);
+            long recebidosBucket = contarRecebidos(servicosAtribuidos, bucket);
+            long concluidosBucket = contarConcluidos(concluidasPrestador, bucket);
+            BigDecimal efetividade = percentual(concluidosBucket, recebidosBucket);
             efetividadeSerie.add(new IndicadorSeriePontoResponse(
                 bucket.label(),
-                BigDecimal.valueOf(concluidosPrestador),
+                BigDecimal.valueOf(concluidosBucket),
                 efetividade
             ));
             if (bucket.atual()) {
-                concluidosPlataformaPeriodo = concluidosPlataforma;
-                concluidosPeriodo = concluidosPrestador;
+                recebidosPeriodo = recebidosBucket;
+                concluidosPeriodo = concluidosBucket;
             }
 
             BigDecimal ganhoPrestador = somarGanhos(pagasPrestador, bucket);
@@ -101,17 +123,23 @@ public class IndicadorPrestadorService {
         }
 
         List<ParticipacaoCategoriaResponse> participacaoCategorias =
-            calcularParticipacaoPorCategoria(pagasPrestador, pagasPlataforma, buckets);
+            calcularParticipacaoPorCategoria(pagasPrestador, pagasPlataforma, pagasPrestador, buckets);
+
+        BigDecimal participacaoAtual = percentualDecimal(ganhoPrestadorPeriodo, ganhoPlataformaPeriodo);
+        BigDecimal crescimentoParticipacao = calcularCrescimentoParticipacao(participacaoSerie, periodoNormalizado);
 
         return new IndicadorPrestadorResponse(
             periodoNormalizado,
             ganhosTotal,
             ganhosSerie,
-            percentual(concluidosPeriodo, concluidosPlataformaPeriodo),
+            avaliacaoMedia,
+            totalAvaliacoes,
+            percentual(concluidosPeriodo, recebidosPeriodo),
             concluidosPeriodo,
-            concluidosPlataformaPeriodo,
+            recebidosPeriodo,
             efetividadeSerie,
-            percentualDecimal(ganhoPrestadorPeriodo, ganhoPlataformaPeriodo),
+            participacaoAtual,
+            crescimentoParticipacao,
             ganhoPrestadorPeriodo,
             ganhoPlataformaPeriodo,
             participacaoSerie,
@@ -120,8 +148,9 @@ public class IndicadorPrestadorService {
     }
 
     private List<ParticipacaoCategoriaResponse> calcularParticipacaoPorCategoria(
-        List<OrdemServico> pagasPrestador,
-        List<OrdemServico> pagasPlataforma,
+        List<OrdemServico> pagasPrestadorPeriodo,
+        List<OrdemServico> pagasPlataformaPeriodo,
+        List<OrdemServico> pagasPrestadorHistorico,
         List<BucketPeriodo> buckets
     ) {
         BucketPeriodo bucketAtual = buckets.stream().filter(BucketPeriodo::atual).findFirst().orElse(null);
@@ -132,7 +161,7 @@ public class IndicadorPrestadorService {
         Map<String, BigDecimal> ganhoPrestadorPorTipo = new LinkedHashMap<>();
         Map<String, BigDecimal> ganhoPlataformaPorTipo = new LinkedHashMap<>();
 
-        for (OrdemServico ordem : pagasPrestador) {
+        for (OrdemServico ordem : pagasPrestadorPeriodo) {
             if (!bucketAtual.contem(dataReferenciaFinanceira(ordem))) {
                 continue;
             }
@@ -140,7 +169,7 @@ public class IndicadorPrestadorService {
             ganhoPrestadorPorTipo.merge(tipo, valorOrdem(ordem), BigDecimal::add);
         }
 
-        for (OrdemServico ordem : pagasPlataforma) {
+        for (OrdemServico ordem : pagasPlataformaPeriodo) {
             if (!bucketAtual.contem(dataReferenciaFinanceira(ordem))) {
                 continue;
             }
@@ -148,19 +177,88 @@ public class IndicadorPrestadorService {
             ganhoPlataformaPorTipo.merge(tipo, valorOrdem(ordem), BigDecimal::add);
         }
 
+        List<BucketPeriodo> trimestreAtual = bucketsTrimestreAtual(buckets);
+        List<BucketPeriodo> trimestreAnterior = bucketsTrimestreAnterior(buckets);
+
         List<ParticipacaoCategoriaResponse> resultado = new ArrayList<>();
         for (String tipo : ganhoPrestadorPorTipo.keySet()) {
             BigDecimal ganhoPrestador = ganhoPrestadorPorTipo.getOrDefault(tipo, BigDecimal.ZERO);
             BigDecimal ganhoPlataforma = ganhoPlataformaPorTipo.getOrDefault(tipo, BigDecimal.ZERO);
+            BigDecimal ganhoTrimestreAtual = somarGanhosPorTipo(pagasPrestadorHistorico, tipo, trimestreAtual);
+            BigDecimal ganhoTrimestreAnterior = somarGanhosPorTipo(pagasPrestadorHistorico, tipo, trimestreAnterior);
             resultado.add(new ParticipacaoCategoriaResponse(
                 tipo,
                 ganhoPrestador,
                 ganhoPlataforma,
-                percentualDecimal(ganhoPrestador, ganhoPlataforma)
+                percentualDecimal(ganhoPrestador, ganhoPlataforma),
+                crescimentoPercentual(ganhoTrimestreAtual, ganhoTrimestreAnterior)
             ));
         }
         resultado.sort((a, b) -> b.ganhoPrestador().compareTo(a.ganhoPrestador()));
         return resultado;
+    }
+
+    private BigDecimal calcularCrescimentoParticipacao(
+        List<IndicadorSeriePontoResponse> participacaoSerie,
+        String periodo
+    ) {
+        if (!"mes".equals(periodo) || participacaoSerie.size() < 2) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal participacaoAtual = participacaoSerie.get(participacaoSerie.size() - 1).percentual();
+        BigDecimal participacaoAnterior = participacaoSerie.get(participacaoSerie.size() - 2).percentual();
+        return crescimentoPercentual(participacaoAtual, participacaoAnterior);
+    }
+
+    private BigDecimal crescimentoPercentual(BigDecimal atual, BigDecimal anterior) {
+        if (anterior == null || anterior.compareTo(BigDecimal.ZERO) <= 0) {
+            return atual != null && atual.compareTo(BigDecimal.ZERO) > 0 ? BigDecimal.valueOf(100) : BigDecimal.ZERO;
+        }
+        if (atual == null) {
+            atual = BigDecimal.ZERO;
+        }
+        return atual.subtract(anterior)
+            .multiply(BigDecimal.valueOf(100))
+            .divide(anterior, 1, RoundingMode.HALF_UP);
+    }
+
+    private List<BucketPeriodo> bucketsTrimestreAtual(List<BucketPeriodo> buckets) {
+        if (buckets.size() < 3) {
+            return buckets;
+        }
+        return buckets.subList(buckets.size() - 3, buckets.size());
+    }
+
+    private List<BucketPeriodo> bucketsTrimestreAnterior(List<BucketPeriodo> buckets) {
+        if (buckets.size() < 6) {
+            return List.of();
+        }
+        return buckets.subList(0, 3);
+    }
+
+    private BigDecimal somarGanhosPorTipo(
+        List<OrdemServico> ordens,
+        String tipoServico,
+        List<BucketPeriodo> buckets
+    ) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrdemServico ordem : ordens) {
+            if (!tipoServico.equals(ordem.getSolicitacao().getTipoServico())) {
+                continue;
+            }
+            LocalDate data = dataReferenciaFinanceira(ordem);
+            boolean pertence = buckets.stream().anyMatch(bucket -> bucket.contem(data));
+            if (pertence) {
+                total = total.add(valorOrdem(ordem));
+            }
+        }
+        return total;
+    }
+
+    private long contarRecebidos(List<SolicitacaoServico> solicitacoes, BucketPeriodo bucket) {
+        return solicitacoes.stream()
+            .filter(solicitacao -> bucket.contem(dataReferenciaAtribuicao(solicitacao)))
+            .count();
     }
 
     private BigDecimal somarGanhos(List<OrdemServico> ordens, BucketPeriodo bucket) {
@@ -175,14 +273,6 @@ public class IndicadorPrestadorService {
 
     private long contarConcluidos(List<OrdemServico> concluidas, BucketPeriodo bucket) {
         return concluidas.stream()
-            .filter(ordem -> bucket.contem(dataReferenciaConclusao(ordem)))
-            .count();
-    }
-
-    private long contarConcluidosPrestador(List<OrdemServico> concluidas, Long prestadorId, BucketPeriodo bucket) {
-        return concluidas.stream()
-            .filter(ordem -> ordem.getSolicitacao().getPrestador() != null)
-            .filter(ordem -> prestadorId.equals(ordem.getSolicitacao().getPrestador().getId()))
             .filter(ordem -> bucket.contem(dataReferenciaConclusao(ordem)))
             .count();
     }
