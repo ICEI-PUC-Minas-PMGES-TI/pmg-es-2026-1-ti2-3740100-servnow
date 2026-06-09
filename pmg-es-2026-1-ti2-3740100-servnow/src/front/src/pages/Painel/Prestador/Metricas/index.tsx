@@ -342,7 +342,7 @@ export function Metricas() {
         return {
           titulo: "Participacao nos serviços concluídos",
           valor: formatarPercentual(dados.efetividadePercentual),
-          detalhe: `${dados.servicosConcluidos} seus servicos de ${dados.servicosConcluidosPlataforma} na plataforma`,
+          detalhe: `${dados.servicosConcluidos} serviços concluídos de ${dados.servicosConcluidosPlataforma} na plataforma`,
           icone: Target,
         };
       case "participacao_plataforma":
@@ -451,7 +451,7 @@ export function Metricas() {
                   <span className="painel-stat-label">Total na serie</span>
                   <strong className="painel-stat-valor">{formatarMoedaBrl(totalReceitaSerie)}</strong>
                   <span className="painel-stat-detalhe">
-                    {periodo === "mes" ? "Ultimos 6 meses" : "Semana atual"}
+                    {periodo === "mes" ? "Desde quando entrou na plataforma" : "Semana atual"}
                   </span>
                 </div>
               )}
@@ -505,7 +505,7 @@ export function Metricas() {
 
             {indicador === "ganhos" && (
               <p className="workspace-hint" style={{ marginTop: 14 }}>
-                Somente servicos com pagamento confirmado pelo cliente entram na receita.
+                Somente serviços com pagamento confirmados  entram na receita.
               </p>
             )}
           </>

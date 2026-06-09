@@ -10,6 +10,7 @@ public record AcompanhamentoDisponivelResponse(
     LocalDate data,
     String horario,
     BigDecimal valorAceito,
-    String etapa
+    String etapa,
+    String observacaoReagendamento
 ) {
 }

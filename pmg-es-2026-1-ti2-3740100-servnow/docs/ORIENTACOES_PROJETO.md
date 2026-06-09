@@ -26,11 +26,16 @@ npm run dev
 - E-mail: PerfilCliente@gmail.com
 - Senha: PerfilCliente
 
-**Perfil prestador**
+**Perfil prestador1**
 
 - Nome: Sergio Matos
 - E-mail: PerfilPrestador@gmail.com
 - Senha: PerfilPrestador
+
+**Perfil prestador2**
+E-mail: PerfilPrestador2@gmail.com
+senha: PerfilPrestador2
+
 
 ## Padrões para commit
 

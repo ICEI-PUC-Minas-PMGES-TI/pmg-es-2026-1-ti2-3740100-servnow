@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern;
 
 public record ConfirmarPagamentoRequest(
     @NotBlank(message = "Informe o metodo de pagamento.")
-    @Pattern(regexp = "PIX|CREDITO|DEBITO", message = "Metodo de pagamento invalido.")
+    @Pattern(regexp = "PIX|CREDITO|DEBITO|DINHEIRO", message = "Metodo de pagamento invalido.")
     String metodoPagamento
 ) {
 }

@@ -8,6 +8,7 @@ export type AcompanhamentoDisponivel = {
   horario: string | null;
   valorAceito: number | null;
   etapa: string | null;
+  observacaoReagendamento: string | null;
 };
 
 export type AtualizacaoServico = {
@@ -162,17 +163,12 @@ export function concluirExecucao(solicitacaoId: number) {
   });
 }
 
-export function solicitarReagendamento(
-  solicitacaoId: number,
-  percentualConcluido: number,
-  observacao?: string,
-) {
+export function solicitarReagendamento(solicitacaoId: number, observacao: string) {
   return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/solicitar-reagendamento`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      percentualConcluido,
-      observacao: observacao?.trim() || null,
+      observacao: observacao.trim(),
     }),
   });
 }
@@ -187,7 +183,7 @@ export function confirmarReagendamento(solicitacaoId: number, data: string, hora
 
 export function selecionarMetodoPagamento(
   solicitacaoId: number,
-  metodoPagamento: "PIX" | "CREDITO" | "DEBITO",
+  metodoPagamento: "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO",
 ) {
   return requestJson<AcompanhamentoDetalhe>(
     `/api/acompanhamento/${solicitacaoId}/selecionar-metodo-pagamento`,
@@ -199,7 +195,10 @@ export function selecionarMetodoPagamento(
   );
 }
 
-export function confirmarPagamento(solicitacaoId: number, metodoPagamento: "PIX" | "CREDITO" | "DEBITO") {
+export function confirmarPagamento(
+  solicitacaoId: number,
+  metodoPagamento: "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO",
+) {
   return requestJson<AcompanhamentoDetalhe>(`/api/acompanhamento/${solicitacaoId}/confirmar-pagamento`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

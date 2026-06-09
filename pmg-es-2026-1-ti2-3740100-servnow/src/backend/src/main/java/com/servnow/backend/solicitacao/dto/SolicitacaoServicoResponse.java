@@ -33,6 +33,8 @@ public record SolicitacaoServicoResponse(
     Double distanciaKm,
     Boolean distanciaLinhaReta,
     BigDecimal valorAceito,
-    OffsetDateTime concluidoEm
+    OffsetDateTime concluidoEm,
+    String etapaAcompanhamento,
+    String observacaoReagendamento
 ) {
 }

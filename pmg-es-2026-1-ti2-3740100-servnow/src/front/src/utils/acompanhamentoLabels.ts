@@ -1,13 +1,20 @@
-﻿export function labelEtapaAcompanhamento(etapa: string | null | undefined): string {
+﻿export function labelStatusAgendamento(etapaAcompanhamento: string | null | undefined): string {
+  if (!etapaAcompanhamento) {
+    return "Agendado";
+  }
+  return labelEtapaAcompanhamento(etapaAcompanhamento);
+}
+
+export function labelEtapaAcompanhamento(etapa: string | null | undefined): string {
   switch (etapa) {
     case "AGUARDANDO_CHEGADA":
       return "Aguardando chegada";
     case "EM_ANDAMENTO":
       return "Em andamento";
     case "AGUARDANDO_REAGENDAMENTO":
-      return "Aguardando reagendamento";
+      return "Aguardando retorno";
     case "VISITA_REAGENDADA":
-      return "Visita reagendada";
+      return "Retorno de serviço";
     case "AGUARDANDO_PAGAMENTO":
       return "Aguardando pagamento";
     case "AGUARDANDO_AVALIACAO":

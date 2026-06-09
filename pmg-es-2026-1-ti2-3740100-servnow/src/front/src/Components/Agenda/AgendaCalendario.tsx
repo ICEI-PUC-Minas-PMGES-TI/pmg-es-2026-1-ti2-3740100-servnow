@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Calendar, ChevronLeft, ChevronRight, Clock, DollarSign, MapPin, User } from "lucide-react";
 
 import type { SolicitacaoServicoResponse } from "../../services/auth";
+import { labelStatusAgendamento } from "../../utils/acompanhamentoLabels";
 import { formatarMoedaBrl } from "../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../utils/tiposServico";
 import { BotaoRota } from "../Acompanhamento/BotaoRota";
@@ -161,6 +162,11 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
                       {item.descricao && (
                         <p className="agenda-servico-descrição">{item.descricao}</p>
                       )}
+                      {item.observacaoReagendamento && (
+                        <p className="agenda-servico-descrição" style={{ marginTop: 8 }}>
+                          Motivo do retorno: {item.observacaoReagendamento}
+                        </p>
+                      )}
                       {papel === "PRESTADOR" && (
                         <div style={{ marginTop: 12 }}>
                           <BotaoRota endereco={item.endereco} />
@@ -168,7 +174,7 @@ export function AgendaCalendario({ agendamentos, papel }: AgendaCalendarioProps)
                       )}
                     </div>
                     <div className="painel-lista-item-acoes">
-                      <span className="painel-status agendado">Agendado</span>
+                      <span className="painel-status agendado">{labelStatusAgendamento(item.etapaAcompanhamento)}</span>
                       <button
                         type="button"
                         className="painel-btn-ghost"

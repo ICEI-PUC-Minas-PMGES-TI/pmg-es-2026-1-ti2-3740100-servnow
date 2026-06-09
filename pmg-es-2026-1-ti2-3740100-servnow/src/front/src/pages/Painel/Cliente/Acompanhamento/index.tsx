@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock,
   Copy,
+  Banknote,
   CreditCard,
   MapPin,
   QrCode,
@@ -36,7 +37,7 @@ import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
 
-type MetodoPagamento = "PIX" | "CREDITO" | "DEBITO";
+type MetodoPagamento = "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO";
 
 type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "reagendamento" | "visita-reagendada" | "pagamento" | "avaliação" | "concluido";
 
@@ -44,6 +45,7 @@ const METODOS_PAGAMENTO: Array<{ id: MetodoPagamento; nome: string; desc: string
   { id: "PIX", nome: "PIX", desc: "Pagamento instantaneo", icone: QrCode },
   { id: "CREDITO", nome: "Cartao de credito", desc: "Em ate 12x", icone: CreditCard },
   { id: "DEBITO", nome: "Cartao de debito", desc: "Debito a vista", icone: CreditCard },
+  { id: "DINHEIRO", nome: "Dinheiro", desc: "Pagamento em especie", icone: Banknote },
 ];
 
 const ETAPAS_INFO: Array<{ id: ClienteEtapa; label: string; numero: number }> = [
@@ -446,22 +448,12 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             <h2>Reagendar servico</h2>
           </div>
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            O prestador informou que o servico ainda nao foi concluido. Escolha um novo horario para continuar.
+            O prestador solicitou um retorno para concluir o servico. Escolha um novo horario para continuar.
           </p>
 
-          <div className="acomp-progresso">
-            <div className="acomp-progresso-cabecalho">
-              <span>Progresso informado pelo prestador</span>
-              <strong>{progressoAtual}%</strong>
-            </div>
-            <div className="acomp-progresso-barra">
-              <span style={{ width: `${progressoAtual}%` }} />
-            </div>
-          </div>
-
           {detalhe.observacaoReagendamento && (
-            <p style={{ marginTop: 14, fontSize: 13 }}>
-              <strong>Observacao do prestador:</strong> {detalhe.observacaoReagendamento}
+            <p style={{ marginBottom: 14, fontSize: 13, padding: "12px 14px", borderRadius: 12, background: "rgba(20, 184, 166, 0.08)", border: "1px solid rgba(20, 184, 166, 0.2)" }}>
+              <strong>Motivo do retorno:</strong> {detalhe.observacaoReagendamento}
             </p>
           )}
 
@@ -502,9 +494,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             <div className="acomp-codigo-icone">
               <Calendar size={26} />
             </div>
-            <h2 className="acomp-codigo-titulo">Visita reagendada</h2>
+            <h2 className="acomp-codigo-titulo">Retorno de serviço</h2>
             <p className="acomp-codigo-sub">
-              O codigo de confirmacao ficara disponivel no dia da nova visita.
+              O codigo de confirmacao ficara disponivel no dia do retorno agendado.
             </p>
 
             <div className="acomp-cliente-mini">
@@ -518,16 +510,10 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
               </div>
             </div>
 
-            {progressoAtual > 0 && (
-              <div className="acomp-progresso" style={{ width: "100%", marginTop: 8 }}>
-                <div className="acomp-progresso-cabecalho">
-                  <span>Progresso do servico</span>
-                  <strong>{progressoAtual}%</strong>
-                </div>
-                <div className="acomp-progresso-barra">
-                  <span style={{ width: `${progressoAtual}%` }} />
-                </div>
-              </div>
+            {detalhe.observacaoReagendamento && (
+              <p style={{ width: "100%", marginTop: 8, fontSize: 13, color: "var(--workspace-muted)" }}>
+                <strong>Motivo do retorno:</strong> {detalhe.observacaoReagendamento}
+              </p>
             )}
 
             <button
@@ -617,7 +603,9 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
 
           {metodoPagamento && metodoPagamento !== "PIX" && (
             <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginTop: 18 }}>
-              Aguarde o prestador confirmar o recebimento do pagamento para seguir com a avaliacao.
+              {metodoPagamento === "DINHEIRO"
+                ? "Entregue o valor em dinheiro ao prestador. Ele confirmara o recebimento para liberar a avaliacao."
+                : "Aguarde o prestador confirmar o recebimento do pagamento para seguir com a avaliacao."}
             </p>
           )}
 

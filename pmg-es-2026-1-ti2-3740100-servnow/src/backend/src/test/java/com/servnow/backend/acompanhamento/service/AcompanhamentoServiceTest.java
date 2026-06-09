@@ -173,11 +173,11 @@ class AcompanhamentoServiceTest {
         var response = acompanhamentoService.solicitarReagendamento(
             100L,
             usuarioAutenticado(10L, TipoUsuario.PRESTADOR),
-            new SolicitarReagendamentoRequest(60, "Falta concluir parte eletrica")
+            new SolicitarReagendamentoRequest("Falta concluir parte eletrica")
         );
 
         assertThat(response.etapa()).isEqualTo("AGUARDANDO_REAGENDAMENTO");
-        assertThat(response.percentualConcluido()).isEqualTo(60);
+        assertThat(response.observacaoReagendamento()).isEqualTo("Falta concluir parte eletrica");
         assertThat(ordem.getEtapa()).isEqualTo(EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO);
     }
 

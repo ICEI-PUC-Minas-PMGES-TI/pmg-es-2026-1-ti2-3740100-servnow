@@ -77,6 +77,11 @@ export function AcompanhamentoLista() {
                       <DollarSign size={13} />
                       {formatarMoedaBrl(item.valorAceito)}
                     </span>
+                    {item.observacaoReagendamento && (
+                      <span className="painel-lista-item-meta-detalhe" style={{ display: "block", marginTop: 4 }}>
+                        Motivo do retorno: {item.observacaoReagendamento}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="painel-lista-item-acoes">

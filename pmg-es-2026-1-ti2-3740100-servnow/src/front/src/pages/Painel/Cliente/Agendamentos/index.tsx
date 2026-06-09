@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { AgendaCalendario } from "../../../../Components/Agenda/AgendaCalendario";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
+import { labelStatusAgendamento } from "../../../../utils/acompanhamentoLabels";
 import { formatarDataSolicitacao } from "../../../../utils/solicitacaoLabels";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
 import { TIPOS_SERVICO_MAP } from "../../../../utils/tiposServico";
@@ -120,10 +121,15 @@ export function Agendamentos() {
                       <DollarSign size={13} />
                       {formatarMoedaBrl(item.valorAceito)}
                     </span>
+                    {item.observacaoReagendamento && (
+                      <span className="painel-lista-item-meta-detalhe" style={{ display: "block", marginTop: 4 }}>
+                        Motivo do retorno: {item.observacaoReagendamento}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="painel-lista-item-acoes">
-                  <span className="painel-status agendado">Agendado</span>
+                  <span className="painel-status agendado">{labelStatusAgendamento(item.etapaAcompanhamento)}</span>
                   <button
                     type="button"
                     className="painel-btn-ghost"

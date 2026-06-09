@@ -86,7 +86,6 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   const [enviando, setEnviando] = useState(false);
   const [notaCliente, setNotaCliente] = useState(0);
   const [comentarioCliente, setComentarioCliente] = useState("");
-  const [percentualReagendamento, setPercentualReagendamento] = useState(50);
   const [observacaoReagendamento, setObservacaoReagendamento] = useState("");
   const [modalVerificacaoAberto, setModalVerificacaoAberto] = useState(false);
   const [fotoPerfilUrl, setFotoPerfilUrl] = useState<string | null | undefined>(
@@ -125,13 +124,6 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
     }
   }, [etapa, detalhe?.verificacaoFacialObrigatoria]);
   const progressoAtual = detalhe?.percentualConcluido ?? 0;
-  const percentualMinimo = Math.min(progressoAtual + 1, 99);
-
-  useEffect(() => {
-    if (percentualReagendamento < percentualMinimo) {
-      setPercentualReagendamento(percentualMinimo);
-    }
-  }, [percentualMinimo, percentualReagendamento]);
 
   useEffect(() => {
     if (etapa !== "aguardando-pagamento") {
@@ -154,7 +146,7 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
     }
     setEnviando(true);
     try {
-      setDetalhe(await confirmarPagamento(solicitacaoId, metodoPagamentoCliente as "PIX" | "CREDITO" | "DEBITO"));
+      setDetalhe(await confirmarPagamento(solicitacaoId, metodoPagamentoCliente as "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO"));
       toast.success("Pagamento confirmado.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao confirmar pagamento.");
@@ -249,19 +241,15 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   }
 
   async function handleSolicitarReagendamento() {
-    if (percentualReagendamento <= progressoAtual) {
-      toast.error(`Informe um percentual maior que ${progressoAtual}%.`);
+    if (!observacaoReagendamento.trim()) {
+      toast.error("Descreva o motivo do reagendamento para o cliente.");
       return;
     }
     setEnviando(true);
     try {
-      setDetalhe(await solicitarReagendamento(
-        solicitacaoId,
-        percentualReagendamento,
-        observacaoReagendamento || undefined,
-      ));
+      setDetalhe(await solicitarReagendamento(solicitacaoId, observacaoReagendamento));
       setObservacaoReagendamento("");
-      toast.success("Reagendamento solicitado. Aguardando o cliente escolher o horario.");
+      toast.success("Retorno solicitado. Aguardando o cliente escolher o horario.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao solicitar reagendamento.");
     } finally {
@@ -547,38 +535,27 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             <div className="acomp-reagendar-bloco" style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--workspace-border)" }}>
               <h3 style={{ margin: "0 0 8px", fontSize: 15 }}>Servico nao concluido nesta visita?</h3>
               <p style={{ margin: "0 0 14px", color: "var(--workspace-muted)", fontSize: 13 }}>
-                Informe o percentual concluido e solicite um reagendamento com o cliente.
+                Solicite um retorno com o cliente informando o motivo.
               </p>
-
-              <label className="acomp-codigo-label" htmlFor="percentual-reagendamento">
-                Percentual concluido ({percentualReagendamento}%)
-              </label>
-              <input
-                id="percentual-reagendamento"
-                type="range"
-                min={percentualMinimo}
-                max={99}
-                value={percentualReagendamento}
-                onChange={(event) => setPercentualReagendamento(Number(event.target.value))}
-                style={{ width: "100%", marginBottom: 12 }}
-              />
 
               <textarea
                 className="acomp-textarea"
-                placeholder="Observação para o cliente (opcional)..."
+                placeholder="Descreva para o cliente o motivo do reagendamento..."
                 value={observacaoReagendamento}
                 onChange={(event) => setObservacaoReagendamento(event.target.value)}
                 style={{ marginBottom: 12 }}
+                maxLength={300}
+                required
               />
 
               <button
                 type="button"
                 className="painel-btn-ghost"
                 onClick={() => void handleSolicitarReagendamento()}
-                disabled={enviando}
+                disabled={enviando || !observacaoReagendamento.trim()}
               >
                 <RefreshCw size={16} />
-                Solicitar reagendamento
+                Solicitar retorno de serviço
               </button>
             </div>
 
@@ -599,23 +576,14 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       {etapa === "aguardando-reagendamento" && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>Aguardando reagendamento</h2>
+            <h2>Aguardando retorno</h2>
           </div>
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            O cliente precisa escolher um novo horario para continuar o servico.
+            O cliente precisa escolher um novo horario para o retorno do servico.
           </p>
-          <div className="acomp-progresso">
-            <div className="acomp-progresso-cabecalho">
-              <span>Progresso informado</span>
-              <strong>{progressoAtual}%</strong>
-            </div>
-            <div className="acomp-progresso-barra">
-              <span style={{ width: `${progressoAtual}%` }} />
-            </div>
-          </div>
           {detalhe.observacaoReagendamento && (
-            <p style={{ marginTop: 14, fontSize: 13 }}>
-              <strong>Sua observacao:</strong> {detalhe.observacaoReagendamento}
+            <p style={{ fontSize: 13, padding: "12px 14px", borderRadius: 12, background: "rgba(20, 184, 166, 0.08)", border: "1px solid rgba(20, 184, 166, 0.2)" }}>
+              <strong>Motivo informado:</strong> {detalhe.observacaoReagendamento}
             </p>
           )}
         </section>
@@ -624,10 +592,10 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
       {etapa === "visita-reagendada" && (
         <section className="painel-card">
           <div className="painel-card-cabecalho">
-            <h2>Visita reagendada</h2>
+            <h2>Retorno de serviço</h2>
           </div>
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 14 }}>
-            O cliente confirmou o novo horario. Retorne na data agendada para continuar o servico.
+            O cliente confirmou o novo horario. Retorne na data agendada para concluir o servico.
           </p>
 
           <div className="acomp-card-servico-meta" style={{ marginBottom: 14 }}>
@@ -635,15 +603,11 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             <span><Clock size={14} /> Cliente: {detalhe.clienteNome}</span>
           </div>
 
-          <div className="acomp-progresso">
-            <div className="acomp-progresso-cabecalho">
-              <span>Progresso do servico</span>
-              <strong>{progressoAtual}%</strong>
-            </div>
-            <div className="acomp-progresso-barra">
-              <span style={{ width: `${progressoAtual}%` }} />
-            </div>
-          </div>
+          {detalhe.observacaoReagendamento && (
+            <p style={{ fontSize: 13, marginBottom: 14, color: "var(--workspace-muted)" }}>
+              <strong>Motivo do retorno:</strong> {detalhe.observacaoReagendamento}
+            </p>
+          )}
 
           <button
             type="button"
@@ -669,7 +633,9 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 18 }}>
             {metodoPagamentoCliente
-              ? `Forma escolhida pelo cliente: ${metodoPagamentoCliente}. Confirme apos receber o pagamento.`
+              ? metodoPagamentoCliente === "DINHEIRO"
+                ? "O cliente escolheu pagamento em dinheiro. Confirme apos receber o valor."
+                : `Forma escolhida pelo cliente: ${metodoPagamentoCliente}. Confirme apos receber o pagamento.`
               : "Aguardando o cliente escolher a forma de pagamento no app."}
           </p>
 

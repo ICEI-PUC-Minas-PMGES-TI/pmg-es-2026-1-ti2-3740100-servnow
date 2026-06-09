@@ -176,6 +176,8 @@ export type SolicitacaoServicoResponse = {
   distanciaLinhaReta?: boolean | null;
   valorAceito: number | null;
   concluidoEm: string | null;
+  etapaAcompanhamento: string | null;
+  observacaoReagendamento: string | null;
 };
 
 export type SolicitacaoServicoCreateRequest = {

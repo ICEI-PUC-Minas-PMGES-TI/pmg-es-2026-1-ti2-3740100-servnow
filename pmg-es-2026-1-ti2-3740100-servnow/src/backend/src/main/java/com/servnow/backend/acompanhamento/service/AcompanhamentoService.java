@@ -246,16 +246,15 @@ public class AcompanhamentoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O servico nao esta em execucao.");
         }
 
-        int percentualAtual = ordem.getPercentualConcluido() == null ? 0 : ordem.getPercentualConcluido();
-        if (request.percentualConcluido() <= percentualAtual) {
+        String observacao = normalizarObservacaoReagendamento(request.observacao());
+        if (observacao == null) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "O percentual deve ser maior que o progresso atual (" + percentualAtual + "%)."
+                "Descreva o motivo do reagendamento para o cliente."
             );
         }
 
-        ordem.setPercentualConcluido(request.percentualConcluido());
-        ordem.setObservacaoReagendamento(normalizarObservacaoReagendamento(request.observacao()));
+        ordem.setObservacaoReagendamento(observacao);
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_REAGENDAMENTO);
         ordemRepository.save(ordem);
         return toDetalhe(solicitacao, ordem, usuarioAutenticado);
@@ -288,7 +287,6 @@ public class AcompanhamentoService {
         ordem.setEtapa(EtapaOrdemServico.VISITA_REAGENDADA);
         ordem.setIniciadoEm(null);
         ordem.setPrevistoTerminoEm(null);
-        ordem.setObservacaoReagendamento(null);
         ordem.setCodigoVerificacao(null);
         ordem.setCodigoExpiraEm(null);
         verificacaoFacialService.limparVerificacao(ordem);
@@ -632,9 +630,9 @@ public class AcompanhamentoService {
     }
 
     private AcompanhamentoDisponivelResponse toDisponivel(SolicitacaoServico solicitacao, TipoUsuario tipoUsuario) {
-        String etapa = ordemRepository.findEtapaBySolicitacaoId(solicitacao.getId())
-            .map(EtapaOrdemServico::name)
-            .orElse(null);
+        var ordem = ordemRepository.findBySolicitacaoId(solicitacao.getId()).orElse(null);
+        String etapa = ordem == null ? null : ordem.getEtapa().name();
+        String observacaoReagendamento = ordem == null ? null : ordem.getObservacaoReagendamento();
 
         String contraparte = tipoUsuario == TipoUsuario.CLIENTE
             ? (solicitacao.getPrestador() == null ? null : solicitacao.getPrestador().getNome())
@@ -647,7 +645,8 @@ public class AcompanhamentoService {
             solicitacao.getData(),
             solicitacao.getHorario(),
             solicitacao.getValorAceito(),
-            etapa
+            etapa,
+            observacaoReagendamento
         );
     }
 

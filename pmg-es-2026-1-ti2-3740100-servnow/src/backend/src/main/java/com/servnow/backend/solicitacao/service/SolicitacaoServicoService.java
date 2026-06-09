@@ -472,6 +472,10 @@ public class SolicitacaoServicoService {
             }
         }
 
+        var ordem = ordemServicoRepository.findBySolicitacaoId(solicitacao.getId()).orElse(null);
+        String etapaAcompanhamento = ordem == null ? null : ordem.getEtapa().name();
+        String observacaoReagendamento = ordem == null ? null : ordem.getObservacaoReagendamento();
+
         return new SolicitacaoServicoResponse(
             solicitacao.getId(),
             solicitacao.getCliente().getId(),
@@ -501,7 +505,9 @@ public class SolicitacaoServicoService {
             distanciaKm,
             distanciaLinhaReta,
             valorExibido,
-            concluidoEm
+            concluidoEm,
+            etapaAcompanhamento,
+            observacaoReagendamento
         );
     }
 }
