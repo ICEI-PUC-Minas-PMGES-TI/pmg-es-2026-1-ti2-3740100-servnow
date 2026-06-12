@@ -1,8 +1,10 @@
 # ServNow
 
-O projeto tem como objetivo desenvolver uma plataforma digital de intermediação de serviços residenciais sob demanda, conectando clientes a profissionais prestadores de serviço, como eletricistas, encanadores e técnicos de manutenção. A proposta busca facilitar a solicitação e execução de serviços de forma prática, segura e eficiente, permitindo o cadastro de usuários, gerenciamento de chamados, localização de profissionais próximos por geolocalização e acompanhamento das solicitações em um ambiente organizado e acessível.
+O sistema é uma plataforma digital de intermediação de serviços residenciais sob demanda, conectando clientes a profissionais prestadores de serviços, como eletricistas, encanadores, pintores e técnicos de manutenção. A plataforma facilita a contratação e execução de serviços de forma prática, segura e eficiente, permitindo o cadastro de usuários, gerenciamento de chamados, localização de profissionais próximos por geolocalização e acompanhamento das solicitações em um ambiente organizado e acessível.
 
-Além disso, o sistema visa oferecer maior transparência e confiabilidade por meio de estimativas de preço, sistema de avaliações entre usuários e mecanismos de segurança para validação da identidade dos prestadores de serviço, proporcionando uma experiência mais segura e eficiente tanto para clientes quanto para profissionais.
+O sistema caracteriza-se como um marketplace de serviços residenciais, no qual a plataforma atua como intermediadora da relação entre clientes e prestadores de serviço, possibilitando a divulgação, busca e contratação de serviços sem executar diretamente as atividades contratadas. Dessa forma, a solução centraliza o processo de contratação, comunicação e acompanhamento dos serviços em um único ambiente digital.
+
+Além disso, o sistema oferece maior transparência e confiabilidade por meio de estimativas de preço, sistema de avaliações e comentários, mecanismos de validação da identidade dos profissionais e histórico de serviços realizados, proporcionando uma experiência mais segura e eficiente tanto para clientes quanto para prestadores.
 
 ## Integrantes
 
