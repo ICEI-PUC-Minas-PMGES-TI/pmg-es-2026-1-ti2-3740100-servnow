@@ -9,6 +9,8 @@ import Layout from "./Layout/Layout";
 import { Home } from "./pages/Home";
 import { Cadastro } from "./pages/Home/Cadastro";
 import { Login } from "./pages/Home/Login";
+import { EsqueciSenha } from "./pages/Home/EsqueciSenha";
+import { RedefinirSenha } from "./pages/Home/RedefinirSenha";
 import { PainelPrestador } from "./Components/Painel/Prestador";
 import { AcompanhamentoPage } from "./pages/Acompanhamento";
 import { getValidAuthSession } from "./services/auth";
@@ -72,6 +74,8 @@ function App() {
             </PublicOnlyRoute>
           )}
         />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route
           path="/perfil"
           element={(
