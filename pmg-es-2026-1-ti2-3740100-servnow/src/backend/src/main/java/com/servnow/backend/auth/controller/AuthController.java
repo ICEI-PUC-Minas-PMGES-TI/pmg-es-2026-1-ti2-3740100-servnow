@@ -14,8 +14,11 @@ import com.servnow.backend.auth.dto.AuthRequest;
 import com.servnow.backend.perfil.service.PerfilService;
 import com.servnow.backend.auth.dto.AuthResponse;
 import com.servnow.backend.auth.dto.CurrentUserResponse;
+import com.servnow.backend.auth.dto.EsqueciSenhaRequest;
+import com.servnow.backend.auth.dto.RedefinirSenhaRequest;
 import com.servnow.backend.auth.dto.RegisterRequest;
 import com.servnow.backend.auth.service.AuthService;
+import com.servnow.backend.auth.service.RecuperacaoSenhaService;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.usuario.domain.Usuario;
 import com.servnow.backend.usuario.repository.UsuarioRepository;
@@ -27,10 +30,16 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    private final RecuperacaoSenhaService recuperacaoSenhaService;
     private final UsuarioRepository usuarioRepository;
 
-    public AuthController(AuthService authService, UsuarioRepository usuarioRepository) {
+    public AuthController(
+        AuthService authService,
+        RecuperacaoSenhaService recuperacaoSenhaService,
+        UsuarioRepository usuarioRepository
+    ) {
         this.authService = authService;
+        this.recuperacaoSenhaService = recuperacaoSenhaService;
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -43,6 +52,18 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/esqueci-senha")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void esqueciSenha(@Valid @RequestBody EsqueciSenhaRequest request) {
+        recuperacaoSenhaService.solicitar(request.email());
+    }
+
+    @PostMapping("/redefinir-senha")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void redefinirSenha(@Valid @RequestBody RedefinirSenhaRequest request) {
+        recuperacaoSenhaService.redefinir(request.token(), request.novaSenha());
     }
 
     @GetMapping("/me")

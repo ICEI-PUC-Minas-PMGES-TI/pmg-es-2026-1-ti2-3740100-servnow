@@ -53,6 +53,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/esqueci-senha", "/api/auth/redefinir-senha").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
