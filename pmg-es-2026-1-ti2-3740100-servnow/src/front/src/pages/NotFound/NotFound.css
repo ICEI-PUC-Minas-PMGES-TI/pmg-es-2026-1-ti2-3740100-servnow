@@ -1,0 +1,70 @@
+.not-found-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--workspace-bg, #f8fafc);
+}
+
+.not-found-card {
+  width: min(100%, 480px);
+  padding: 40px 32px;
+  border-radius: 20px;
+  background: var(--workspace-surface, #fff);
+  border: 1px solid var(--workspace-border, #e2e8f0);
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+}
+
+.not-found-code {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--workspace-primary, #2563eb);
+  margin-bottom: 12px;
+}
+
+.not-found-card h1 {
+  margin: 0 0 12px;
+  font-size: 1.6rem;
+  color: var(--workspace-text, #0f172a);
+}
+
+.not-found-card p {
+  margin: 0;
+  color: var(--workspace-muted, #64748b);
+  line-height: 1.6;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.not-found-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.not-found-btn-primary {
+  background: var(--workspace-primary, #2563eb);
+  color: #fff;
+}
+
+.not-found-btn-ghost {
+  background: transparent;
+  color: var(--workspace-text, #0f172a);
+  border: 1px solid var(--workspace-border, #e2e8f0);
+}

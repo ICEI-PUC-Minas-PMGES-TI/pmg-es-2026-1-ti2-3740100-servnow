@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Mail } from "lucide-react";
-import "../Login/Login.css";
+import "../../Login/Login.css";
 
 import { API_URL } from "../../../services/auth";
 

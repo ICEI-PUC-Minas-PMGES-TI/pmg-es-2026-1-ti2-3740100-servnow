@@ -202,7 +202,7 @@ public class IndicadorPrestadorService {
         List<IndicadorSeriePontoResponse> participacaoSerie,
         String periodo
     ) {
-        if (!"mes".equals(periodo) || participacaoSerie.size() < 2) {
+        if (!("mes".equals(periodo) || "ano".equals(periodo)) || participacaoSerie.size() < 2) {
             return BigDecimal.ZERO;
         }
         BigDecimal participacaoAtual = participacaoSerie.get(participacaoSerie.size() - 1).percentual();
@@ -232,6 +232,9 @@ public class IndicadorPrestadorService {
     private List<BucketPeriodo> bucketsTrimestreAnterior(List<BucketPeriodo> buckets) {
         if (buckets.size() < 6) {
             return List.of();
+        }
+        if (buckets.size() >= 12) {
+            return buckets.subList(buckets.size() - 6, buckets.size() - 3);
         }
         return buckets.subList(0, 3);
     }
@@ -331,6 +334,22 @@ public class IndicadorPrestadorService {
             return buckets;
         }
 
+        if ("ano".equals(periodo)) {
+            List<BucketPeriodo> buckets = new ArrayList<>();
+            int ano = hoje.getYear();
+            for (int mes = 1; mes <= 12; mes += 1) {
+                LocalDate ref = LocalDate.of(ano, mes, 1);
+                LocalDate fim = ref.withDayOfMonth(ref.lengthOfMonth());
+                buckets.add(new BucketPeriodo(
+                    NOMES_MES_CURTO[mes - 1],
+                    ref,
+                    fim,
+                    mes == hoje.getMonthValue()
+                ));
+            }
+            return buckets;
+        }
+
         List<BucketPeriodo> buckets = new ArrayList<>();
         for (int i = 5; i >= 0; i -= 1) {
             LocalDate ref = hoje.minusMonths(i).withDayOfMonth(1);
@@ -375,7 +394,10 @@ public class IndicadorPrestadorService {
         if ("mes".equals(valor)) {
             return "mes";
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Periodo invalido. Use mes ou semana.");
+        if ("ano".equals(valor)) {
+            return "ano";
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Periodo invalido. Use mes, semana ou ano.");
     }
 
     private Usuario encontrarPrestador(UsuarioAutenticado usuarioAutenticado) {

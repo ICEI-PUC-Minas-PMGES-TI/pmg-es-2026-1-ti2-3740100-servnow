@@ -1752,6 +1752,16 @@
   font-size: 12px;
 }
 
+.acomp-pagamento-opcao.indisponivel {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.acomp-pagamento-opcao.indisponivel:hover {
+  border-color: var(--workspace-border);
+  background: transparent;
+}
+
 .acomp-pix-qr-container {
   display: flex;
   flex-direction: column;

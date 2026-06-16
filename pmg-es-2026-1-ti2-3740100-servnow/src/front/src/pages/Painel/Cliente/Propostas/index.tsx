@@ -43,6 +43,7 @@ export function Propostas() {
   const [perfilUsuarioId, setPerfilUsuarioId] = useState<number | null>(null);
   const [filtro, setFiltro] = useState<FiltroProposta>("todas");
   const [confirmarRecusa, setConfirmarRecusa] = useState<PropostaServicoResponse | null>(null);
+  const [confirmarAceite, setConfirmarAceite] = useState<PropostaServicoResponse | null>(null);
 
   const carregar = useCallback(
     async (opcoes?: { silencioso?: boolean }) => {
@@ -151,6 +152,7 @@ export function Propostas() {
     } finally {
       setAcaoId(null);
       setConfirmarRecusa(null);
+      setConfirmarAceite(null);
     }
   }
 
@@ -275,7 +277,7 @@ export function Propostas() {
                           type="button"
                           className="painel-btn-aceitar"
                           disabled={processando}
-                          onClick={() => void responderProposta(proposta.id, "aceitar")}
+                          onClick={() => setConfirmarAceite(proposta)}
                         >
                           <Check size={15} />
                           Aceitar
@@ -324,7 +326,7 @@ export function Propostas() {
             <div className="solicitacao-modal-corpo">
               <p style={{ marginTop: 0 }}>Deseja recusar a proposta de {confirmarRecusa.prestadorNome}?</p>
               <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
-                A proposta continuara visivel no filtro Recusadas.
+                A proposta continuará visível no filtro Recusadas.
               </p>
             </div>
             <footer className="solicitacao-modal-rodape">
@@ -338,6 +340,59 @@ export function Propostas() {
                 onClick={() => void responderProposta(confirmarRecusa.id, "recusar")}
               >
                 {acaoId === confirmarRecusa.id ? "Recusando..." : "Sim, recusar"}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
+      {confirmarAceite && (
+        <div className="solicitacao-modal-overlay" role="presentation" onClick={() => setConfirmarAceite(null)}>
+          <div
+            className="solicitacao-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) => event.stopPropagation()}
+            style={{ maxWidth: 460 }}
+          >
+            <header className="solicitacao-modal-cabecalho">
+              <div className="solicitacao-modal-titulo-grupo">
+                <Check size={20} />
+                <h3>Aceitar proposta</h3>
+              </div>
+              <button
+                type="button"
+                className="solicitacao-modal-fechar"
+                onClick={() => setConfirmarAceite(null)}
+                aria-label="Fechar"
+              >
+                <X size={18} />
+              </button>
+            </header>
+            <div className="solicitacao-modal-corpo">
+              <p style={{ marginTop: 0 }}>
+                Deseja aceitar a proposta de {confirmarAceite.prestadorNome} por{" "}
+                {Number(confirmarAceite.valor).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+                ?
+              </p>
+              <p style={{ marginBottom: 0, color: "var(--workspace-muted)" }}>
+                As demais propostas desta solicitação serão canceladas automaticamente.
+              </p>
+            </div>
+            <footer className="solicitacao-modal-rodape">
+              <button type="button" className="btn-secondary" onClick={() => setConfirmarAceite(null)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="painel-btn-aceitar"
+                disabled={acaoId === confirmarAceite.id}
+                onClick={() => void responderProposta(confirmarAceite.id, "aceitar")}
+              >
+                {acaoId === confirmarAceite.id ? "Aceitando..." : "Sim, aceitar"}
               </button>
             </footer>
           </div>

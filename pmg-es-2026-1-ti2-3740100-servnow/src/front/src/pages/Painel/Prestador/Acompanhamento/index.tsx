@@ -138,6 +138,8 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
   }, [etapa, solicitacaoId]);
 
   const metodoPagamentoCliente = detalhe?.metodoPagamentoSelecionado;
+  const pagamentoCartao =
+    metodoPagamentoCliente === "CREDITO" || metodoPagamentoCliente === "DEBITO";
 
   async function handleConfirmarPagamento() {
     if (!metodoPagamentoCliente) {
@@ -633,9 +635,11 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
 
           <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginBottom: 18 }}>
             {metodoPagamentoCliente
-              ? metodoPagamentoCliente === "DINHEIRO"
-                ? "O cliente escolheu pagamento em dinheiro. Confirme apos receber o valor."
-                : `Forma escolhida pelo cliente: ${metodoPagamentoCliente}. Confirme apos receber o pagamento.`
+              ? pagamentoCartao
+                ? "O cliente está pagando com cartão via Mercado Pago. A confirmação é automática após o pagamento."
+                : metodoPagamentoCliente === "DINHEIRO"
+                  ? "O cliente escolheu pagamento em dinheiro. Confirme após receber o valor."
+                  : `Forma escolhida pelo cliente: ${metodoPagamentoCliente}. Confirme após receber o pagamento.`
               : "Aguardando o cliente escolher a forma de pagamento no app."}
           </p>
 
@@ -645,14 +649,16 @@ export function AcompanhamentoPrestadorDetalhe({ solicitacaoId }: Props) {
             </p>
           )}
 
-          <button
-            type="button"
-            className="acomp-btn-primary"
-            onClick={() => void handleConfirmarPagamento()}
-            disabled={enviando || !metodoPagamentoCliente}
-          >
-            Confirmar pagamento recebido
-          </button>
+          {!pagamentoCartao && (
+            <button
+              type="button"
+              className="acomp-btn-primary"
+              onClick={() => void handleConfirmarPagamento()}
+              disabled={enviando || !metodoPagamentoCliente}
+            >
+              Confirmar pagamento recebido
+            </button>
+          )}
         </section>
       )}
 

@@ -104,6 +104,12 @@
   }
 }
 
+.footer-legal-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--footer-muted, rgba(255, 255, 255, 0.55));
+}
+
 @media (max-width: 560px) {
   .footer {
     padding-top: 56px;

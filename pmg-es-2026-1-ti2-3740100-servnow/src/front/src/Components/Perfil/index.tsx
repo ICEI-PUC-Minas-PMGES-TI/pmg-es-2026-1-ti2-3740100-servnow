@@ -23,6 +23,7 @@ import {
     authHeaders,
     clearAuthSession,
     getAuthSession,
+    getDashboardRoute,
     saveAuthSession,
     type ClienteCadastroSyncRequest,
     type PerfilResponse,
@@ -559,7 +560,7 @@ export function Perfil() {
         fotoPerfilEnquadramento: perfilAtualizado.fotoPerfilEnquadramento,
       });
       toast.success("Perfil atualizado com sucesso.");
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate(getDashboardRoute(session.tipoUsuario)), 1000);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao salvar o perfil.");
     } finally {

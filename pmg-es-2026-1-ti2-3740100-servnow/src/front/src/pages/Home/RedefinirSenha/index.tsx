@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock } from "lucide-react";
-import "../Login/Login.css";
+import "../../Login/Login.css";
 
 import { API_URL } from "../../../services/auth";
 

@@ -22,7 +22,7 @@ export function PainelSidebar({
   children,
   onEditarConta,
 }: PainelSidebarProps) {
-  const nomeExibicao = nomeUsuario.trim() || "Usuario";
+  const nomeExibicao = nomeUsuario.trim() || "Usuário";
 
   return (
     <aside className="painel-sidebar">

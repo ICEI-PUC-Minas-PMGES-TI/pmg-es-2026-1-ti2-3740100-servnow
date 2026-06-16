@@ -20,7 +20,7 @@ export function AcompanhamentoLista() {
       try {
         setItens(await listarDisponiveis());
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Erro ao carregar servicos.");
+        toast.error(error instanceof Error ? error.message : "Erro ao carregar serviços.");
       } finally {
         setIsLoading(false);
       }
@@ -31,7 +31,7 @@ export function AcompanhamentoLista() {
   return (
     <>
       <PainelSectionHeader
-        eyebrow="Vizualize os serviços agendandados"
+        eyebrow="Visualize os serviços agendados"
         title="Acompanhamento"
         description="Selecione um serviço agendado para acompanhar em tempo real."
       />

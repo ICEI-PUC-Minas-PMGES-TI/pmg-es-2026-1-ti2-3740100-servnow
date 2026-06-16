@@ -314,6 +314,12 @@ public class AcompanhamentoService {
         if (metodoSelecionado == null || metodoSelecionado.isBlank()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O cliente ainda nao escolheu a forma de pagamento.");
         }
+        if ("CREDITO".equals(metodoSelecionado) || "DEBITO".equals(metodoSelecionado)) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Pagamento com cartao e confirmado automaticamente pelo Mercado Pago."
+            );
+        }
         ordem.setMetodoPagamento(metodoSelecionado);
         ordem.setMetodoPagamentoSelecionado(null);
         ordem.setEtapa(EtapaOrdemServico.AGUARDANDO_AVALIACAO);

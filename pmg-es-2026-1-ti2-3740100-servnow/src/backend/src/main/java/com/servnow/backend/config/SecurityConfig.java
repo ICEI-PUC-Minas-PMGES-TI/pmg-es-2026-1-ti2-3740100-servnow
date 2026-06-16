@@ -54,6 +54,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/esqueci-senha", "/api/auth/redefinir-senha").permitAll()
+                .requestMatchers("/api/webhooks/mercadopago", "/api/webhooks/mercadopago/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/pagamento/cartao/disponivel").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )

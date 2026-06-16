@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import "./Login.css";
 
-import loginImg from "../../../assets/login.svg";
+import loginImg from "../../assets/login.svg";
 import {
   API_URL,
   authHeader,
@@ -14,7 +14,7 @@ import {
   saveAuthSession,
   type AuthResponse,
   type CurrentUserResponse,
-} from "../../../services/auth";
+} from "../../services/auth";
 
 type UserType = "cliente" | "prestador";
 
@@ -82,9 +82,9 @@ export function Login() {
     <div className="login-page">
       <div className="login-visual">
         <div className="login-visual-content">
-          <span className="login-visual-badge">Plataforma de servicos #1 do Brasil</span>
-          <h2>Bem-vindo de volta a Servnow</h2>
-          <p>Conectamos clientes e prestadores de forma rapida, segura e sem complicacao.</p>
+          <span className="login-visual-badge">Plataforma de serviços #1 do Brasil</span>
+          <h2>Bem-vindo de volta à ServNow</h2>
+          <p>Conectamos clientes e prestadores de forma rápida, segura e sem complicação.</p>
 
           <div className="login-img-placeholder">
             <img src={loginImg} alt="Login illustration" />
@@ -114,7 +114,7 @@ export function Login() {
           <h1>Entrar na conta</h1>
           <p className="login-sub">
             {userType === "cliente"
-              ? "Acesse e encontre o profissional ideal para voce."
+              ? "Acesse e encontre o profissional ideal para você."
               : "Acesse e gerencie seus serviços e clientes."}
           </p>
 

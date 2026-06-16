@@ -48,10 +48,17 @@ public class RecuperacaoSenhaService {
 
     /**
      * Gera um token e envia o e-mail com o link de redefinicao.
-     * Sempre retorna sem erro, mesmo se o e-mail nao existir (nao revela cadastro).
+     * Retorna sem erro se o e-mail nao existir (nao revela cadastro).
      */
     @Transactional
     public void solicitar(String emailBruto) {
+        if (!emailService.configurado()) {
+            throw new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Servico de e-mail indisponivel no momento. Tente novamente mais tarde ou contate o suporte."
+            );
+        }
+
         String email = emailBruto == null ? "" : emailBruto.trim().toLowerCase();
         usuarioRepository.findByEmail(email).ifPresent(usuario -> {
             tokenRepository.deleteByUsuarioId(usuario.getId());
@@ -72,14 +79,14 @@ public class RecuperacaoSenhaService {
                 + "Se voce nao solicitou, e so ignorar este e-mail.\n\n"
                 + "Equipe ServNow";
 
-            if (emailService.configurado()) {
-                try {
-                    emailService.enviar(email, "Redefinicao de senha - ServNow", corpo);
-                } catch (Exception erro) {
-                    log.warn("Nao foi possivel enviar o e-mail de recuperacao para {}: {}", email, erro.getMessage());
-                }
-            } else {
-                log.warn("E-mail nao configurado (MAIL_USERNAME/MAIL_PASSWORD). Link de redefinicao para {}: {}", email, link);
+            try {
+                emailService.enviar(email, "Redefinicao de senha - ServNow", corpo);
+            } catch (Exception erro) {
+                log.warn("Nao foi possivel enviar o e-mail de recuperacao para {}: {}", email, erro.getMessage());
+                throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Nao foi possivel enviar o e-mail de recuperacao. Tente novamente mais tarde."
+                );
             }
         });
     }

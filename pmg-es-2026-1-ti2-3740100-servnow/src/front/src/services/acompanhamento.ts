@@ -206,6 +206,46 @@ export function confirmarPagamento(
   });
 }
 
+export async function cartaoGatewayDisponivel(): Promise<{
+  disponivel: boolean;
+  modo: "mercadopago" | "demo" | "indisponivel";
+}> {
+  try {
+    const response = await fetch(`${API_URL}/api/pagamento/cartao/disponivel`);
+    if (!response.ok) {
+      return { disponivel: false, modo: "indisponivel" };
+    }
+    const data = (await response.json()) as { disponivel?: boolean; modo?: string };
+    const modo =
+      data.modo === "mercadopago" || data.modo === "demo" ? data.modo : "indisponivel";
+    return { disponivel: Boolean(data.disponivel), modo };
+  } catch {
+    return { disponivel: false, modo: "indisponivel" };
+  }
+}
+
+export function iniciarCheckoutCartao(
+  solicitacaoId: number,
+  metodoPagamento: "CREDITO" | "DEBITO",
+) {
+  return requestJson<{ checkoutUrl: string; preferenceId: string }>(
+    `/api/acompanhamento/${solicitacaoId}/checkout-cartao`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metodoPagamento }),
+    },
+  );
+}
+
+export function sincronizarPagamentoCartao(solicitacaoId: number, paymentId?: string) {
+  const query = paymentId ? `?paymentId=${encodeURIComponent(paymentId)}` : "";
+  return requestJson<AcompanhamentoDetalhe>(
+    `/api/acompanhamento/${solicitacaoId}/sincronizar-pagamento-cartao${query}`,
+    { method: "POST" },
+  );
+}
+
 export async function carregarPixQrCode(solicitacaoId: number): Promise<string> {
   const session = getValidAuthSession();
   if (!session?.token) {

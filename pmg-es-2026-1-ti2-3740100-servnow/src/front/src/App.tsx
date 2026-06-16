@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,13 +8,14 @@ import { Perfil } from "./Components/Perfil";
 import "./global.css";
 import Layout from "./Layout/Layout";
 import { Home } from "./pages/Home";
-import { Cadastro } from "./pages/Home/Cadastro";
-import { Login } from "./pages/Home/Login";
+import { Cadastro } from "./pages/Cadastro";
+import { Login } from "./pages/Login";
 import { EsqueciSenha } from "./pages/Home/EsqueciSenha";
 import { RedefinirSenha } from "./pages/Home/RedefinirSenha";
 import { PainelPrestador } from "./Components/Painel/Prestador";
 import { AcompanhamentoPage } from "./pages/Acompanhamento";
-import { getValidAuthSession } from "./services/auth";
+import { NotFound } from "./pages/NotFound";
+import { getValidAuthSession, getDashboardRoute, type TipoUsuario } from "./services/auth";
 import { applyTheme, getStoredTheme } from "./services/theme";
 
 function ProtectedRoute({
@@ -25,6 +27,26 @@ function ProtectedRoute({
 
   if (!session) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function RoleRoute({
+  children,
+  role,
+}: {
+  children: React.ReactNode;
+  role: TipoUsuario;
+}) {
+  const session = getValidAuthSession();
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (session.tipoUsuario !== role) {
+    return <Navigate to={getDashboardRoute(session.tipoUsuario)} replace />;
   }
 
   return <>{children}</>;
@@ -87,17 +109,17 @@ function App() {
         <Route
           path="/painel/cliente"
           element={(
-            <ProtectedRoute>
+            <RoleRoute role="CLIENTE">
               <PainelCliente />
-            </ProtectedRoute>
+            </RoleRoute>
           )}
         />
         <Route
           path="/painel/prestador"
           element={(
-            <ProtectedRoute>
+            <RoleRoute role="PRESTADOR">
               <PainelPrestador />
-            </ProtectedRoute>
+            </RoleRoute>
           )}
         />
         <Route
@@ -116,6 +138,7 @@ function App() {
             </ProtectedRoute>
           )}
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <ToastContainer
@@ -126,6 +149,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
+      <Analytics />
     </>
   );
 }

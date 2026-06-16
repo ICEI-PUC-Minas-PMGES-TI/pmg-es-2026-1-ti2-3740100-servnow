@@ -27,7 +27,7 @@ import completoImg from "../../assets/completo.svg";
 import eletricistaImg from "../../assets/eletricista.svg";
 import clientesGlobaisImg from "../../assets/globalclientes.svg";
 import prestadorImg from "../../assets/prestador.jpg";
-import { getAuthSession } from "../../services/auth";
+import { getAuthSession, getDashboardRoute } from "../../services/auth";
 
 type IconItem = {
   icon: LucideIcon;
@@ -139,11 +139,12 @@ function SectionIntro({
 
 export function Home() {
   const session = getAuthSession();
-  const ctaRoute = session
-    ? session.tipoUsuario === "CLIENTE"
-      ? "/painel/cliente"
-      : "/painel/prestador"
-    : "/cadastro";
+  const clienteCta = session
+    ? getDashboardRoute(session.tipoUsuario)
+    : "/cadastro?tipo=cliente";
+  const prestadorCta = session
+    ? getDashboardRoute(session.tipoUsuario)
+    : "/cadastro?tipo=prestador";
 
   return (
     <div className="home-shell">
@@ -167,8 +168,8 @@ export function Home() {
             </p>
 
             <div className="home-hero-actions">
-              <PrimaryCta to={ctaRoute}>Solicitar serviço</PrimaryCta>
-              <Link to={ctaRoute} className="home-button home-button-secondary">
+              <PrimaryCta to={clienteCta}>Solicitar serviço</PrimaryCta>
+              <Link to={prestadorCta} className="home-button home-button-secondary">
                 Sou prestador
               </Link>
             </div>
@@ -299,7 +300,7 @@ export function Home() {
             {categories.map((category) => {
               const Icon = category.icon;
               return (
-                <Link to={ctaRoute} className="home-category-row" key={category.title}>
+                <Link to={clienteCta} className="home-category-row" key={category.title}>
                   <div className="home-category-icon">
                     <Icon size={22} />
                   </div>
@@ -331,10 +332,10 @@ export function Home() {
             <ul className="home-check-list">
               <li><CheckCircle2 size={18} /> Profissionais verificados e avaliados</li>
               <li><CheckCircle2 size={18} /> Orçamentos claros antes da contratação</li>
-              <li><CheckCircle2 size={18} /> Agendamento online e Historico do atendimento</li>
+              <li><CheckCircle2 size={18} /> Agendamento online e histórico do atendimento</li>
             </ul>
             <br />
-            <PrimaryCta to={ctaRoute}>Encontrar profissional</PrimaryCta>
+            <PrimaryCta to={clienteCta}>Encontrar profissional</PrimaryCta>
           </div>
 
           <div className="home-visual-frame home-visual-frame-client">
@@ -362,7 +363,7 @@ export function Home() {
             </ul>
             <br/>
 
-            <PrimaryCta to={ctaRoute}>Criar perfil profissional</PrimaryCta>
+            <PrimaryCta to={prestadorCta}>Criar perfil profissional</PrimaryCta>
           </div>
 
           <div className="home-visual-frame home-visual-frame-provider">
@@ -428,8 +429,8 @@ export function Home() {
               a receber novas oportunidades na sua região.
             </p>
             <div className="home-hero-actions">
-              <PrimaryCta to={ctaRoute}>Entrar na Servnow</PrimaryCta>
-              <Link to={ctaRoute} className="home-button home-button-secondary">
+              <PrimaryCta to={clienteCta}>Entrar na ServNow</PrimaryCta>
+              <Link to={prestadorCta} className="home-button home-button-secondary">
                 Ver oportunidades
               </Link>
             </div>

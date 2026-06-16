@@ -3,35 +3,26 @@ import "./Footer.css";
 
 const footerGroups = [
   {
-    title: "Produto",
+    title: "Para clientes",
     links: [
-      { label: "Funcionalidades", to: "/funcionalidades" },
-      { label: "Planos", to: "/planos" },
-      { label: "Segurança", to: "/seguranca" },
+      { label: "Criar conta", to: "/cadastro?tipo=cliente" },
+      { label: "Entrar", to: "/login" },
+      { label: "Painel", to: "/painel/cliente" },
     ],
   },
   {
-    title: "Empresa",
+    title: "Para prestadores",
     links: [
-      { label: "Sobre", to: "/sobre" },
-      { label: "Carreiras", to: "/carreiras" },
-      { label: "Blog", to: "/blog" },
+      { label: "Criar perfil", to: "/cadastro?tipo=prestador" },
+      { label: "Entrar", to: "/login" },
+      { label: "Painel", to: "/painel/prestador" },
     ],
   },
   {
-    title: "Suporte",
+    title: "Plataforma",
     links: [
-      { label: "Central de ajuda", to: "/ajuda" },
-      { label: "Contato", to: "/contato" },
-      { label: "Status", to: "/status" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { label: "Privacidade", to: "/privacidade" },
-      { label: "Termos", to: "/termos" },
-      { label: "Cookies", to: "/cookies" },
+      { label: "Início", to: "/" },
+      { label: "Acompanhamento", to: "/acompanhamento" },
     ],
   },
 ];
@@ -41,7 +32,7 @@ export function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-brand">
-          <h2>Servnow</h2>
+          <h2>ServNow</h2>
           <p>
             Plataforma para conectar clientes e prestadores de serviços com uma
             experiência simples, segura e confiável.
@@ -53,7 +44,7 @@ export function Footer() {
             <div className="footer-col" key={group.title}>
               <span>{group.title}</span>
               {group.links.map((link) => (
-                <Link to={link.to} key={link.to}>
+                <Link to={link.to} key={`${group.title}-${link.to}`}>
                   {link.label}
                 </Link>
               ))}
@@ -63,13 +54,8 @@ export function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} Servnow</p>
-
-        <div className="footer-socials">
-          <a href="#">Instagram</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">Twitter</a>
-        </div>
+        <p>© {new Date().getFullYear()} ServNow</p>
+        <p className="footer-legal-note">Termos, privacidade e central de ajuda em breve.</p>
       </div>
     </footer>
   );

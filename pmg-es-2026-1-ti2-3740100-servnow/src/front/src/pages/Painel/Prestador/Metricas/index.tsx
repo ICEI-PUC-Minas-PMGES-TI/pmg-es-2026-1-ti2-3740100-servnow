@@ -27,6 +27,28 @@ const INDICADORES: Array<{ id: TipoIndicador; label: string }> = [
   { id: "participacao_categoria", label: "Por tipo de serviço" },
 ];
 
+function rotuloPeriodo(periodo: PeriodoIndicador): string {
+  switch (periodo) {
+    case "semana":
+      return "Semana atual";
+    case "ano":
+      return "Ano corrente";
+    default:
+      return "Mes corrente";
+  }
+}
+
+function rotuloSerie(periodo: PeriodoIndicador): string {
+  switch (periodo) {
+    case "semana":
+      return "Semana atual";
+    case "ano":
+      return "Janeiro a dezembro do ano atual";
+    default:
+      return "Desde quando entrou na plataforma";
+  }
+}
+
 function rotuloMeta(atingida: boolean): string {
   return atingida ? "Meta atingida" : "Meta nao atingida";
 }
@@ -365,7 +387,7 @@ export function Metricas() {
         return {
           titulo: "Participacao nos ganhos da plataforma",
           valor: formatarPercentual(dados.participacaoPlataformaPercentual),
-          detalhe: periodo === "mes"
+          detalhe: periodo === "mes" || periodo === "ano"
             ? `Crescimento mensal: ${formatarPercentual(dados.crescimentoParticipacaoMensal)} · Meta: ≥ ${METAS_INDICADORES.crescimentoParticipacaoMensal}% · ${rotuloMeta(metaAtingida)}`
             : `${formatarMoedaBrl(dados.ganhoPrestadorPeriodo)} de ${formatarMoedaBrl(dados.ganhoPlataformaPeriodo)} no periodo atual`,
           icone: Percent,
@@ -394,7 +416,7 @@ export function Metricas() {
         return {
           titulo: "Receita propria no período atual",
           valor: formatarMoedaBrl(dados.ganhosPropriosTotal),
-          detalhe: periodo === "mes" ? "Mes corrente (pagos)" : "Dia corrente (pagos)",
+          detalhe: rotuloPeriodo(periodo) + " (pagos)",
           icone: Wallet,
         };
     }
@@ -407,7 +429,7 @@ export function Metricas() {
       <PainelSectionHeader
         eyebrow="Desempenho"
         title="Métricas"
-        description="Compare sua receita, efetividade e participacao na plataforma por mes ou por semana."
+        description="Compare sua receita, efetividade e participacao na plataforma por semana, mes ou ano."
       />
 
       <section className="painel-card">
@@ -427,6 +449,13 @@ export function Metricas() {
               onClick={() => setPeriodo("semana")}
             >
               Por semana
+            </button>
+            <button
+              type="button"
+              className={`painel-filtro ${periodo === "ano" ? "ativo" : ""}`}
+              onClick={() => setPeriodo("ano")}
+            >
+              Por ano
             </button>
           </div>
         </div>
@@ -473,9 +502,7 @@ export function Metricas() {
                   </div>
                   <span className="painel-stat-label">Total na serie</span>
                   <strong className="painel-stat-valor">{formatarMoedaBrl(totalReceitaSerie)}</strong>
-                  <span className="painel-stat-detalhe">
-                    {periodo === "mes" ? "Desde quando entrou na plataforma" : "Semana atual"}
-                  </span>
+                  <span className="painel-stat-detalhe">{rotuloSerie(periodo)}</span>
                 </div>
               )}
             </div>

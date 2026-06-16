@@ -90,7 +90,7 @@ export function Agendamentos() {
             <div className="painel-vazio-icone">
               <Calendar size={32} />
             </div>
-            <p>Voce ainda nao tem servicos agendados.</p>
+            <p>Você ainda não tem serviços agendados.</p>
           </div>
         ) : visao === "agenda" ? (
           <AgendaCalendario agendamentos={lista} papel="CLIENTE" />

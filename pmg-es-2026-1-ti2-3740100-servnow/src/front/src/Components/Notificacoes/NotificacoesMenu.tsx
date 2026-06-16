@@ -80,8 +80,8 @@ export function NotificacoesMenu() {
       <button
         type="button"
         className="header-notificacoes-icon"
-        aria-label={`Notificacoes${totalNaoLidas > 0 ? `, ${totalNaoLidas} nao lidas` : ""}`}
-        title="Notificacoes"
+        aria-label={`Notificações${totalNaoLidas > 0 ? `, ${totalNaoLidas} não lidas` : ""}`}
+        title="Notificações"
         onClick={() => void handleAbrir()}
       >
         <Bell size={22} />
@@ -91,7 +91,7 @@ export function NotificacoesMenu() {
       {aberto ? (
         <div className="notificacoes-painel" role="dialog" aria-label="Lista de notificações">
           <div className="notificacoes-painel-cabecalho">
-            <h3>Notificacoes</h3>
+            <h3>Notificações</h3>
             {totalNaoLidas > 0 ? (
               <button type="button" className="notificacoes-marcar-todas" onClick={() => void handleMarcarTodas()}>
                 Marcar todas como lidas

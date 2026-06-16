@@ -1,6 +1,6 @@
 import { API_URL, authHeader, getValidAuthSession } from "./auth";
 
-export type PeriodoIndicador = "mes" | "semana";
+export type PeriodoIndicador = "mes" | "semana" | "ano";
 
 export type IndicadorSeriePonto = {
   label: string;
@@ -52,7 +52,16 @@ export async function buscarIndicadoresPrestador(periodo: PeriodoIndicador): Pro
   });
 
   if (!response.ok) {
-    throw new Error("Não foi possível carregar os indicadores.");
+    let detalhe = "Não foi possível carregar os indicadores.";
+    try {
+      const erro = (await response.json()) as { detail?: string };
+      if (erro.detail) {
+        detalhe = erro.detail;
+      }
+    } catch {
+      // mantém mensagem padrão
+    }
+    throw new Error(detalhe);
   }
 
   return (await response.json()) as IndicadorPrestadorResponse;

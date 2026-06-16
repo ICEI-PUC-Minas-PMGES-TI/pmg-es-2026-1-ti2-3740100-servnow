@@ -1,19 +1,24 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { ArrowRight, Eye, EyeOff, Lock, Mail, User, Briefcase } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../Login/Login.css";
 
-import cadastroClienteImg from "../../../assets/cadastrocliente.svg";
-import cadastroPrestadorImg from "../../../assets/imgprestadorcadastro.svg";
-import { API_URL, clearAuthSession, type AuthResponse } from "../../../services/auth";
+import cadastroClienteImg from "../../assets/cadastrocliente.svg";
+import cadastroPrestadorImg from "../../assets/imgprestadorcadastro.svg";
+import { API_URL, clearAuthSession, type AuthResponse } from "../../services/auth";
 
 type UserType = "cliente" | "prestador";
 
+function tipoFromParam(value: string | null): UserType {
+  return value === "prestador" ? "prestador" : "cliente";
+}
+
 export function Cadastro() {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<UserType>("cliente");
+  const [searchParams] = useSearchParams();
+  const [userType, setUserType] = useState<UserType>(() => tipoFromParam(searchParams.get("tipo")));
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [nome, setNome] = useState("");
@@ -28,8 +33,8 @@ export function Cadastro() {
       : "Cadastro de prestador na plataforma Servnow";
   const registerDescription =
     userType === "cliente"
-      ? "Cadastre-se como cliente para encontrar profissionais confiaveis, solicitar serviços e acompanhar seus atendimentos em um so lugar."
-      : "Cadastre-se como prestador para divulgar seus servicos, receber oportunidades e gerenciar seus atendimentos com praticidade.";
+      ? "Cadastre-se como cliente para encontrar profissionais confiáveis, solicitar serviços e acompanhar seus atendimentos em um só lugar."
+      : "Cadastre-se como prestador para divulgar seus serviços, receber oportunidades e gerenciar seus atendimentos com praticidade.";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,7 +68,7 @@ export function Cadastro() {
 
       const registerData = data as AuthResponse;
       clearAuthSession();
-      toast.success(`Conta criada com sucesso como ${registerData.tipoUsuario.toLowerCase()}. Faca login para acessar.`);
+      toast.success(`Conta criada com sucesso como ${registerData.tipoUsuario.toLowerCase()}. Faça login para acessar.`);
       setNome("");
       setEmail("");
       setSenha("");
@@ -115,7 +120,7 @@ export function Cadastro() {
           <h1>Criar conta</h1>
           <p className="login-sub">
             {userType === "cliente"
-              ? "Cadastre-se para encontrar profissionais confiaveis perto de voce."
+              ? "Cadastre-se para encontrar profissionais confiáveis perto de você."
               : "Cadastre-se para divulgar seus serviços e atender novos clientes."}
           </p>
 

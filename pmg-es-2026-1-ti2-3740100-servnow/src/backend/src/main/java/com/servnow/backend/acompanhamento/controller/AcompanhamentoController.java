@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,8 @@ import com.servnow.backend.acompanhamento.dto.ConfirmarPagamentoRequest;
 import com.servnow.backend.acompanhamento.dto.ConfirmarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.dto.SolicitarReagendamentoRequest;
 import com.servnow.backend.acompanhamento.service.AcompanhamentoService;
+import com.servnow.backend.pagamento.mercadopago.MercadoPagoCheckoutService;
+import com.servnow.backend.pagamento.mercadopago.dto.CheckoutCartaoResponse;
 import com.servnow.backend.security.UsuarioAutenticado;
 import com.servnow.backend.verificacaofacial.dto.RegistrarVerificacaoFacialRequest;
 import com.servnow.backend.verificacaofacial.dto.VerificacaoFacialResponse;
@@ -36,13 +39,16 @@ public class AcompanhamentoController {
 
     private final AcompanhamentoService acompanhamentoService;
     private final VerificacaoFacialService verificacaoFacialService;
+    private final MercadoPagoCheckoutService mercadoPagoCheckoutService;
 
     public AcompanhamentoController(
         AcompanhamentoService acompanhamentoService,
-        VerificacaoFacialService verificacaoFacialService
+        VerificacaoFacialService verificacaoFacialService,
+        MercadoPagoCheckoutService mercadoPagoCheckoutService
     ) {
         this.acompanhamentoService = acompanhamentoService;
         this.verificacaoFacialService = verificacaoFacialService;
+        this.mercadoPagoCheckoutService = mercadoPagoCheckoutService;
     }
 
     @GetMapping({"/disponiveis", "/disponiveis/"})
@@ -146,6 +152,25 @@ public class AcompanhamentoController {
         @Valid @RequestBody ConfirmarPagamentoRequest request
     ) {
         return acompanhamentoService.confirmarPagamento(solicitacaoId, usuario, request);
+    }
+
+    @PostMapping("/{solicitacaoId}/checkout-cartao")
+    public CheckoutCartaoResponse iniciarCheckoutCartao(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @Valid @RequestBody ConfirmarPagamentoRequest request
+    ) {
+        return mercadoPagoCheckoutService.iniciarCheckout(solicitacaoId, usuario, request.metodoPagamento());
+    }
+
+    @PostMapping("/{solicitacaoId}/sincronizar-pagamento-cartao")
+    public AcompanhamentoDetalheResponse sincronizarPagamentoCartao(
+        @AuthenticationPrincipal UsuarioAutenticado usuario,
+        @PathVariable Long solicitacaoId,
+        @RequestParam(required = false) String paymentId
+    ) {
+        mercadoPagoCheckoutService.sincronizarPagamento(solicitacaoId, usuario, paymentId);
+        return acompanhamentoService.obterDetalhe(solicitacaoId, usuario);
     }
 
     @GetMapping("/{solicitacaoId}/pix-qrcode")

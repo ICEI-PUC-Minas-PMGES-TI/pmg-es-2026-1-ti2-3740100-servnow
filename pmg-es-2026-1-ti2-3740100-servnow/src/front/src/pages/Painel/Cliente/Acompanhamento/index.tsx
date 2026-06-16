@@ -13,7 +13,7 @@ import {
   Star,
   User,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { AtualizacaoFoto } from "../../../../Components/Acompanhamento/AtualizacaoFoto";
@@ -22,13 +22,16 @@ import {
   avaliarServico,
   carregarPixCopiaCola,
   carregarPixQrCode,
+  cartaoGatewayDisponivel,
   confirmarReagendamento,
-  iniciarAcompanhamento,
+  iniciarCheckoutCartao,
   obterDetalhe,
   renovarCodigo,
   selecionarMetodoPagamento,
+  sincronizarPagamentoCartao,
   type AcompanhamentoDetalhe,
 } from "../../../../services/acompanhamento";
+import { API_URL } from "../../../../services/auth";
 import {
   formatarDataHoraAcompanhamento,
   formatarHorarioAcompanhamento,
@@ -41,12 +44,37 @@ type MetodoPagamento = "PIX" | "CREDITO" | "DEBITO" | "DINHEIRO";
 
 type ClienteEtapa = "aguardando-chegada" | "em-andamento" | "reagendamento" | "visita-reagendada" | "pagamento" | "avaliação" | "concluido";
 
-const METODOS_PAGAMENTO: Array<{ id: MetodoPagamento; nome: string; desc: string; icone: typeof QrCode }> = [
-  { id: "PIX", nome: "PIX", desc: "Pagamento instantaneo", icone: QrCode },
-  { id: "CREDITO", nome: "Cartao de credito", desc: "Em ate 12x", icone: CreditCard },
-  { id: "DEBITO", nome: "Cartao de debito", desc: "Debito a vista", icone: CreditCard },
-  { id: "DINHEIRO", nome: "Dinheiro", desc: "Pagamento em especie", icone: Banknote },
-];
+function metodosPagamento(modoCartao: "mercadopago" | "demo" | "indisponivel") {
+  const descCredito =
+    modoCartao === "demo"
+      ? "Demonstração local (sem cobrança real)"
+      : modoCartao === "mercadopago"
+        ? "Até 12x via Mercado Pago"
+        : "Crédito via Mercado Pago";
+  const descDebito =
+    modoCartao === "demo"
+      ? "Demonstração local (sem cobrança real)"
+      : modoCartao === "mercadopago"
+        ? "Débito à vista via Mercado Pago"
+        : "Débito via Mercado Pago";
+
+  return [
+    { id: "PIX" as const, nome: "PIX", desc: "Pagamento instantâneo", icone: QrCode },
+    {
+      id: "CREDITO" as const,
+      nome: "Cartão de crédito",
+      desc: descCredito,
+      icone: CreditCard,
+    },
+    {
+      id: "DEBITO" as const,
+      nome: "Cartão de débito",
+      desc: descDebito,
+      icone: CreditCard,
+    },
+    { id: "DINHEIRO" as const, nome: "Dinheiro", desc: "Pagamento em espécie", icone: Banknote },
+  ];
+}
 
 const ETAPAS_INFO: Array<{ id: ClienteEtapa; label: string; numero: number }> = [
   { id: "aguardando-chegada", label: "Aguardando chegada", numero: 1 },
@@ -80,8 +108,10 @@ type Props = {
 
 export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [detalhe, setDetalhe] = useState<AcompanhamentoDetalhe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [modoCartao, setModoCartao] = useState<"mercadopago" | "demo" | "indisponivel">("indisponivel");
   const [metodoPagamento, setMetodoPagamento] = useState<MetodoPagamento | null>(null);
   const [pixQrUrl, setPixQrUrl] = useState<string | null>(null);
   const [pixCopiaCola, setPixCopiaCola] = useState<string | null>(null);
@@ -95,7 +125,7 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
 
   const carregar = useCallback(async () => {
     try {
-      const dados = await iniciarAcompanhamento(solicitacaoId);
+      const dados = await obterDetalhe(solicitacaoId);
       setDetalhe(dados);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao carregar acompanhamento.");
@@ -107,7 +137,80 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
 
   useEffect(() => {
     void carregar();
+    void cartaoGatewayDisponivel().then(({ disponivel, modo }) => {
+      if (disponivel) {
+        setModoCartao(modo);
+      }
+    });
   }, [carregar]);
+
+  useEffect(() => {
+    const retorno = searchParams.get("pagamento");
+    if (!retorno?.startsWith("cartao-")) {
+      return;
+    }
+
+    void (async () => {
+      const paymentId =
+        searchParams.get("payment_id") ?? searchParams.get("paymentId") ?? undefined;
+      const maxTentativas = retorno === "cartao-sucesso" ? 6 : 1;
+      let dados: AcompanhamentoDetalhe | null = null;
+
+      try {
+        for (let tentativa = 0; tentativa < maxTentativas; tentativa += 1) {
+          dados = await sincronizarPagamentoCartao(
+            solicitacaoId,
+            tentativa === 0 ? paymentId ?? undefined : undefined,
+          );
+          if (dados.etapa !== "AGUARDANDO_PAGAMENTO") {
+            break;
+          }
+          if (tentativa < maxTentativas - 1) {
+            await new Promise((resolve) => window.setTimeout(resolve, 2000));
+          }
+        }
+
+        if (!dados) {
+          return;
+        }
+
+        setDetalhe(dados);
+
+        if (dados.etapa === "AGUARDANDO_AVALIACAO" || dados.etapa === "CONCLUIDA") {
+          toast.success("Pagamento confirmado! Avalie o prestador.");
+        } else if (retorno === "cartao-erro") {
+          toast.error("Pagamento não concluído. Tente novamente.");
+        } else if (retorno === "cartao-sucesso") {
+          toast.info("Pagamento recebido pelo Mercado Pago. Aguarde a confirmação na plataforma.");
+        } else {
+          toast.info("Pagamento em processamento. Aguarde a confirmação.");
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Não foi possível confirmar o pagamento.");
+      } finally {
+        const localFront = searchParams.get("local_front")?.trim();
+        if (localFront) {
+          window.location.replace(
+            `${localFront.replace(/\/+$/, "")}/acompanhamento/${solicitacaoId}`,
+          );
+          return;
+        }
+
+        const params = new URLSearchParams(searchParams);
+        params.delete("pagamento");
+        params.delete("payment_id");
+        params.delete("paymentId");
+        params.delete("local_front");
+        params.delete("status");
+        params.delete("collection_status");
+        params.delete("collection_id");
+        params.delete("preference_id");
+        params.delete("merchant_order_id");
+        params.delete("external_reference");
+        setSearchParams(params, { replace: true });
+      }
+    })();
+  }, [searchParams, setSearchParams, solicitacaoId]);
 
   useEffect(() => {
     if (!detalhe?.metodoPagamentoSelecionado) {
@@ -115,6 +218,8 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     }
     setMetodoPagamento(detalhe.metodoPagamentoSelecionado as MetodoPagamento);
   }, [detalhe?.metodoPagamentoSelecionado]);
+
+  const opcoesPagamento = useMemo(() => metodosPagamento(modoCartao), [modoCartao]);
 
   const etapa = detalhe ? etapaBackendParaCliente(detalhe.etapa) : "aguardando-chegada";
   const progressoAtual = detalhe?.percentualConcluido ?? 0;
@@ -170,7 +275,50 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
     }
   }, [detalhe, etapa, novaDataReagendamento, novoHorarioReagendamento]);
 
+  async function redirecionarMercadoPago(
+    metodo: "CREDITO" | "DEBITO",
+    etapaAtual?: string,
+  ) {
+    const etapaServico = etapaAtual ?? detalhe?.etapa;
+    if (etapaServico !== "AGUARDANDO_PAGAMENTO") {
+      toast.error("Este serviço não está aguardando pagamento.");
+      return;
+    }
+
+    setEnviando(true);
+    try {
+      const { checkoutUrl } = await iniciarCheckoutCartao(solicitacaoId, metodo);
+      const urlDemo = modoCartao === "demo" || checkoutUrl.includes("pagamento=cartao-");
+      if (!urlDemo && !checkoutUrl.includes("mercadopago")) {
+        toast.error(
+          `Não foi possível abrir o Mercado Pago. Verifique o backend (${API_URL}).`,
+        );
+        return;
+      }
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao iniciar pagamento com cartão.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   async function handleMetodoPagamentoChange(metodo: MetodoPagamento) {
+    if (metodo === "CREDITO" || metodo === "DEBITO") {
+      const mesmoMetodo = metodoPagamento === metodo;
+      setMetodoPagamento(metodo);
+      try {
+        const dados = await selecionarMetodoPagamento(solicitacaoId, metodo);
+        setDetalhe(dados);
+        if (!mesmoMetodo) {
+          await redirecionarMercadoPago(metodo, dados.etapa);
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Erro ao selecionar metodo de pagamento.");
+      }
+      return;
+    }
+
     setMetodoPagamento(metodo);
     try {
       setDetalhe(await selecionarMetodoPagamento(solicitacaoId, metodo));
@@ -539,13 +687,19 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             <strong>{formatarMoedaBrl(valorExibir)}</strong>
           </div>
 
-          <div className="acomp-pagamento-opções">
-            {METODOS_PAGAMENTO.map((metodo) => {
+          <div className="acomp-pagamento-opcoes">
+            {opcoesPagamento.map((metodo) => {
               const Icone = metodo.icone;
+              const cartao = metodo.id === "CREDITO" || metodo.id === "DEBITO";
               return (
                 <label
                   key={metodo.id}
                   className={`acomp-pagamento-opcao ${metodoPagamento === metodo.id ? "selecionada" : ""}`}
+                  onClick={() => {
+                    if (cartao && metodoPagamento === metodo.id) {
+                      void redirecionarMercadoPago(metodo.id);
+                    }
+                  }}
                 >
                   <span className="acomp-pagamento-opcao-icone">
                     {metodo.id === "PIX" ? <Smartphone size={18} /> : <Icone size={18} />}
@@ -601,11 +755,27 @@ export function AcompanhamentoClienteDetalhe({ solicitacaoId }: Props) {
             </div>
           )}
 
-          {metodoPagamento && metodoPagamento !== "PIX" && (
+          {(metodoPagamento === "CREDITO" || metodoPagamento === "DEBITO") && (
+            <>
+              <button
+                type="button"
+                className="acomp-btn-primary"
+                style={{ marginTop: 18, width: "100%", maxWidth: 360 }}
+                disabled={enviando}
+                onClick={() => void redirecionarMercadoPago(metodoPagamento)}
+              >
+                {enviando
+                  ? "Abrindo checkout..."
+                  : modoCartao === "demo"
+                    ? "Confirmar pagamento (demo)"
+                    : "Pagar no Mercado Pago"}
+              </button>
+            </>
+          )}
+
+          {metodoPagamento === "DINHEIRO" && (
             <p style={{ color: "var(--workspace-muted)", fontSize: 13, marginTop: 18 }}>
-              {metodoPagamento === "DINHEIRO"
-                ? "Entregue o valor em dinheiro ao prestador. Ele confirmara o recebimento para liberar a avaliacao."
-                : "Aguarde o prestador confirmar o recebimento do pagamento para seguir com a avaliacao."}
+              Entregue o valor em dinheiro ao prestador. Ele confirmará o recebimento para liberar a avaliação.
             </p>
           )}
 
