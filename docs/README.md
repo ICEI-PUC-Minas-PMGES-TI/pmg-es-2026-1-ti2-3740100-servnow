@@ -25,7 +25,10 @@ _Instituto de Informática e Ciências Exatas – Pontifícia Universidade Cató
 
 ---
 
-_**Resumo**. A contratação de serviços residenciais no Brasil ocorre, em grande parte, de forma informal, dependendo de indicações pessoais e contatos sem qualquer mecanismo de padronização, histórico ou segurança. Este trabalho apresenta o desenvolvimento da ServNow, uma plataforma web de intermediação de serviços residenciais sob demanda, que conecta clientes a prestadores autônomos como eletricistas, encanadores e pintores. O sistema foi desenvolvido com front-end em React e back-end em Java com Spring Boot, contemplando cadastro diferenciado por perfil, geolocalização, envio e negociação de propostas, verificação de identidade do prestador, acompanhamento do atendimento em tempo real, processamento de pagamentos via PIX e cartão, e avaliação mútua entre as partes. Como resultado, foi implementada uma solução funcional e integrada, cobrindo de ponta a ponta o ciclo de contratação de um serviço residencial, validada por meio de testes automatizados e hospedada em ambiente de produção, demonstrando a viabilidade técnica da proposta para reduzir a informalidade do setor._
+## Resumo
+A ServNow é uma plataforma de intermediação de serviços residenciais sob demanda que conecta clientes a profissionais autônomos, como eletricistas, encanadores, pintores e técnicos de manutenção. O projeto surgiu da necessidade de reduzir a informalidade presente nesse setor, onde a contratação de serviços geralmente depende de indicações e contatos realizados de forma manual. A solução proposta busca proporcionar mais segurança, praticidade e organização durante todo o processo de contratação.
+
+Por meio da plataforma, os clientes podem solicitar serviços, acompanhar o andamento dos atendimentos e avaliar os profissionais após a conclusão do trabalho. Os prestadores, por sua vez, têm acesso às solicitações recebidas, podem gerenciar seus atendimentos e construir uma reputação baseada nas avaliações dos usuários. Além disso, a plataforma oferece recursos como negociação de propostas, confirmação da identidade do prestador, acompanhamento das ordens de serviço e gerenciamento de pagamentos.
 
 ---
 
