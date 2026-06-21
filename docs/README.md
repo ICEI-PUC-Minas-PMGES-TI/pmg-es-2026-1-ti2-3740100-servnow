@@ -1,5 +1,7 @@
 # ServNow
 
+![Logotipo ServNow](images/design/logo_ServNow.jpeg)
+
 **Fábio Garcia Martins, 676102@sga.pucminas.br**
 
 **Gabriel Henrique Fernandes Vieira, 1564418@sga.pucminas.br**
@@ -23,15 +25,14 @@ _Instituto de Informática e Ciências Exatas – Pontifícia Universidade Cató
 
 ---
 
-_**Resumo**. Escrever aqui o resumo. O resumo deve contextualizar rapidamente o trabalho, descrever seu objetivo e, ao final, 
-mostrar algum resultado relevante do trabalho (até 10 linhas)._
+_**Resumo**. A contratação de serviços residenciais no Brasil ocorre, em grande parte, de forma informal, dependendo de indicações pessoais e contatos sem qualquer mecanismo de padronização, histórico ou segurança. Este trabalho apresenta o desenvolvimento da ServNow, uma plataforma web de intermediação de serviços residenciais sob demanda, que conecta clientes a prestadores autônomos como eletricistas, encanadores e pintores. O sistema foi desenvolvido com front-end em React e back-end em Java com Spring Boot, contemplando cadastro diferenciado por perfil, geolocalização, envio e negociação de propostas, verificação de identidade do prestador, acompanhamento do atendimento em tempo real, processamento de pagamentos via PIX e cartão, e avaliação mútua entre as partes. Como resultado, foi implementada uma solução funcional e integrada, cobrindo de ponta a ponta o ciclo de contratação de um serviço residencial, validada por meio de testes automatizados e hospedada em ambiente de produção, demonstrando a viabilidade técnica da proposta para reduzir a informalidade do setor._
 
 ---
 
 
 ## 1. Introdução
 
-O presente projeto propõe o desenvolvimento de um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, como eletricistas, encanadores e profissionais de manutenção em geral. A plataforma busca proporcionar mais praticidade, segurança, agilidade e organização no processo de prestação de serviços domesticos
+O presente projeto propõe o desenvolvimento de um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, como eletricistas, encanadores e profissionais de manutenção em geral. A plataforma busca proporcionar mais praticidade, segurança, agilidade e organização no processo de prestação de serviços domésticos.
 
 ### 1.1 Contextualização
 
@@ -144,14 +145,90 @@ Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade
 
 ## 6. Interface do sistema
 
-A documentação de interface descreve as principais telas do ServNow: Cadastro e Login, Painéis do cliente e do prestador, fluxo de solicitação e propostas,, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e telas de perfil. O objetivo é demonstrar como os processos modelados se materializam na experiência do usuário.
-A sessão a seguir apresenta a descrição do produto de software desenvolvido.
+A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, configuração de perfil, fluxo de solicitação e propostas, confirmação de chegada por código, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e histórico de serviços. O objetivo é demonstrar como os processos modelados nas seções anteriores se materializam na experiência do usuário. As imagens a seguir mostram as telas já implementadas na versão final da plataforma; o detalhamento completo de cada uma está disponível na documentação de interface.
 
 [Documentação da interface do sistema](interface.md)
 
+### 6.1. Página inicial
+
+Tela de apresentação institucional da plataforma, exibida a visitantes não autenticados.
+
+![Página inicial do ServNow](images/design/Homepage.jpeg)
+
+### 6.2. Cadastro de usuário
+
+Formulário de criação de conta, com alternância entre os perfis de cliente e prestador.
+
+![Tela de cadastro](images/design/Telacadastro.jpeg)
+
+### 6.3. Painel do cliente
+
+Ambiente inicial do cliente após o login, com indicadores resumidos e lista de solicitações.
+
+![Painel do cliente](images/design/Painel_Cliente.jpeg)
+
+### 6.4. Painel do prestador
+
+Ambiente inicial do prestador após o login, com solicitações recebidas e indicadores de desempenho.
+
+![Painel do prestador](images/design/Painel_Prestador.jpeg)
+
+### 6.5. Perfil do cliente
+
+Tela de configuração dos dados pessoais e de endereço do cliente.
+
+![Perfil do cliente](images/design/Perfil_Cliente.jpeg)
+
+### 6.6. Perfil do prestador
+
+Tela de configuração dos dados profissionais do prestador, incluindo especialidades, disponibilidade e raio de atendimento.
+
+![Perfil do prestador](images/design/Perfil_Prestador.jpeg)
+
+### 6.7. Solicitação de serviço
+
+Formulário utilizado pelo cliente para publicar uma nova solicitação de serviço.
+
+![Tela de solicitação de serviço](images/design/SolicitarServiço.jpeg)
+
+### 6.8. Confirmação de chegada por código
+
+Tela de geração e validação do código numérico utilizado para confirmar a chegada do prestador ao endereço do atendimento.
+
+| Visão do cliente | Visão do prestador |
+|---|---|
+| ![Código de confirmação — cliente](images/design/CodigoCliente.jpeg) | ![Código de confirmação — prestador](images/design/CodigoPrestador.jpeg) |
+
+### 6.9. Acompanhamento do serviço
+
+Tela de acompanhamento da execução do atendimento em tempo real, incluindo avaliação mútua e pagamento.
+
+| Visão do cliente | Visão do prestador |
+|---|---|
+| ![Acompanhamento do serviço — cliente](images/design/Acompanhamento_Cliente.jpeg) | ![Acompanhamento do serviço — prestador](images/design/Acompanhamento_Prestador.jpeg) |
+
+### 6.10. Histórico de serviços
+
+Tela com o registro de todos os serviços já concluídos, compartilhada entre clientes e prestadores.
+
+![Histórico de serviços](images/design/Historico.jpeg)
+
+
 ## 7. Conclusão
 
-Apresente aqui a conclusão do seu trabalho. Deve ser apresentada aqui uma discussão dos resultados obtidos no trabalho, local em que se verifica as observações pessoais de cada aluno. Essa seção poderá também apresentar sugestões de novas linhas de estudo._
+O desenvolvimento da ServNow permitiu validar, na prática, a viabilidade de uma solução digital capaz de estruturar a contratação de serviços residenciais, hoje predominantemente informal. Ao
+longo do projeto, foram implementadas com sucesso as funcionalidades centrais definidas nos objetivos específicos: cadastro e gerenciamento diferenciado de clientes e prestadores, publicação
+e negociação de solicitações por meio de propostas, acompanhamento do atendimento em tempo real, mecanismos de verificação de identidade do prestador (código de confirmação e reconhecimento
+facial), processamento de pagamentos via PIX e cartão, e avaliação mútua ao final do serviço. 
+Os resultados obtidos demonstram que a centralização desses processos em uma única plataforma resolve boa parte das limitações identificadas no modelo tradicional de contratação: a
+padronização de preços é alcançada por meio do sistema de propostas, a confiabilidade é reforçada pelo histórico de avaliações e pelos mecanismos de verificação de identidade, e a organização do
+atendimento passa a ser registrada e rastreável de ponta a ponta, reduzindo a dependência exclusiva de contatos informais.
+
+Do ponto de vista técnico, a separação entre front-end e back-end, integrada por uma API REST bem
+definida, mostrou-se adequada para permitir o desenvolvimento paralelo das duas camadas pela
+equipe, além de isolar as regras de negócio em módulos coesos por funcionalidade. A adoção de
+testes automatizados para os principais serviços de domínio contribuiu para a confiabilidade das
+regras implementadas ao longo das diversas iterações do projeto.
 
 # REFERÊNCIAS
 
