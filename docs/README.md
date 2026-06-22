@@ -148,73 +148,9 @@ Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade
 
 ## 6. Interface do sistema
 
-A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, configuração de perfil, fluxo de solicitação e propostas, confirmação de chegada por código, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e histórico de serviços. O objetivo é demonstrar como os processos modelados nas seções anteriores se materializam na experiência do usuário. As imagens a seguir mostram as telas já implementadas na versão final da plataforma; o detalhamento completo de cada uma está disponível na documentação de interface.
+A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, configuração de perfil, fluxo de solicitação e propostas, confirmação de chegada por código, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e histórico de serviços. O objetivo é demonstrar como os processos modelados nas seções anteriores se materializam na experiência do usuário. As imagens a seguir mostram as telas já implementadas na versão final da plataforma, o detalhamento completo de cada uma está disponível na documentação de interface.
 
 [Documentação da interface do sistema](interface.md)
-
-### 6.1. Página inicial
-
-Tela de apresentação institucional da plataforma, exibida a visitantes não autenticados.
-
-![Página inicial do ServNow](images/design/Homepage.jpeg)
-
-### 6.2. Cadastro de usuário
-
-Formulário de criação de conta, com alternância entre os perfis de cliente e prestador.
-
-![Tela de cadastro](images/design/Telacadastro.jpeg)
-
-### 6.3. Painel do cliente
-
-Ambiente inicial do cliente após o login, com indicadores resumidos e lista de solicitações.
-
-![Painel do cliente](images/design/Painel_Cliente.jpeg)
-
-### 6.4. Painel do prestador
-
-Ambiente inicial do prestador após o login, com solicitações recebidas e indicadores de desempenho.
-
-![Painel do prestador](images/design/Painel_Prestador.jpeg)
-
-### 6.5. Perfil do cliente
-
-Tela de configuração dos dados pessoais e de endereço do cliente.
-
-![Perfil do cliente](images/design/Perfil_Cliente.jpeg)
-
-### 6.6. Perfil do prestador
-
-Tela de configuração dos dados profissionais do prestador, incluindo especialidades, disponibilidade e raio de atendimento.
-
-![Perfil do prestador](images/design/Perfil_Prestador.jpeg)
-
-### 6.7. Solicitação de serviço
-
-Formulário utilizado pelo cliente para publicar uma nova solicitação de serviço.
-
-![Tela de solicitação de serviço](images/design/SolicitarServiço.jpeg)
-
-### 6.8. Confirmação de chegada por código
-
-Tela de geração e validação do código numérico utilizado para confirmar a chegada do prestador ao endereço do atendimento.
-
-| Visão do cliente | Visão do prestador |
-|---|---|
-| ![Código de confirmação — cliente](images/design/CodigoCliente.jpeg) | ![Código de confirmação — prestador](images/design/CodigoPrestador.jpeg) |
-
-### 6.9. Acompanhamento do serviço
-
-Tela de acompanhamento da execução do atendimento em tempo real, incluindo avaliação mútua e pagamento.
-
-| Visão do cliente | Visão do prestador |
-|---|---|
-| ![Acompanhamento do serviço — cliente](images/design/Acompanhamento_Cliente.jpeg) | ![Acompanhamento do serviço — prestador](images/design/Acompanhamento_Prestador.jpeg) |
-
-### 6.10. Histórico de serviços
-
-Tela com o registro de todos os serviços já concluídos, compartilhada entre clientes e prestadores.
-
-![Histórico de serviços](images/design/Historico.jpeg)
 
 
 ## 7. Conclusão
