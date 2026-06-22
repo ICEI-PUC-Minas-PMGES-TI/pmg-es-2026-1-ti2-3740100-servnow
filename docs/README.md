@@ -25,7 +25,10 @@ _Instituto de Informática e Ciências Exatas – Pontifícia Universidade Cató
 
 ---
 
-_**Resumo**. A contratação de serviços residenciais no Brasil ocorre, em grande parte, de forma informal, dependendo de indicações pessoais e contatos sem qualquer mecanismo de padronização, histórico ou segurança. Este trabalho apresenta o desenvolvimento da ServNow, uma plataforma web de intermediação de serviços residenciais sob demanda, que conecta clientes a prestadores autônomos como eletricistas, encanadores e pintores. O sistema foi desenvolvido com front-end em React e back-end em Java com Spring Boot, contemplando cadastro diferenciado por perfil, geolocalização, envio e negociação de propostas, verificação de identidade do prestador, acompanhamento do atendimento em tempo real, processamento de pagamentos via PIX e cartão, e avaliação mútua entre as partes. Como resultado, foi implementada uma solução funcional e integrada, cobrindo de ponta a ponta o ciclo de contratação de um serviço residencial, validada por meio de testes automatizados e hospedada em ambiente de produção, demonstrando a viabilidade técnica da proposta para reduzir a informalidade do setor._
+## Resumo
+A ServNow é uma plataforma de intermediação de serviços residenciais sob demanda que conecta clientes a profissionais autônomos, como eletricistas, encanadores, pintores e técnicos de manutenção. O projeto surgiu da necessidade de reduzir a informalidade presente nesse setor, onde a contratação de serviços geralmente depende de indicações e contatos realizados de forma manual. A solução proposta busca proporcionar mais segurança, praticidade e organização durante todo o processo de contratação.
+
+Por meio da plataforma, os clientes podem solicitar serviços, acompanhar o andamento dos atendimentos e avaliar os profissionais após a conclusão do trabalho. Os prestadores, por sua vez, têm acesso às solicitações recebidas, podem gerenciar seus atendimentos e construir uma reputação baseada nas avaliações dos usuários. Além disso, a plataforma oferece recursos como negociação de propostas, confirmação da identidade do prestador, acompanhamento das ordens de serviço e gerenciamento de pagamentos.
 
 ---
 
@@ -216,19 +219,7 @@ Tela com o registro de todos os serviços já concluídos, compartilhada entre c
 
 ## 7. Conclusão
 
-O desenvolvimento da ServNow permitiu validar, na prática, a viabilidade de uma solução digital capaz de estruturar a contratação de serviços residenciais, hoje predominantemente informal. Ao
-longo do projeto, foram implementadas com sucesso as funcionalidades centrais definidas nos objetivos específicos: cadastro e gerenciamento diferenciado de clientes e prestadores, publicação
-e negociação de solicitações por meio de propostas, acompanhamento do atendimento em tempo real, mecanismos de verificação de identidade do prestador (código de confirmação e reconhecimento
-facial), processamento de pagamentos via PIX e cartão, e avaliação mútua ao final do serviço. 
-Os resultados obtidos demonstram que a centralização desses processos em uma única plataforma resolve boa parte das limitações identificadas no modelo tradicional de contratação: a
-padronização de preços é alcançada por meio do sistema de propostas, a confiabilidade é reforçada pelo histórico de avaliações e pelos mecanismos de verificação de identidade, e a organização do
-atendimento passa a ser registrada e rastreável de ponta a ponta, reduzindo a dependência exclusiva de contatos informais.
-
-Do ponto de vista técnico, a separação entre front-end e back-end, integrada por uma API REST bem
-definida, mostrou-se adequada para permitir o desenvolvimento paralelo das duas camadas pela
-equipe, além de isolar as regras de negócio em módulos coesos por funcionalidade. A adoção de
-testes automatizados para os principais serviços de domínio contribuiu para a confiabilidade das
-regras implementadas ao longo das diversas iterações do projeto.
+O desenvolvimento da ServNow permitiu demonstrar a viabilidade de uma plataforma capaz de estruturar e modernizar a contratação de serviços residenciais, um mercado ainda marcado pela informalidade. A centralização do processo em uma única solução proporcionou maior segurança, transparência e organização para clientes e prestadores de serviço, reduzindo a dependência de indicações e contatos informais. Os recursos implementados, como negociação de propostas, acompanhamento dos atendimentos, mecanismos de verificação de identidade e sistema de avaliações, contribuem para aumentar a confiabilidade e a qualidade das relações entre as partes. Dessa forma, os resultados obtidos indicam que a plataforma atende aos objetivos propostos e possui potencial para contribuir para a profissionalização do setor de serviços residenciais, além de possibilitar futuras expansões e novas funcionalidade
 
 # REFERÊNCIAS
 
