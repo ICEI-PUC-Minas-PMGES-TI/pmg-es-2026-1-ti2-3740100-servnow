@@ -67,7 +67,7 @@ Na tela de configuração do perfil, o prestador de serviço pode cadastrar e at
 Adicionalmente, o prestador pode cadastrar seu endereço para facilitar a localização e informar sua chave Pix, que será utilizada para o recebimento de pagamentos pelos serviços prestados. Após o preenchimento ou atualização dos dados, as informações são confirmadas por meio do botão "Salvar alterações"
 
 ### 6.3.2. Tela de  de perfil 
-[Perfil prestador](images/design/perfilprestadore.png)
+[Perfil prestador](images/design/perfilprestadorcorreto.png)
 
 Na tela de perfil são exibidas as principais informações do usuário, incluindo sua foto de perfil, o endereço atualmente cadastrado e as avaliações recebidas. Além disso, a página apresenta os comentários realizados por outros usuários, permitindo visualizar o histórico de feedbacks e a reputação construída na plataforma.
 
