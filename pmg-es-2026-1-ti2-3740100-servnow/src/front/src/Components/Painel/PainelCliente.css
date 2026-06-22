@@ -526,12 +526,23 @@
   gap: 18px;
 }
 
-.painel-perfil-card:first-child {
+.painel-perfil-card-foto {
   grid-row: span 2;
   align-items: center;
   justify-content: center;
   min-height: 300px;
   text-align: center;
+}
+
+.painel-perfil-card-avaliacoes {
+  min-height: 0;
+}
+
+.painel-perfil-avaliacoes-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 
 .painel-perfil-avatar {
@@ -1905,9 +1916,13 @@
     grid-template-columns: 1fr;
   }
 
-  .painel-perfil-card:first-child {
+  .painel-perfil-card-foto {
     grid-row: auto;
     min-height: 240px;
+  }
+
+  .painel-perfil-avaliacoes-scroll {
+    max-height: 300px;
   }
 }
 

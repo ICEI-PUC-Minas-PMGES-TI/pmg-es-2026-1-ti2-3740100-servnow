@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { MapPin, MessageSquare, Star, User } from "lucide-react";
+import { MapPin, Star, User } from "lucide-react";
 
 import { AvaliacoesPerfilSecao } from "../../../../Components/Perfil/AvaliacoesPerfilSecao";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
@@ -147,21 +147,6 @@ export function PerfilCliente() {
           descricaoLista="Histórico de notas deixadas por prestadores após serviços concluídos."
           mensagemVazia="Você ainda não recebeu Avaliações. Conclua serviços para que os prestadores possam avaliar voce."
         />
-
-        <div className="painel-card painel-perfil-card">
-          <div className="painel-perfil-card-cabecalho">
-            <div className="painel-conta-card-icone">
-              <MessageSquare size={22} />
-            </div>
-            <div>
-              <h2>Comentarios em destaque</h2>
-              <p>Comentarios recentes vinculados as suas avaliacoes.</p>
-            </div>
-          </div>
-          <p className="painel-perfil-vazio">
-            Os comentários aparecem junto de cada avaliação na lista acima.
-          </p>
-        </div>
       </section>
     </>
   );
