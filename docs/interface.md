@@ -14,13 +14,9 @@ Além disso, a página contará com uma seção dedicada às vantagens da plataf
 Por fim, serão exibidos feedbacks e avaliações de clientes, com o objetivo de gerar confiança e demonstrar a qualidade dos serviços oferecidos.
 
 ![ Home page)](images/design/Homepage.jpeg)
-
 ![ Home page)](images/design/homee1.png)
-
 ![ Home page)](images/design/homee2.png)
-
 ![ Home page)](images/design/home3.png)
-
 ![ Home page)](images/design/home4.png)
 
 
