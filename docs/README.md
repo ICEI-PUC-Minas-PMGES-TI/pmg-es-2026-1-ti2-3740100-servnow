@@ -209,7 +209,7 @@ http://portal.pucminas.br/imagedb/documento/DOC_DSC_NOME_ARQUI20160217102425.pdf
 [Slides da apresentação final](presentations/)
 
 
-[Vídeo da apresentação final](video/)
+[Vídeo da apresentação final](https://www.youtube.com/watch?v=icxqDnkafFM)
 
 
 
