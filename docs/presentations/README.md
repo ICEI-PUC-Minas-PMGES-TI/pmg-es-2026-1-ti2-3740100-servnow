@@ -3,5 +3,5 @@ Slide de apresentação inicial:
 
 
 
-Slide da apresentação final
-
+Slide da apresentação final:
+https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2026-1-ti2-3740100-servnow/blob/main/docs/presentations/ServNow_Apresentacao_final.pptx
