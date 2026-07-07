@@ -36,3 +36,7 @@ Toda a documentação está em [docs/](pmg-es-2026-1-ti2-3740100-servnow/docs/RE
 * 0.0.1
     * Trabalhando na modelagem do processo de negócio.
 
+
+    link do site: https://pmg-es-2026-1-ti2-3740100-servnow.vercel.app/login
+    link do video:https://www.youtube.com/watch?v=icxqDnkafFM
+
