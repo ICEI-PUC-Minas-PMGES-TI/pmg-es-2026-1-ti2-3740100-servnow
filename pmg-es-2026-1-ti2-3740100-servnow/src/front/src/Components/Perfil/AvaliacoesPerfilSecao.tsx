@@ -33,7 +33,7 @@ export function AvaliacoesPerfilSecao({ descricaoLista, mensagemVazia }: Props) 
   }, []);
 
   return (
-    <div className="painel-card painel-perfil-card">
+    <div className="painel-card painel-perfil-card painel-perfil-card-avaliacoes">
       <div className="painel-perfil-card-cabecalho">
         <div className="painel-conta-card-icone">
           <Star size={22} />
@@ -58,7 +58,7 @@ export function AvaliacoesPerfilSecao({ descricaoLista, mensagemVazia }: Props) 
       ) : avaliacoes.length === 0 ? (
         <p className="painel-perfil-vazio">{mensagemVazia}</p>
       ) : (
-        <div className="painel-feedback-lista">
+        <div className="painel-feedback-lista painel-perfil-avaliacoes-scroll">
           {avaliacoes.map((avaliacao) => {
             const tituloServico = TIPOS_SERVICO_MAP[avaliacao.tipoServico]?.nome ?? avaliacao.tipoServico;
             return (

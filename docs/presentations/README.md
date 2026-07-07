@@ -1,2 +1,5 @@
 Slide de apresentação inicial:
- [Slides (1).pdf](https://github.com/user-attachments/files/26226579/Slides.1.pdf)
+[Slides (1).pdf](https://github.com/user-attachments/files/26226579/Slides.1.pdf)
+
+Slide da apresentação final:
+[ServNow_Apresentacao_final.pptx](ServNow_Apresentacao_final.pptx)

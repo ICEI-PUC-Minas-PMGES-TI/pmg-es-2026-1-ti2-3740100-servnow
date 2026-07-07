@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Calendar, CheckCircle, DollarSign, History as HistoryIcon, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { RelatorioServicoModal } from "../../../../Components/Historico/RelatorioServicoModal";
 import { PainelSectionHeader } from "../../../../Components/Painel/PainelSectionHeader";
 import { API_URL, authHeader, getValidAuthSession, type SolicitacaoServicoResponse } from "../../../../services/auth";
 import { formatarMoedaBrl } from "../../../../utils/formatarMoeda";
@@ -55,6 +56,7 @@ export function Historico() {
   const [concluidos, setConcluidos] = useState<SolicitacaoServicoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filtro, setFiltro] = useState<FiltroHistorico>("mes");
+  const [relatorioId, setRelatorioId] = useState<number | null>(null);
 
   useEffect(() => {
     async function carregar() {
@@ -184,7 +186,7 @@ export function Historico() {
                     <button
                       type="button"
                       className="painel-btn-ghost"
-                      onClick={() => navigate(`/acompanhamento/${item.id}`)}
+                      onClick={() => setRelatorioId(item.id)}
                     >
                       Ver detalhes
                     </button>
@@ -195,6 +197,12 @@ export function Historico() {
           </div>
         )}
       </section>
+
+      <RelatorioServicoModal
+        solicitacaoId={relatorioId}
+        perfil="CLIENTE"
+        onFechar={() => setRelatorioId(null)}
+      />
     </>
   );
 }

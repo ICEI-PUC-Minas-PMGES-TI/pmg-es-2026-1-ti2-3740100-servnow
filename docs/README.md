@@ -1,5 +1,7 @@
 # ServNow
 
+![Logotipo ServNow](images/design/logo_ServNow.jpeg)
+
 **Fábio Garcia Martins, 676102@sga.pucminas.br**
 
 **Gabriel Henrique Fernandes Vieira, 1564418@sga.pucminas.br**
@@ -23,15 +25,17 @@ _Instituto de Informática e Ciências Exatas – Pontifícia Universidade Cató
 
 ---
 
-_**Resumo**. Escrever aqui o resumo. O resumo deve contextualizar rapidamente o trabalho, descrever seu objetivo e, ao final, 
-mostrar algum resultado relevante do trabalho (até 10 linhas)._
+## Resumo
+A ServNow é uma plataforma de intermediação de serviços residenciais sob demanda que conecta clientes a profissionais autônomos, como eletricistas, encanadores, pintores e técnicos de manutenção. O projeto surgiu da necessidade de reduzir a informalidade presente nesse setor, onde a contratação de serviços geralmente depende de indicações e contatos realizados de forma manual. A solução proposta busca proporcionar mais segurança, praticidade e organização durante todo o processo de contratação.
+
+Por meio da plataforma, os clientes podem solicitar serviços, acompanhar o andamento dos atendimentos e avaliar os profissionais após a conclusão do trabalho. Os prestadores, por sua vez, têm acesso às solicitações recebidas, podem gerenciar seus atendimentos e construir uma reputação baseada nas avaliações dos usuários. Além disso, a plataforma oferece recursos como negociação de propostas, confirmação da identidade do prestador, acompanhamento das ordens de serviço e gerenciamento de pagamentos.
 
 ---
 
 
 ## 1. Introdução
 
-O presente projeto propõe o desenvolvimento de um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, como eletricistas, encanadores e profissionais de manutenção em geral. A plataforma busca proporcionar mais praticidade, segurança, agilidade e organização no processo de prestação de serviços domesticos
+O presente projeto propõe o desenvolvimento de um sistema digital de intermediação de serviços residenciais sob demanda, conectando clientes a prestadores de serviços, como eletricistas, encanadores e profissionais de manutenção em geral. A plataforma busca proporcionar mais praticidade, segurança, agilidade e organização no processo de prestação de serviços domésticos.
 
 ### 1.1 Contextualização
 
@@ -144,14 +148,14 @@ Os indicadores de desempenho permitem acompanhar, de forma objetiva, a qualidade
 
 ## 6. Interface do sistema
 
-A documentação de interface descreve as principais telas do ServNow: Cadastro e Login, Painéis do cliente e do prestador, fluxo de solicitação e propostas,, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e telas de perfil. O objetivo é demonstrar como os processos modelados se materializam na experiência do usuário.
-A sessão a seguir apresenta a descrição do produto de software desenvolvido.
+A documentação de interface descreve as principais telas do ServNow: cadastro e login, painéis do cliente e do prestador, configuração de perfil, fluxo de solicitação e propostas, confirmação de chegada por código, acompanhamento do serviço em andamento (incluindo pagamento e avaliação) e histórico de serviços. O objetivo é demonstrar como os processos modelados nas seções anteriores se materializam na experiência do usuário. As imagens a seguir mostram as telas já implementadas na versão final da plataforma, o detalhamento completo de cada uma está disponível na documentação de interface.
 
 [Documentação da interface do sistema](interface.md)
 
+
 ## 7. Conclusão
 
-Apresente aqui a conclusão do seu trabalho. Deve ser apresentada aqui uma discussão dos resultados obtidos no trabalho, local em que se verifica as observações pessoais de cada aluno. Essa seção poderá também apresentar sugestões de novas linhas de estudo._
+O desenvolvimento da ServNow permitiu demonstrar a viabilidade de uma plataforma capaz de estruturar e modernizar a contratação de serviços residenciais, um mercado ainda marcado pela informalidade. A centralização do processo em uma única solução proporcionou maior segurança, transparência e organização para clientes e prestadores de serviço, reduzindo a dependência de indicações e contatos informais. Os recursos implementados, como negociação de propostas, acompanhamento dos atendimentos, mecanismos de verificação de identidade e sistema de avaliações, contribuem para aumentar a confiabilidade e a qualidade das relações entre as partes. Dessa forma, os resultados obtidos indicam que a plataforma atende aos objetivos propostos e possui potencial para contribuir para a profissionalização do setor de serviços residenciais, além de possibilitar futuras expansões e novas funcionalidade
 
 # REFERÊNCIAS
 
@@ -205,7 +209,7 @@ http://portal.pucminas.br/imagedb/documento/DOC_DSC_NOME_ARQUI20160217102425.pdf
 [Slides da apresentação final](presentations/)
 
 
-[Vídeo da apresentação final](video/)
+[Vídeo da apresentação final](https://www.youtube.com/watch?v=icxqDnkafFM)
 
 
 
